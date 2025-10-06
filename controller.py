@@ -32,7 +32,7 @@ async def api_listar_produtos():
     return listar_produtos()
 
 # rota id produto
-@router.get("/api/produto/{id_produto}")
+@router.get("/produto/{id_produto}")
 async def api_produto_id(id_produto: int):
     return id_produtos(id_produto)
 

@@ -7,7 +7,7 @@ import mysql.connector
 def conexao_db():
     conexao = mysql.connector.connect(
         user="root",
-        password="SENAI@123",
+        password="dev1t@24",
         host="localhost",
         port=3306,
         database="ecommerce_esportes"
