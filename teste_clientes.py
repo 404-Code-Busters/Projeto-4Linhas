@@ -22,11 +22,13 @@ class Clientes(BaseModel):
     nome:str
     email:str
     telefone:str
+    senha:str
 #atualizar clientes
 class AtualizarCliente(BaseModel):
     nome:Optional[str] = None
     email:Optional[str] = None
     telefone:Optional[str] = None
+    senha:Optional[str] = None
 
 #endpoints GET,POST,PUT,DELETE
 #listar todos os clientes"
@@ -34,8 +36,8 @@ class AtualizarCliente(BaseModel):
 async def listar_clientes():
     cur.execute("SELECT * FROM clientes")
     dados = cur.fetchall()#trazer os dados do banco
-    return [{"id":id,"nome":nome,"email":email,"telefone":telefone,"Data de cadastro:":data_cadastro}
-            for id,nome,email,telefone,data_cadastro in dados]
+    return [{"id":id,"nome":nome,"email":email,"telefone":telefone,"senha":senha, "data_cadastro":data_cadastro}
+            for id,nome,email,telefone,senha,data_cadastro in dados]
 
 #cadastrar um cliente
 @app.post("/cadastrar-cliente/{cliente_id}")
@@ -45,8 +47,8 @@ async def cadastrar_cliente(cliente_id:int,cliente:Clientes):
     if cur.fetchone():
         return{"ERRO":"ID já existe"}
     #criar o Clientes
-    cur.execute("""INSERT INTO clientes (id_cliente,nome,email,telefone) VALUES (%s,%s,%s,%s)""",
-                (cliente_id,cliente.nome,cliente.email,cliente.telefone))
+    cur.execute("""INSERT INTO clientes (id_cliente,nome,email,senha,telefone) VALUES (%s,%s,%s,%s,%s)""",
+                (cliente_id,cliente.nome,cliente.email,cliente.senha,cliente.telefone))
     con.commit()
     return {"MENSAGEM":"Cliente cadastrado com sucesso!"}
 #atualizar o cliente pelo id
@@ -66,6 +68,10 @@ async def atualizar_cliente(cliente_id:int,cliente:AtualizarCliente):
     if cliente.telefone:
         cur.execute("UPDATE clientes SET telefone=%s WHERE id_cliente=%s",
                     (cliente.telefone,cliente_id))
+    if cliente.senha:
+        cur.execute("UPDATE clientes SET senha=%s WHERE id_cliente=%s",
+                    (cliente.senha,cliente_id))
+
     con.commit()
     return {"mensagem":"Cliente atualizado"}
 
