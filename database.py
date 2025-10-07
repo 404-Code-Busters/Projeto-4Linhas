@@ -2,8 +2,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import Column,Integer,String,Float,DateTime
-import datetime
-
 
 def get_db():
     db = SessionLocal()
@@ -39,7 +37,7 @@ class Clientes(Base):
 # Base.metadata.create_all(bind=engine)
 
 
-engine = create_engine('mysql+pymysql://dev_a:dev1t#24@localhost:3306/ecommerce_esportes')
+engine = create_engine('mysql+pymysql://dev_a:dev1t#24@localhost:3306/ecommerce_esportes')#Acesso ao banco de dados
 SessionLocal = sessionmaker(bind=engine)
 # Base.metadata.create_all(engine)
 

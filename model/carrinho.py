@@ -3,18 +3,16 @@ from database import Base
 from sqlalchemy import Column,Integer,String,Float,DateTime,ForeignKey
 from sqlalchemy.orm import relationship
 
-class Pedido(Base):
-    __tablename__ = 'pedidos'
+class Carrinho(Base):
+    __tablename__ = 'carrinho'
 
-    id_pedido = Column(Integer, primary_key=True,index=True)
+    id_carrinho = Column(Integer, primary_key=True,index=True)
     id_cliente = Column(Integer, ForeignKey('clientes.id_cliente'), nullable=False,index=True)  # Chave estrangeira /NÃO SEI SE TA FUNCIONANDO
     id_produto = Column(Integer, ForeignKey('produtos.id_produto'), nullable=False,index=True)  # Chave estrangeira /NÃO SEI SE TA FUNCIONANDO
-    data_pedido = Column(DateTime,index=True)
-    status = Column(String,index=True)
-    valor_total = Column(Float,index=True)
+    valor_unitario = Column(Float,index=True)
 
     # Relacionamento de volta para o Cliente
-    cliente = relationship('clientes', back_populates='pedidos')
-    produto = relationship('produtos', back_populates='pedidos')
+    cliente = relationship('clientes', back_populates='carrinho')
+    produto = relationship('produtos', back_populates='carrinho')
 
 # Base.metadata.create_all(bind=engine)
