@@ -1,0 +1,228 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produtos - 4linhas</title>
+
+  <!-- CSS base (reset, variáveis, estilos globais) -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+  <!-- CSS específico da página -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/produtos.css') }}">
+  <!-- CSS inline -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/inline/produtos-inline.css') }}">
+
+  <!-- JS específico da página -->
+  <script src="{{ url_for('static', path='js/pages/produtos.js') }}"></script>
+
+  <!-- Fonte Google Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- =============== HEADER =============== -->
+  <header>
+    <!-- Linha 1: Top Bar -->
+    <div class="top-bar">
+      <div class="promo-message">Frete grátis acima de R$100 | 30% OFF em toda a loja</div>
+      <div class="promo-arrow">▼</div>
+      <button class="scroll-to-top" aria-label="Voltar ao topo">↑</button>
+    </div>
+
+    <!-- Linha 2: Navegação principal -->
+    <nav class="main-nav" aria-label="Menu principal">
+      <!-- Logo na esquerda -->
+      <a href="../home/home.html" class="logo">
+        <img src="../../../assets/images/common/logo/Logo_m.svg" alt="Logo da Loja">
+      </a>
+
+      <!-- Links principais centralizados -->
+      <ul class="menu-links">
+        <li><a href="../home/home.html">Destaques</a></li>
+        <li><a href="produtos.html">Artigos Esportivos</a></li>
+        <li><a href="produtos.html">Homem</a></li>
+        <li><a href="produtos.html">Mulher</a></li>
+      </ul>
+
+      <!-- Botão de busca (ícone apenas) -->
+      <button class="search-button" aria-label="Buscar">
+        <img src="../../../assets/images/common/icons/magnifying-glass.png" alt="Buscar" class="search-icon">
+      </button>
+
+      <!-- Botão hambúrguer para mobile -->
+      <button class="hamburger" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Menu mobile -->
+      <div class="mobile-menu">
+        <ul>
+          <li><a href="../home/home.html">Destaques</a></li>
+          <li><a href="produtos.html">Artigos Esportivos</a></li>
+          <li><a href="produtos.html">Homem</a></li>
+          <li><a href="produtos.html">Mulher</a></li>
+          <li><a href="produtos.html">Produtos</a></li>
+        </ul>
+      </div>
+
+      <!-- Seção direita com elementos reorganizados -->
+      <div class="nav-right">
+        <!-- Ações do usuário -->
+        <div class="user-actions">
+          <a href="../wishlist">
+            <img src="../../../assets/images/common/icons/heart.png" alt="Wishlist" class="nav-icons">
+          </a>
+          <a href="../carrinho/index.html">
+            <img src="../../../assets/images/common/icons/carrinho-carrinho.png" alt="Carrinho" class="nav-icons">
+            <span id="cart-count" class="cart-count">0</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+
+  <!-- MAIN CONTENT: PRODUTOS -->
+  <main class="products-page">
+    <section class="products-hero">
+      <h1>Nossos Produtos</h1>
+      <p>Explore nossa coleção de produtos de alta qualidade.</p>
+    </section>
+
+    <button id="filter-toggle" class="filter-toggle">Filtros</button>
+    <section class="filters-section">
+      <aside class="filter-sidebar">
+        <div class="filter-header">
+          <h3>Filtros</h3>
+          <button id="close-filters" class="close-filters">&times;</button>
+        </div>
+        <div class="filter-group">
+          <h4>Preço</h4>
+          <input type="range" min="0" max="500" value="500" id="price-slider">
+          <span id="price-value">Até R$ 500</span>
+        </div>
+        <div class="filter-group">
+          <h4>Cor</h4>
+          <div class="color-swatches">
+            <div class="swatch active" data-color="black"></div>
+            <div class="swatch active" data-color="white"></div>
+            <div class="swatch active" data-color="red"></div>
+            <div class="swatch active" data-color="blue"></div>
+          </div>
+        </div>
+        <div class="filter-group">
+          <h4>Tamanho</h4>
+          <label><input type="checkbox" name="size" value="S" checked> S</label>
+          <label><input type="checkbox" name="size" value="M" checked> M</label>
+          <label><input type="checkbox" name="size" value="L" checked> L</label>
+          <label><input type="checkbox" name="size" value="XL" checked> XL</label>
+        </div>
+      </aside>
+
+      <div class="products-content">
+        <div class="top-controls">
+          <div class="search-bar">
+            <input type="text" placeholder="Buscar produtos..." id="search-input">
+            <button id="search-btn">Buscar</button>
+          </div>
+          <div class="sort-view">
+            <select id="sort-select">
+              <option value="default">Ordenar por</option>
+              <option value="price-low">Preço: Menor para Maior</option>
+              <option value="price-high">Preço: Maior para Menor</option>
+              <option value="name">Nome</option>
+            </select>
+            <button id="view-grid" class="view-btn active">Grid</button>
+            <button id="view-list" class="view-btn">List</button>
+          </div>
+        </div>
+
+        <!-- PRODUTOS SECTION -->
+        <section class="inspire-section">
+        <div class="outfit-grid">
+          {% for p in produtos %}
+          <div class="outfit-card">
+            <img src="{{ url_for('static', path='img/cards_produtos/' ~ p.imagem) }}') }}" alt="{{ p.nome }}">
+            <div class="outfit-overlay">
+              <h3>{{ p.nome }}</h3>
+              <p>{{ p.descricao }}</p>
+              <p>R$ {{ "%.2f"|format(p.preco) }}</p>
+              <button class="add-to-cart-btn" data-id="{{ p.id_produto }}">Adicionar ao Carrinho</button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <!-- Bloco de Newsletter - Primeiro -->
+    <div class="newsletter">
+      <h3>Assine nossa newsletter</h3>
+      <p>Receba novidades, promoções e lançamentos em primeira mão.</p>
+      <form class="newsletter-form" action="/newsletter" method="post">
+        <input type="email" name="email" placeholder="Seu e-mail" required>
+        <button type="submit">Inscrever-se</button>
+      </form>
+    </div>
+
+    <div class="footer-content">
+      <div class="footer-col">
+        <a href="/" class="footer-logo">
+          <img src="../../../../assets/images/common/logo/Logo_m.svg" alt="Logo da Loja">
+        </a>
+        <p>Produtos de alta qualidade, estilo e conforto. Inspirados nas melhores marcas do mundo.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Institucional</h3>
+        <ul>
+          <li><a href="/sobre">Sobre nós</a></li>
+          <li><a href="/politica-de-privacidade">Política de Privacidade</a></li>
+          <li><a href="/termos">Termos de Uso</a></li>
+          <li><a href="/contato">Contato</a></li>
+          <li><a href="/carreiras">Carreiras</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Ajuda</h3>
+        <ul>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/acompanhe-pedido">Acompanhe seu pedido</a></li>
+          <li><a href="/suporte">Suporte</a></li>
+          <li><a href="/trocas">Trocas e Devoluções</a></li>
+          <li><a href="/entrega">Entrega</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Nos siga</h3>
+        <div class="footer-social">
+          <a href="#"><img src="../../../../assets/images/common/icons/instagram.svg" alt="Instagram"></a>
+          <a href="#"><img src="../../../../assets/images/common/icons/facebook.svg" alt="Facebook"></a>
+          <a href="#"><img src="../../../../assets/images/common/icons/twitter.svg" alt="Twitter"></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>Produtos</h3>
+        <ul>
+          <li><a href="/homem">Homem</a></li>
+          <li><a href="/mulher">Mulher</a></li>
+          <li><a href="/artigos">Artigos</a></li>
+          <li><a href="/destaques">Destaques</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 4linhas. Todos os direitos reservados. | CNPJ: 12.345.678/0001-90</p>
+    </div>
+  </footer>
+
+<script src="js/produtos.js"></script>
+</body>
+</html>

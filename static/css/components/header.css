@@ -1,0 +1,85 @@
+/* Shared header styles extracted from home.css to ensure consistency across pages */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 2rem;
+  background-color: rgba(255, 107, 53, 0.95);
+  backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  min-height: 50px;
+  transition: all 0.3s ease;
+  color: #fff;
+}
+
+.top-logo {
+  position: absolute;
+  left: 2rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1001;
+}
+
+.top-logo img {
+  width: 40px;
+  height: auto;
+  filter: brightness(0) invert(1);
+}
+
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 2rem;
+  background-color: #D9D9D9;
+  position: relative;
+  transition: opacity 0.3s ease;
+}
+
+.main-nav .logo img {
+  width: 60px;
+  height: auto;
+}
+
+.menu-links {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0 auto 0 28rem; /* fallback for very old pages, overridden by absolute centering where applied */
+  align-self: center;
+}
+
+.menu-links.centered-absolute {
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.menu-links li a {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #0D1B2A;
+  padding: 0.5rem 0;
+  transition: color 0.3s;
+}
+
+@media (max-width: 768px) {
+  .main-nav {
+    flex-direction: column;
+    padding: 0.5rem 1rem;
+    align-items: flex-start;
+  }
+  .menu-links {
+    display: none;
+  }
+  .hamburger {
+    display: flex;
+  }
+  .top-logo {
+    left: 1rem;
+  }
+}
