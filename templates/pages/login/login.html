@@ -6,9 +6,9 @@
   <title>Login - 4linhas</title>
 
   <!-- CSS base (reset, variáveis, estilos globais) -->
-  <link rel="stylesheet" href="../../../css/base.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
   <!-- CSS especifico da página -->
-  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/login/login.css') }}">
 
   <!-- Fonte Google Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,21 +34,21 @@
     <!-- Linha 2: Navegação principal -->
     <nav class="main-nav" aria-label="Menu principal">
       <!-- Logo na esquerda -->
-      <a href="../home/home.html" class="logo">
-        <img src="../../../assets/images/common/logo/Logo_m.svg" alt="Logo da Loja">
+      <a href="{{ url_for('index') }}" class="logo">
+  <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
       </a>
 
       <!-- Links principais centralizados -->
       <ul class="menu-links">
-        <li><a href="../home/home.html">Destaques</a></li>
-        <li><a href="../produtos/produtos.html">Artigos Esportivos</a></li>
-        <li><a href="../produtos/produtos.html">Homem</a></li>
-        <li><a href="../produtos/produtos.html">Mulher</a></li>
+  <li><a href="{{ url_for('index') }}">Destaques</a></li>
+  <li><a href="{{ url_for('catalogo') }}">Artigos Esportivos</a></li>
+  <li><a href="{{ url_for('catalogo') }}">Homem</a></li>
+  <li><a href="{{ url_for('catalogo') }}">Mulher</a></li>
       </ul>
 
       <!-- Botão de busca (ícone apenas) -->
       <button class="search-button" aria-label="Buscar">
-        <img src="../../../assets/images/common/icons/magnifying-glass.png" alt="Buscar" class="search-icon">
+  <img src="{{ url_for('static', path='assets/icons/magnifying-glass.png') }}" alt="Buscar" class="search-icon">
       </button>
 
       <!-- Botão hambúrguer para mobile -->
@@ -74,10 +74,10 @@
         <!-- Ações do usuário -->
         <div class="user-actions">
           <a href="../wishlist">
-            <img src="../../../assets/images/common/icons/heart.png" alt="Wishlist" class="nav-icons">
+            <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
           </a>
           <a href="../carrinho/index.html">
-            <img src="../../../assets/images/common/icons/carrinho-carrinho.png" alt="Carrinho" class="nav-icons">
+            <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt="Carrinho" class="nav-icons">
           </a>
         </div>
       </div>
@@ -108,7 +108,7 @@
           <span>ou</span>
         </div>
         <button class="google-login-btn">
-          <img src="../../../assets/images/common/icons/google.svg" alt="Google" class="google-icon">
+          <img src="{{ url_for('static', path='assets/icons/google.svg') }}" alt="Google" class="google-icon">
           Entrar com Google
         </button>
       </div>
@@ -144,7 +144,7 @@
     <div class="footer-content">
       <div class="footer-col">
         <a href="/" class="footer-logo">
-          <img src="../../../assets/images/common/logo/Logo_m.svg" alt="Logo da Loja">
+          <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
         </a>
         <p>Produtos de alta qualidade, estilo e conforto. Inspirados nas melhores marcas do mundo.</p>
       </div>
@@ -171,9 +171,9 @@
       <div class="footer-col">
         <h3>Nos siga</h3>
         <div class="footer-social">
-          <a href="#"><img src="../../../assets/images/common/icons/instagram.svg" alt="Instagram"></a>
-          <a href="#"><img src="../../../assets/images/common/icons/facebook.svg" alt="Facebook"></a>
-          <a href="#"><img src="../../../assets/images/common/icons/twitter.svg" alt="Twitter"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/twitter.svg') }}" alt="Twitter"></a>
         </div>
       </div>
       <div class="footer-col">
@@ -193,68 +193,45 @@
   </footer>
 
 <script>
-  // Promo messages cycling
-  const promoMessage = document.querySelector('.promo-message');
-  const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
-  let currentPromo = 0;
+  document.addEventListener('DOMContentLoaded', () => {
+    // Promo messages cycling (guarded)
+    const promoMessage = document.querySelector('.promo-message');
+    if (promoMessage) {
+      const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
+      let currentPromo = 0;
+      const showNextPromo = () => {
+        promoMessage.style.opacity = 0;
+        setTimeout(() => {
+          currentPromo = (currentPromo + 1) % messages.length;
+          promoMessage.textContent = messages[currentPromo];
+          promoMessage.style.opacity = 1;
+        }, 500);
+      };
+      setInterval(showNextPromo, 5000);
+    }
 
-  function showNextPromo() {
-    promoMessage.style.opacity = 0;
-    setTimeout(() => {
-      currentPromo = (currentPromo + 1) % messages.length;
-      promoMessage.textContent = messages[currentPromo];
-      promoMessage.style.opacity = 1;
-    }, 500);
-  }
+    // Hamburger and modal behavior (guarded)
+    const hamburger = document.querySelector('.hamburger');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener('click', () => {
+        mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
+      });
+      mobileMenu.addEventListener('click', (e) => {
+        if (e.target === mobileMenu) mobileMenu.style.display = 'none';
+      });
+    }
 
-  // Start cycling every 5 seconds
-  setInterval(showNextPromo, 5000);
-
-  // Hamburger menu toggle
-  const hamburger = document.querySelector('.hamburger');
-  const mobileMenu = document.querySelector('.mobile-menu');
-
-  if (hamburger && mobileMenu) {
-    hamburger.addEventListener('click', () => {
-      mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Close menu when clicking outside
-    mobileMenu.addEventListener('click', (e) => {
-      if (e.target === mobileMenu) {
-        mobileMenu.style.display = 'none';
-      }
-    });
-  }
-
-  // Search modal functionality
-  const searchButton = document.querySelector('.search-button');
-  const searchModal = document.getElementById('search-modal');
-  const closeModal = document.querySelector('.close-modal');
-
-  if (searchButton && searchModal && closeModal) {
-    searchButton.addEventListener('click', () => {
-      searchModal.style.display = 'flex';
-    });
-
-    closeModal.addEventListener('click', () => {
-      searchModal.style.display = 'none';
-    });
-
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-      if (e.target === searchModal) {
-        searchModal.style.display = 'none';
-      }
-    });
-
-    // Close modal on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && searchModal.style.display === 'flex') {
-        searchModal.style.display = 'none';
-      }
-    });
-  }
+    const searchButton = document.querySelector('.search-button');
+    const searchModal = document.getElementById('search-modal');
+    const closeModal = document.querySelector('.close-modal');
+    if (searchButton && searchModal && closeModal) {
+      searchButton.addEventListener('click', () => { searchModal.style.display = 'flex'; });
+      closeModal.addEventListener('click', () => { searchModal.style.display = 'none'; });
+      window.addEventListener('click', (e) => { if (e.target === searchModal) searchModal.style.display = 'none'; });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && searchModal.style.display === 'flex') searchModal.style.display = 'none'; });
+    }
+  });
 </script>
 </body>
 </html>

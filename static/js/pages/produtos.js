@@ -1,19 +1,4 @@
-// Promo messages cycling
-const promoMessage = document.querySelector('.promo-message');
-const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
-let currentPromo = 0;
-
-function showNextPromo() {
-  promoMessage.style.opacity = 0;
-  setTimeout(() => {
-    currentPromo = (currentPromo + 1) % messages.length;
-    promoMessage.textContent = messages[currentPromo];
-    promoMessage.style.opacity = 1;
-  }, 500);
-}
-
-// Start cycling every 5 seconds
-setInterval(showNextPromo, 5000);
+// Promo messages cycling will be initialized on DOMContentLoaded to avoid duplicate global vars
 
 // Hamburger menu toggle
 const hamburger = document.querySelector('.hamburger');
@@ -124,6 +109,22 @@ if (sortSelect) {
 
 // Add event listeners to add-to-cart buttons
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize promo message cycling (only if element exists)
+  const promoMessage = document.querySelector('.promo-message');
+  if (promoMessage) {
+    const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
+    let currentPromo = 0;
+    const showNextPromo = () => {
+      promoMessage.style.opacity = 0;
+      setTimeout(() => {
+        currentPromo = (currentPromo + 1) % messages.length;
+        promoMessage.textContent = messages[currentPromo];
+        promoMessage.style.opacity = 1;
+      }, 500);
+    };
+    // Start cycling every 5 seconds
+    setInterval(showNextPromo, 5000);
+  }
   const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
 
   addToCartButtons.forEach(button => {
@@ -133,9 +134,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const productName = card.querySelector('h3') ? card.querySelector('h3').textContent : 'Produto';
       const priceText = card.querySelector('p') ? card.querySelector('p').textContent : 'R$ 0,00';
-      const priceNumber = parseFloat(priceText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        const priceNumber = parseFloat(priceText.replace(/[^\\d,]/g, '').replace(',', '.')) || 0;
+        const btn = event.currentTarget;
+        const id = btn.dataset && btn.dataset.id ? btn.dataset.id : undefined;
+        // Try to find image inside card
+        const imgEl = card.querySelector('img') || card.querySelector('.product-card-img');
+        const imgSrc = imgEl ? imgEl.getAttribute('src') : '';
 
-      adicionarAoCarrinho(productName, priceNumber);
+        // Call adicionarAoCarrinho with an object (cart.js expects an item object)
+        try {
+          adicionarAoCarrinho({ id: id, nome: productName, preco: priceNumber, quantidade: 1, imagem: imgSrc });
+        } catch (e) {
+          console.error('adicionarAoCarrinho not available:', e);
+        }
     });
   });
 

@@ -1,20 +1,5 @@
 (function() {
-  // Promo messages cycling
-  const promoMessage = document.querySelector('.promo-message');
-  const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
-  let currentPromo = 0;
-
-  function showNextPromo() {
-    promoMessage.style.opacity = 0;
-    setTimeout(() => {
-      currentPromo = (currentPromo + 1) % messages.length;
-      promoMessage.textContent = messages[currentPromo];
-      promoMessage.style.opacity = 1;
-    }, 500);
-  }
-
-  // Start cycling every 5 seconds
-  setInterval(showNextPromo, 5000);
+  // Promo message initialization will run on DOMContentLoaded to avoid duplicate globals
 
   // Hamburger menu toggle
   const hamburger = document.querySelector('.hamburger');
@@ -103,26 +88,41 @@
     }
   });
 
-  // Thumbnail switching
-  const thumbnails = document.querySelectorAll('.thumbnail');
-  const mainImage = document.querySelector('.product-image-main');
+  // Thumbnail switching: attach on DOMContentLoaded to ensure elements exist
+  document.addEventListener('DOMContentLoaded', function() {
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const mainImage = document.querySelector('.product-image-main');
 
-  thumbnails.forEach(thumb => {
-    thumb.addEventListener('click', () => {
-      thumbnails.forEach(t => t.classList.remove('active'));
-      thumb.classList.add('active');
-      mainImage.src = thumb.src.replace('thumb', 'sample-product'); // Placeholder logic
-    });
+    if (thumbnails && thumbnails.length > 0 && mainImage) {
+      thumbnails.forEach(thumb => {
+        thumb.addEventListener('click', () => {
+          thumbnails.forEach(t => t.classList.remove('active'));
+          thumb.classList.add('active');
+          const thumbSrc = thumb.getAttribute('src') || thumb.src || '';
+          if (thumbSrc) mainImage.setAttribute('src', thumbSrc);
+        });
+      });
+    }
   });
 
   // Add to cart functionality
   const addToCartBtn = document.querySelector('.add-to-cart');
-  addToCartBtn.addEventListener('click', () => {
-    const productTitle = document.querySelector('.product-title').textContent;
-    const productPriceText = document.querySelector('.product-price').textContent;
-    const productPrice = parseFloat(productPriceText.replace('R$ ', '').replace(',', '.'));
-    adicionarAoCarrinho(productTitle, productPrice);
-  });
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', () => {
+      const titleEl = document.querySelector('.product-title');
+      const priceEl = document.querySelector('.product-price');
+      const imgEl = document.querySelector('.product-image-main');
+      const productTitle = titleEl ? titleEl.textContent : 'Produto';
+      const productPriceText = priceEl ? priceEl.textContent : 'R$ 0,00';
+      const productPrice = parseFloat(productPriceText.replace('R$', '').replace(/[\.\s]/g, '').replace(',', '.')) || 0;
+      const imageSrc = imgEl ? imgEl.getAttribute('src') : '';
+      try {
+        adicionarAoCarrinho({ id: undefined, nome: productTitle, preco: productPrice, quantidade: 1, imagem: imageSrc });
+      } catch (e) {
+        console.error('adicionarAoCarrinho not available:', e);
+      }
+    });
+  }
 
   // Add to wishlist functionality (placeholder)
   const addToWishlistBtn = document.querySelector('.add-to-wishlist');
@@ -132,6 +132,21 @@
 
   // Scroll to top button and show/hide elements on scroll
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize promo messages (guarded)
+    const promoMessage = document.querySelector('.promo-message');
+    if (promoMessage) {
+      const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
+      let currentPromo = 0;
+      const showNextPromo = () => {
+        promoMessage.style.opacity = 0;
+        setTimeout(() => {
+          currentPromo = (currentPromo + 1) % messages.length;
+          promoMessage.textContent = messages[currentPromo];
+          promoMessage.style.opacity = 1;
+        }, 500);
+      };
+      setInterval(showNextPromo, 5000);
+    }
     // Atualiza o contador do carrinho
     updateCartCount();
 

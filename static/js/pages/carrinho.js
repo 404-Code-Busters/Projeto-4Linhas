@@ -1,19 +1,4 @@
-// Promo messages cycling
-const promoMessage = document.querySelector('.promo-message');
-const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
-let currentPromo = 0;
-
-function showNextPromo() {
-  promoMessage.style.opacity = 0;
-  setTimeout(() => {
-    currentPromo = (currentPromo + 1) % messages.length;
-    promoMessage.textContent = messages[currentPromo];
-    promoMessage.style.opacity = 1;
-  }, 500);
-}
-
-// Start cycling every 5 seconds
-setInterval(showNextPromo, 5000);
+// Promo messages cycling will initialize on DOMContentLoaded to avoid duplicate globals
 
 // Hamburger menu toggle
 const hamburger = document.querySelector('.hamburger');
@@ -144,8 +129,24 @@ function showPromoMessage(message, type) {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize promo messages (guarded)
+  const promoMessage = document.querySelector('.promo-message');
+  if (promoMessage) {
+    const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
+    let currentPromo = 0;
+    const showNextPromo = () => {
+      promoMessage.style.opacity = 0;
+      setTimeout(() => {
+        currentPromo = (currentPromo + 1) % messages.length;
+        promoMessage.textContent = messages[currentPromo];
+        promoMessage.style.opacity = 1;
+      }, 500);
+    };
+    setInterval(showNextPromo, 5000);
+  }
   // Load cart
-  mostrarCarrinho();
+  // Do not open modal on cart page load; instead render the cart inside the page
+  try { renderCartPage(); } catch (e) { /* ignore if function not present */ }
 
   // Update cart count
   updateCartCount();
@@ -166,3 +167,115 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+/* -----------------------------
+   Cart page rendering utilities
+   ----------------------------- */
+function currencyBRL(value) {
+  return 'R$ ' + Number(value || 0).toFixed(2).replace('.', ',');
+}
+
+function renderCartPage() {
+  const container = document.querySelector('.cart-items');
+  const summary = document.querySelector('.cart-summary');
+  if (!container) return;
+
+  const cart = window.getCart ? window.getCart() : [];
+  container.innerHTML = '';
+
+  if (!cart || cart.length === 0) {
+    container.innerHTML = '<p>Seu carrinho está vazio.</p>';
+    // update summary totals
+    updateSummary(0);
+    updateCartCount();
+    return;
+  }
+
+  let subtotal = 0;
+
+  cart.forEach((item, idx) => {
+    const price = Number(item.preco || 0);
+    const qty = Number(item.quantidade || 1);
+    const itemTotal = price * qty;
+    subtotal += itemTotal;
+
+    const node = document.createElement('div');
+    node.className = 'cart-item';
+    node.dataset.productId = item.id || item.nome || idx;
+    node.innerHTML = `
+      <img src="${item.imagem || ''}" alt="${item.nome || ''}">
+      <div class="item-details">
+        <h3>${item.nome || ''}</h3>
+        <p class="product-price">${currencyBRL(itemTotal)}</p>
+        <div class="quantity-controls">
+          <button class="quantity-btn minus-btn" data-idx="${idx}">-</button>
+          <span class="quantity" data-quantity="${qty}">${qty}</span>
+          <button class="quantity-btn plus-btn" data-idx="${idx}">+</button>
+        </div>
+      </div>
+      <button class="remove-btn" data-idx="${idx}">Remover</button>
+    `;
+    container.appendChild(node);
+  });
+
+  updateSummary(subtotal);
+  attachCartPageHandlers();
+  updateCartCount();
+}
+
+function updateSummary(subtotal) {
+  const summaryRows = document.querySelector('.cart-summary');
+  if (!summaryRows) return;
+  const frete = subtotal > 0 ? 20.00 : 0.00; // placeholder
+  const total = subtotal + frete;
+  // Replace displayed values (assumes specific DOM structure)
+  const subtotalEl = summaryRows.querySelector('.summary-row:nth-of-type(1) span:last-child');
+  const freteEl = summaryRows.querySelector('.summary-row:nth-of-type(2) span:last-child');
+  const totalEl = summaryRows.querySelector('.summary-row.total span:last-child');
+  if (subtotalEl) subtotalEl.textContent = currencyBRL(subtotal);
+  if (freteEl) freteEl.textContent = currencyBRL(frete);
+  if (totalEl) totalEl.textContent = currencyBRL(total);
+}
+
+function attachCartPageHandlers() {
+  const plusButtons = document.querySelectorAll('.quantity-btn.plus-btn');
+  const minusButtons = document.querySelectorAll('.quantity-btn.minus-btn');
+  const removeButtons = document.querySelectorAll('.remove-btn');
+
+  plusButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = Number(e.currentTarget.dataset.idx);
+      changeQuantity(idx, 1);
+    });
+  });
+
+  minusButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = Number(e.currentTarget.dataset.idx);
+      changeQuantity(idx, -1);
+    });
+  });
+
+  removeButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = Number(e.currentTarget.dataset.idx);
+      const cart = window.getCart ? window.getCart() : [];
+      if (idx >= 0 && idx < cart.length) {
+        cart.splice(idx, 1);
+        window.setCart ? window.setCart(cart) : localStorage.setItem('cart', JSON.stringify(cart));
+        renderCartPage();
+      }
+    });
+  });
+}
+
+function changeQuantity(idx, delta) {
+  const cart = window.getCart ? window.getCart() : [];
+  if (!(idx >= 0 && idx < cart.length)) return;
+  cart[idx].quantidade = Math.max(1, (Number(cart[idx].quantidade) || 1) + delta);
+  window.setCart ? window.setCart(cart) : localStorage.setItem('cart', JSON.stringify(cart));
+  renderCartPage();
+}
+
+// Expose for debugging if needed
+window.renderCartPage = renderCartPage;

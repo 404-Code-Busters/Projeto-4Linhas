@@ -34,8 +34,17 @@ async def detalhe_produto(request: Request, id_produto: int):
             {"request": request, "mensagem": "Produto não encontrado"}
         )
     return templates.TemplateResponse(
-        "pages/produtos/produto.html",
+        "pages/produto/produto.html",
         {"request": request, "produto": produto}
+    )
+
+
+# Página do carrinho (renderiza template existente em templates/pages/carrinho/carrinho.html)
+@router.get("/carrinho", response_class=HTMLResponse)
+async def carrinho_page(request: Request):
+    return templates.TemplateResponse(
+        "pages/carrinho/carrinho.html",
+        {"request": request}
     )
 
 # -----------------------------

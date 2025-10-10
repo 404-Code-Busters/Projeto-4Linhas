@@ -1,5 +1,6 @@
 /* ===== BASE GERAL PARA PRODUTO ===== */
-@import url('../../src/css/colors.css');
+/* Corrigido: importar colors.css a partir de static/css */
+@import url('../colors.css');
 
 * {
   margin: 0;
@@ -415,15 +416,6 @@ body.scrolled .main-nav {
   justify-content: center;
   padding: 0.5rem;
   border-radius: 4px;
-}
-
-/* Position cart count badge on top of the cart icon (same coords as the icon) */
-.cart-link .cart-count {
-  top: -6px; /* slightly above the icon */
-  right: -6px; /* slightly to the right edge of the icon */
-  left: auto; /* override centering from base.css */
-  transform: none; /* don't translate horizontally */
-  display: flex; /* ensure visible when >0 */
 }
 
 

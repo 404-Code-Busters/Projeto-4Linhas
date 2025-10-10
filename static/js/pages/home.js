@@ -156,9 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Load cart
-  mostrarCarrinho();
-
   // Update cart count
   updateCartCount();
 

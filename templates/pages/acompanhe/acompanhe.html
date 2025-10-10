@@ -6,18 +6,18 @@
   <title>Acompanhe seu Pedido - 4linhas</title>
 
   <!-- CSS base (reset, variáveis, estilos globais) -->
-  <link rel="stylesheet" href="../../../css/base.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
   <!-- CSS especifico da página -->
-  <link rel="stylesheet" href="acompanhe.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/acompanhe.css') }}">
   <!-- CSS inline extraído -->
-  <link rel="stylesheet" href="acompanhe-inline.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/inline/acompanhe-inline.css') }}">
 
   <!-- Fonte Google Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
-<script src="js/acompanhe.js"></script>
+<script src="{{ url_for('static', path='js/pages/acompanhe.js') }}"></script>
 </head>
 <body>
 
@@ -26,7 +26,7 @@
   <!-- Linha 1: Top Bar -->
   <div class="top-bar">
     <a href="#home" class="top-logo">
-      <img src="/src/assets/images/logo/Logo_m.svg" alt="Logo da Loja">
+  <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
     </a>
     <div class="promo-container">
       <div class="promo-message">30% OFF em toda a loja</div>
@@ -38,7 +38,7 @@
           <h3>FAÇA LOGIN</h3>
           <p>Acesse sua conta para uma experiência personalizada</p>
           <div class="benefits-buttons">
-            <a href="/src/assets/pages/login/login.html" class="btn-login">Fazer Login</a>
+            <a href="{{ url_for('index') }}" class="btn-login">Fazer Login</a>
           </div>
         </div>
         <div class="benefits-divider"></div>
@@ -51,7 +51,7 @@
             <li>Ofertas especiais para membros</li>
           </ul>
           <div class="benefits-buttons">
-            <a href="/src/assets/pages/login/login.html#cadastro" class="btn-register">Criar Conta</a>
+            <a href="{{ url_for('index') }}#cadastro" class="btn-register">Criar Conta</a>
           </div>
         </div>
       </div>
@@ -63,15 +63,15 @@
     <nav class="main-nav" aria-label="Menu principal">
       <!-- Logo na esquerda -->
       <a href="home.html" class="logo">
-        <img src="/src/assets/images/logo/Logo_m.svg" alt="Logo da Loja">
+  <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
       </a>
 
       <!-- Links principais centralizados -->
       <ul class="menu-links">
-        <li><a href="/src/assets/pages/produtos/produtos.html">Destaques</a></li>
-        <li><a href="/src/assets/pages/produtos/produtos.html">Artigos Esportivos</a></li>
-        <li><a href="/src/assets/pages/produtos/produtos.html">Homem</a></li>
-        <li><a href="/src/assets/pages/produtos/produtos.html">Mulher</a></li>
+  <li><a href="{{ url_for('catalogo') }}">Destaques</a></li>
+  <li><a href="{{ url_for('catalogo') }}">Artigos Esportivos</a></li>
+  <li><a href="{{ url_for('catalogo') }}">Homem</a></li>
+  <li><a href="{{ url_for('catalogo') }}">Mulher</a></li>
       </ul>
 
       <!-- Botão hambúrguer para mobile -->
@@ -84,11 +84,11 @@
       <!-- Menu mobile -->
       <div class="mobile-menu">
         <ul>
-          <li><a href="/src/assets/pages/produtos/produtos.html">Destaques</a></li>
-          <li><a href="/src/assets/pages/produtos/produtos.html">Artigos Esportivos</a></li>
-          <li><a href="/src/assets/pages/produtos/produtos.html">Homem</a></li>
-          <li><a href="/src/assets/pages/produtos/produtos.html">Mulher</a></li>
-          <li><a href="/src/assets/pages/produtos/produtos.html">Produtos</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Destaques</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Artigos Esportivos</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Homem</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Mulher</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Produtos</a></li>
           <li><a href="#home">Home</a></li>
           <li><a href="#categoria-principal">Categoria Principal</a></li>
           <li><a href="#competitividade">Competitividade</a></li>
@@ -102,13 +102,13 @@
         <!-- Ações do usuário -->
           <div class="user-actions">
             <button class="search-button" aria-label="Buscar">
-              <img src="/src/assets/images/icons/magnifying-glass.png" alt="Buscar" class="search-icon">
+              <img src="{{ url_for('static', path='assets/icons/magnifying-glass.png') }}" alt="Buscar" class="search-icon">
             </button>
-            <a href="/src/assets/pages/">
-              <img src="/src/assets/images/icons/heart.png" alt="Wishlist" class="nav-icons">
+            <a href="{{ url_for('index') }}">
+              <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
             </a>
-            <a href="/src/assets/pages/carrinho/index.html">
-              <img src="/src/assets/images/icons/carrinho-carrinho.png" alt= "Carrinho" class="nav-icons">
+            <a href="{{ url_for('catalogo') }}">
+              <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt= "Carrinho" class="nav-icons">
             </a>
           </div>
       </div>
@@ -174,7 +174,7 @@
     <div class="footer-content">
       <div class="footer-col">
         <a href="/" class="footer-logo">
-          <img src="../../../assets/images/common/logo/Logo_m.svg" alt="Logo da Loja">
+          <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
         </a>
         <p>Produtos de alta qualidade, estilo e conforto. Inspirados nas melhores marcas do mundo.</p>
       </div>
@@ -201,9 +201,9 @@
       <div class="footer-col">
         <h3>Nos siga</h3>
         <div class="footer-social">
-          <a href="#"><img src="../../../assets/images/common/icons/instagram.svg" alt="Instagram"></a>
-          <a href="#"><img src="../../../assets/images/common/icons/facebook.svg" alt="Facebook"></a>
-          <a href="#"><img src="../../../assets/images/common/icons/twitter.svg" alt="Twitter"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/twitter.svg') }}" alt="Twitter"></a>
         </div>
       </div>
       <div class="footer-col">

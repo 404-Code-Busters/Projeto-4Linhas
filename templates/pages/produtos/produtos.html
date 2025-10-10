@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
   <!-- CSS específico da página -->
   <link rel="stylesheet" href="{{ url_for('static', path='css/pages/produtos.css') }}">
+  <!-- CSS do header/home para padronizar aparência -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/home.css') }}">
   <!-- CSS inline -->
   <link rel="stylesheet" href="{{ url_for('static', path='css/inline/produtos-inline.css') }}">
 
-  <!-- JS específico da página -->
-  <script src="{{ url_for('static', path='js/pages/produtos.js') }}"></script>
+  <!-- JS específico da página (loaded at page end to avoid duplicate execution) -->
 
   <!-- Fonte Google Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,32 +24,56 @@
 
   <!-- =============== HEADER =============== -->
   <header>
-    <!-- Linha 1: Top Bar -->
-    <div class="top-bar">
-      <div class="promo-message">Frete grátis acima de R$100 | 30% OFF em toda a loja</div>
+  <!-- Linha 1: Top Bar -->
+  <div class="top-bar">
+    <a href="#home" class="top-logo">
+      <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja" style="filter: brightness(0) invert(1);">
+    </a>
+    <div class="promo-container">
+      <div class="promo-message">30% OFF em toda a loja</div>
       <div class="promo-arrow">▼</div>
-      <button class="scroll-to-top" aria-label="Voltar ao topo">↑</button>
     </div>
+    <div class="benefits-dropdown">
+      <div class="benefits-content">
+        <div class="benefits-main">
+          <h3>FAÇA LOGIN</h3>
+          <p>Acesse sua conta para uma experiência personalizada</p>
+          <div class="benefits-buttons">
+            <a href="{{ url_for('index') }}" class="btn-login">Fazer Login</a>
+          </div>
+        </div>
+        <div class="benefits-divider"></div>
+        <div class="benefits-secondary">
+          <h3>CADASTRE-SE</h3>
+          <p>Crie sua conta e aproveite benefícios exclusivos:</p>
+          <ul class="benefits-list">
+            <li>Frete grátis em todas as compras</li>
+            <li>Acesso antecipado a produtos exclusivos</li>
+            <li>Ofertas especiais para membros</li>
+          </ul>
+          <div class="benefits-buttons">
+            <a href="{{ url_for('index') }}#cadastro" class="btn-register">Criar Conta</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="scroll-to-top" aria-label="Voltar ao topo">↑</button>
+  </div>
 
     <!-- Linha 2: Navegação principal -->
     <nav class="main-nav" aria-label="Menu principal">
       <!-- Logo na esquerda -->
-      <a href="../home/home.html" class="logo">
-        <img src="../../../assets/images/common/logo/Logo_m.svg" alt="Logo da Loja">
+      <a href="{{ url_for('index') }}" class="logo">
+        <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
       </a>
 
       <!-- Links principais centralizados -->
       <ul class="menu-links">
-        <li><a href="../home/home.html">Destaques</a></li>
-        <li><a href="produtos.html">Artigos Esportivos</a></li>
-        <li><a href="produtos.html">Homem</a></li>
-        <li><a href="produtos.html">Mulher</a></li>
+        <li><a href="{{ url_for('catalogo') }}">Destaques</a></li>
+        <li><a href="{{ url_for('catalogo') }}">Artigos Esportivos</a></li>
+        <li><a href="{{ url_for('catalogo') }}">Homem</a></li>
+        <li><a href="{{ url_for('catalogo') }}">Mulher</a></li>
       </ul>
-
-      <!-- Botão de busca (ícone apenas) -->
-      <button class="search-button" aria-label="Buscar">
-        <img src="../../../assets/images/common/icons/magnifying-glass.png" alt="Buscar" class="search-icon">
-      </button>
 
       <!-- Botão hambúrguer para mobile -->
       <button class="hamburger" aria-label="Menu">
@@ -60,26 +85,34 @@
       <!-- Menu mobile -->
       <div class="mobile-menu">
         <ul>
-          <li><a href="../home/home.html">Destaques</a></li>
-          <li><a href="produtos.html">Artigos Esportivos</a></li>
-          <li><a href="produtos.html">Homem</a></li>
-          <li><a href="produtos.html">Mulher</a></li>
-          <li><a href="produtos.html">Produtos</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Destaques</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Artigos Esportivos</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Homem</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Mulher</a></li>
+          <li><a href="{{ url_for('catalogo') }}">Produtos</a></li>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#categoria-principal">Categoria Principal</a></li>
+          <li><a href="#competitividade">Competitividade</a></li>
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#newsletter">Newsletter</a></li>
         </ul>
       </div>
 
       <!-- Seção direita com elementos reorganizados -->
       <div class="nav-right">
         <!-- Ações do usuário -->
-        <div class="user-actions">
-          <a href="../wishlist">
-            <img src="../../../assets/images/common/icons/heart.png" alt="Wishlist" class="nav-icons">
-          </a>
-          <a href="../carrinho/index.html">
-            <img src="../../../assets/images/common/icons/carrinho-carrinho.png" alt="Carrinho" class="nav-icons">
-            <span id="cart-count" class="cart-count">0</span>
-          </a>
-        </div>
+          <div class="user-actions">
+            <button class="search-button" aria-label="Buscar">
+              <img src="{{ url_for('static', path='assets/icons/magnifying-glass.png') }}" alt="Buscar" class="search-icon">
+            </button>
+                  <a href="{{ url_for('static', path='') }}">
+                    <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
+                  </a>
+                  <a href="{{ url_for('catalogo') }}">
+                    <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt= "Carrinho" class="nav-icons">
+              <span id="cart-count" class="cart-count">0</span>
+            </a>
+          </div>
       </div>
     </nav>
   </header>
@@ -145,7 +178,20 @@
         <div class="outfit-grid">
           {% for p in produtos %}
           <div class="outfit-card">
-            <img src="{{ url_for('static', path='img/cards_produtos/' ~ p.imagem) }}') }}" alt="{{ p.nome }}">
+            <a href="{{ url_for('detalhe_produto', id_produto=p.id_produto) }}" class="product-link">
+              {# If DB stores full path like 'static/...' strip it and use url_for; otherwise use stored path relative to static/ #}
+              {% set img_path = (p.imagem_caminho or '') %}
+              {% if img_path.startswith('static/') %}
+                {% set img_rel = img_path.replace('static/', '') %}
+              {% else %}
+                {% set img_rel = img_path %}
+              {% endif %}
+              {# If DB only stored a filename (no folder), assume it lives under img/cards_produtos/ #}
+              {% if not img_rel.startswith('img/') and not img_rel.startswith('assets/') and not img_rel.startswith('images/') and img_rel|length > 0 and '/' not in img_rel %}
+                {% set img_rel = 'img/' ~ img_rel %}
+              {% endif %}
+              <img class="product-card-img" src="{{ url_for('static', path=img_rel) }}" alt="{{ p.nome }}">
+            </a>
             <div class="outfit-overlay">
               <h3>{{ p.nome }}</h3>
               <p>{{ p.descricao }}</p>
@@ -160,13 +206,15 @@
     </section>
   </main>
 
+</footer>
+
   <!-- FOOTER -->
   <footer class="site-footer">
     <!-- Bloco de Newsletter - Primeiro -->
-    <div class="newsletter">
+    <div id="newsletter" class="newsletter">
       <h3>Assine nossa newsletter</h3>
       <p>Receba novidades, promoções e lançamentos em primeira mão.</p>
-      <form class="newsletter-form" action="/newsletter" method="post">
+      <form class="newsletter-form" action="../../newsletter" method="post">
         <input type="email" name="email" placeholder="Seu e-mail" required>
         <button type="submit">Inscrever-se</button>
       </form>
@@ -175,7 +223,7 @@
     <div class="footer-content">
       <div class="footer-col">
         <a href="/" class="footer-logo">
-          <img src="../../../../assets/images/common/logo/Logo_m.svg" alt="Logo da Loja">
+          <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
         </a>
         <p>Produtos de alta qualidade, estilo e conforto. Inspirados nas melhores marcas do mundo.</p>
       </div>
@@ -202,9 +250,9 @@
       <div class="footer-col">
         <h3>Nos siga</h3>
         <div class="footer-social">
-          <a href="#"><img src="../../../../assets/images/common/icons/instagram.svg" alt="Instagram"></a>
-          <a href="#"><img src="../../../../assets/images/common/icons/facebook.svg" alt="Facebook"></a>
-          <a href="#"><img src="../../../../assets/images/common/icons/twitter.svg" alt="Twitter"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/twitter.svg') }}" alt="Twitter"></a>
         </div>
       </div>
       <div class="footer-col">
@@ -223,6 +271,8 @@
     </div>
   </footer>
 
-<script src="js/produtos.js"></script>
+  <script src="{{ url_for('static', path='js/cart.js') }}"></script>
+  <script src="{{ url_for('static', path='js/pages/home.js') }}"></script>
+  <script src="{{ url_for('static', path='js/pages/produtos.js') }}"></script>
 </body>
 </html>

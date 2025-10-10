@@ -1,19 +1,23 @@
 // Promo messages cycling
-const promoMessage = document.querySelector('.promo-message');
-const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
-let currentPromo = 0;
+// Promo messages cycling will initialize on DOMContentLoaded to avoid duplicate globals
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize promo messages (guarded)
+  const promoMessage = document.querySelector('.promo-message');
+  if (promoMessage) {
+    const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
+    let currentPromo = 0;
+    const showNextPromo = () => {
+      promoMessage.style.opacity = 0;
+      setTimeout(() => {
+        currentPromo = (currentPromo + 1) % messages.length;
+        promoMessage.textContent = messages[currentPromo];
+        promoMessage.style.opacity = 1;
+      }, 500);
+    };
+    setInterval(showNextPromo, 5000);
+  }
 
-function showNextPromo() {
-  promoMessage.style.opacity = 0;
-  setTimeout(() => {
-    currentPromo = (currentPromo + 1) % messages.length;
-    promoMessage.textContent = messages[currentPromo];
-    promoMessage.style.opacity = 1;
-  }, 500);
-}
-
-// Start cycling every 5 seconds
-setInterval(showNextPromo, 5000);
+});
 
 // Funcionalidade do botão voltar ao topo
 const scrollToTopButton = document.querySelector('.scroll-to-top');
