@@ -57,4 +57,29 @@ body {
 }
 
 /* Ensure user-actions anchors can host an absolute positioned badge */
-.user-actions a { position: relative; display: inline-flex; align-items: center; }
+.user-actions a, .user-actions button { position: relative; display: inline-flex; align-items: center; }
+/* Ensure header action buttons (search, cart, wishlist) don't show default button outlines/boxes */
+.user-actions button, .user-actions a { background: transparent; border: none; padding: 0.25rem; }
+.user-actions button:focus { outline: none; box-shadow: none; }
+.cart-button img, .nav-icons { display: block; }
+
+/* Cart modal (shared) - ensure it's visible across all pages */
+.cart-modal { position: fixed; inset: 0; display: block; z-index: 2000; pointer-events: none; opacity: 0; transition: opacity 220ms ease; }
+.cart-modal.open { opacity: 1; pointer-events: auto; }
+.cart-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0); transition: background 220ms ease; }
+.cart-modal.open .cart-modal-backdrop { background: rgba(0,0,0,0.5); }
+.cart-modal-panel { position: absolute; right: 1rem; top: 5rem; width: 360px; max-height: 70vh; overflow: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 1rem; transform: translateY(-8px) scale(0.98); transition: transform 220ms ease, opacity 220ms ease; opacity: 0; }
+.cart-modal.open .cart-modal-panel { transform: translateY(0) scale(1); opacity: 1; }
+.cart-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #f0f0f0; padding-bottom: 0.5rem; }
+.cart-modal-title { font-size: 1.1rem; margin: 0; padding: 0.25rem 0; }
+.cart-modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #333; padding: 0.25rem; border-radius: 6px; }
+.cart-modal-close:hover { background: rgba(0,0,0,0.05); }
+.cart-items { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
+.cart-item-row { display: flex; gap: 0.75rem; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
+.cart-item-img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-weight: 600; }
+.cart-item-price { color: #FF6B35; font-weight: 700; }
+.cart-item-remove { background: none; border: none; color: #e05b2d; cursor: pointer; }
+.cart-actions { margin-top: 1rem; display:flex; justify-content: flex-end; }
+.cart-checkout { background: #FF6B35; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }

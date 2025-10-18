@@ -18,6 +18,34 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+  <script src="{{ url_for('static', path='js/cart.js') }}"></script>
+  <script src="{{ url_for('static', path='js/pages/home.js') }}"></script>
+  <script src="{{ url_for('static', path='js/pages/produtos.js') }}"></script>
+  <!-- Ensure cart button opens modal (fallback if cart.js didn't bind) -->
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const cartBtn = document.getElementById('cart-button');
+      if (!cartBtn) return;
+      cartBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Prefer the primary implementation from cart.js
+        if (typeof mostrarCarrinho === 'function') {
+          mostrarCarrinho();
+          return;
+        }
+        if (typeof openCartModal === 'function') {
+          openCartModal();
+          return;
+        }
+        // Last-resort: trigger a data-bound anchor if present
+        const fake = document.querySelector('a[data-cart]');
+        if (fake) fake.click();
+      });
+    });
+  </script>
+
 </head>
 
 <body>
@@ -27,7 +55,7 @@
   <!-- Linha 1: Top Bar -->
   <div class="top-bar">
     <a href="#home" class="top-logo">
-      <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja" style="filter: brightness(0) invert(1);">
+  <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja" style="filter: brightness(0) invert(1);">
     </a>
     <div class="promo-container">
       <div class="promo-message">30% OFF em toda a loja</div>
@@ -64,7 +92,7 @@
     <nav class="main-nav" aria-label="Menu principal">
       <!-- Logo na esquerda -->
       <a href="{{ url_for('index') }}" class="logo">
-        <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
+  <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
       </a>
 
       <!-- Links principais centralizados -->
@@ -105,13 +133,14 @@
             <button class="search-button" aria-label="Buscar">
               <img src="{{ url_for('static', path='assets/icons/magnifying-glass.png') }}" alt="Buscar" class="search-icon">
             </button>
-                  <a href="{{ url_for('static', path='') }}">
-                    <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
-                  </a>
-                  <a href="{{ url_for('catalogo') }}">
-                    <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt= "Carrinho" class="nav-icons">
-              <span id="cart-count" class="cart-count">0</span>
+            <a href="{{ url_for('catalogo') }}">
+              <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
             </a>
+            <!-- Replace cart anchor with a button to avoid accidental navigation/hover link -->
+            <button id="cart-button" class="cart-button" aria-label="Abrir carrinho">
+              <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt="Carrinho" class="nav-icons">
+              <span id="cart-count" class="cart-count">0</span>
+            </button>
           </div>
       </div>
     </nav>
@@ -177,25 +206,23 @@
         <section class="inspire-section">
         <div class="outfit-grid">
           {% for p in produtos %}
-          <div class="outfit-card">
+          <div class="outfit-card" data-price="{{ "%.2f"|format(p.preco) }}">
             <a href="{{ url_for('detalhe_produto', id_produto=p.id_produto) }}" class="product-link">
-              {# If DB stores full path like 'static/...' strip it and use url_for; otherwise use stored path relative to static/ #}
-              {% set img_path = (p.imagem_caminho or '') %}
-              {% if img_path.startswith('static/') %}
-                {% set img_rel = img_path.replace('static/', '') %}
-              {% else %}
-                {% set img_rel = img_path %}
+              {# Simple image resolution: use p.imagem_caminho if present, otherwise fallback to placeholder under static/img/ #}
+              {% set img_rel = (p.imagem_caminho or '') | trim %}
+              {# Strip leading 'static/' if present in DB value so url_for receives a filename relative to static/ #}
+              {% if img_rel.startswith('static/') %}
+                {% set img_rel = img_rel.replace('static/', '') %}
               {% endif %}
-              {# If DB only stored a filename (no folder), assume it lives under img/cards_produtos/ #}
-              {% if not img_rel.startswith('img/') and not img_rel.startswith('assets/') and not img_rel.startswith('images/') and img_rel|length > 0 and '/' not in img_rel %}
-                {% set img_rel = 'img/' ~ img_rel %}
+              {% if img_rel == '' %}
+                {% set img_rel = 'img/placeholder.png' %}
               {% endif %}
               <img class="product-card-img" src="{{ url_for('static', path=img_rel) }}" alt="{{ p.nome }}">
             </a>
             <div class="outfit-overlay">
               <h3>{{ p.nome }}</h3>
-              <p>{{ p.descricao }}</p>
-              <p>R$ {{ "%.2f"|format(p.preco) }}</p>
+              <p class="product-desc">{{ p.descricao }}</p>
+              <p class="product-price">R$ {{ "%.2f"|format(p.preco) }}</p>
               <button class="add-to-cart-btn" data-id="{{ p.id_produto }}">Adicionar ao Carrinho</button>
             </div>
           </div>
@@ -223,7 +250,7 @@
     <div class="footer-content">
       <div class="footer-col">
         <a href="/" class="footer-logo">
-          <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
+         <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
         </a>
         <p>Produtos de alta qualidade, estilo e conforto. Inspirados nas melhores marcas do mundo.</p>
       </div>
@@ -252,7 +279,7 @@
         <div class="footer-social">
           <a href="#"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
           <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>
-          <a href="#"><img src="{{ url_for('static', path='assets/icons/twitter.svg') }}" alt="Twitter"></a>
+          <!-- Twitter removed per request -->
         </div>
       </div>
       <div class="footer-col">
@@ -271,8 +298,5 @@
     </div>
   </footer>
 
-  <script src="{{ url_for('static', path='js/cart.js') }}"></script>
-  <script src="{{ url_for('static', path='js/pages/home.js') }}"></script>
-  <script src="{{ url_for('static', path='js/pages/produtos.js') }}"></script>
 </body>
 </html>

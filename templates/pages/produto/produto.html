@@ -66,7 +66,7 @@
     <nav class="main-nav" aria-label="Menu principal">
       <!-- Logo na esquerda -->
       <a href="{{ url_for('index') }}" class="logo">
-        <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
+  <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
       </a>
 
       <!-- Links principais centralizados -->
@@ -110,10 +110,10 @@
             <a href="{{ url_for('index') }}">
               <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
             </a>
-            <a href="{{ url_for('catalogo') }}" class="cart-link">
+            <button id="cart-button" class="cart-button" aria-label="Abrir carrinho">
               <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt= "Carrinho" class="nav-icons">
               <span id="cart-count" class="cart-count">0</span>
-            </a>
+            </button>
           </div>
       </div>
     </nav>
@@ -133,10 +133,14 @@
       {% if not img_rel.startswith('img/') and not img_rel.startswith('assets/') and not img_rel.startswith('images/') and img_rel|length > 0 and '/' not in img_rel %}
         {% set img_rel = 'img/' ~ img_rel %}
       {% endif %}
-      <img src="{{ url_for('static', path=img_rel) }}" alt="{{ produto.nome }}" class="product-image-main">
+      {# Ensure img_rel is relative to static/ and use filename= #}
+      {% if img_rel.startswith('static/') %}
+        {% set img_rel = img_rel.replace('static/', '') %}
+      {% endif %}
+  <img src="{{ url_for('static', path=img_rel) }}" alt="{{ produto.nome }}" class="product-image-main">
       <div class="product-thumbnails">
         {# Render a single square thumbnail (you can expand to multiple images later) #}
-        <img src="{{ url_for('static', path=img_rel) }}" alt="{{ produto.nome }}" class="thumbnail active">
+  <img src="{{ url_for('static', path=img_rel) }}" alt="{{ produto.nome }}" class="thumbnail active">
       </div>
     </div>
 
@@ -284,7 +288,7 @@
         <div class="footer-social">
           <a href="#"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
           <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>
-          <a href="#"><img src="{{ url_for('static', path='assets/icons/twitter.svg') }}" alt="Twitter"></a>
+          <!-- Twitter removed per request -->
         </div>
       </div>
       <div class="footer-col">

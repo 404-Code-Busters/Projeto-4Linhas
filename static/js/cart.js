@@ -32,6 +32,7 @@ function _clearCartStorage() {
 function mostrarCarrinho() {
 	// Render cart into a modal. If modal not present, create it.
 	const cart = _getCartFromStorage();
+	try { console.debug('[cart.js] mostrarCarrinho() called — cart length:', Array.isArray(cart) ? cart.length : 0); } catch (e) { /* noop */ }
 	let modal = document.getElementById('cart-modal');
 	if (!modal) {
 		modal = document.createElement('div');
@@ -81,7 +82,7 @@ function mostrarCarrinho() {
 				<div class="cart-item-info">
 					<div class="cart-item-name">${item.nome || ''}</div>
 					<div class="cart-item-price">R$ ${itemTotal.toFixed(2)}</div>
-					<div class="cart-item-qty">Qtd: ${Number(item.quantidade || 1)}</div>
+					<div class="cart-item-qty">Qtd: <button class="qty-decr" data-idx="${idx}">-</button> <span class="qty-value">${Number(item.quantidade || 1)}</span> <button class="qty-incr" data-idx="${idx}">+</button></div>
 				</div>
 				<button class="cart-item-remove" data-idx="${idx}">Remover</button>
 			`;
@@ -95,6 +96,20 @@ function mostrarCarrinho() {
 			btn.addEventListener('click', (e) => {
 				const idx = Number(e.currentTarget.dataset.idx);
 				removeItemAtIndex(idx);
+			});
+		});
+
+		// attach qty +/- handlers
+		container.querySelectorAll('.qty-incr').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				const idx = Number(e.currentTarget.dataset.idx);
+				changeQuantityAtIndex(idx, 1);
+			});
+		});
+		container.querySelectorAll('.qty-decr').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				const idx = Number(e.currentTarget.dataset.idx);
+				changeQuantityAtIndex(idx, -1);
 			});
 		});
 	}
@@ -153,6 +168,27 @@ function removeItemAtIndex(idx) {
 	}
 }
 
+function changeQuantityAtIndex(idx, delta) {
+	try {
+		const cart = _getCartFromStorage();
+		if (idx >= 0 && idx < cart.length) {
+			const item = cart[idx];
+			const newQty = (Number(item.quantidade) || 1) + Number(delta);
+			if (newQty <= 0) {
+				// remove item if quantity falls to zero or below
+				cart.splice(idx, 1);
+			} else {
+				item.quantidade = newQty;
+			}
+			localStorage.setItem('cart', JSON.stringify(cart));
+			updateCartCount();
+			mostrarCarrinho();
+		}
+	} catch (e) {
+		console.error('Erro ao alterar quantidade do item:', e);
+	}
+}
+
 // Export to global scope (already global in browsers) but ensure availability
 window.mostrarCarrinho = mostrarCarrinho;
 window.updateCartCount = updateCartCount;
@@ -166,6 +202,19 @@ window.clearCart = _clearCartStorage;
  * item: { id (optional), nome, preco (optional), quantidade (optional) }
  */
 function adicionarAoCarrinho(item) {
+	// Prevent accidental double adds: ignore if same item added within 400ms
+	if (!window.__cart_last_adds) window.__cart_last_adds = new Map();
+	try {
+		const key = item.id || item.nome || '__anon__';
+		const last = window.__cart_last_adds.get(key) || 0;
+		const now = Date.now();
+		if (now - last < 400) {
+			// ignore duplicate rapid add
+			try { console.debug('[cart.js] Ignoring rapid duplicate add for', key); } catch (e) {}
+			return;
+		}
+		window.__cart_last_adds.set(key, now);
+	} catch (e) { /* ignore timestamp errors */ }
 	try {
 		const cart = _getCartFromStorage();
 		const id = item.id || item.nome;
@@ -200,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			el.addEventListener('click', (e) => {
 				// If it's an anchor that navigates to another page, prevent navigation and open modal
 				if (el.tagName.toLowerCase() === 'a') e.preventDefault();
+				try { console.debug('[cart.js] header candidate clicked, opening cart modal'); } catch (err) {}
 				openCartModal();
 			});
 			el.dataset.cartHandler = '1';
@@ -208,4 +258,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Ensure cart count is initialized
 	try { updateCartCount(); } catch (e) { /* ignore */ }
+});
+
+// Delegated click handler as a robust fallback: catches clicks on any current or future
+// cart triggers (#cart-button, .cart-button, a.cart-link, a[data-cart]) and opens the modal.
+document.addEventListener('click', function (e) {
+	try {
+		const trigger = e.target.closest && e.target.closest('#cart-button, .cart-button, a.cart-link, a[data-cart]');
+		if (!trigger) return;
+		// Prevent navigation for anchors and open modal
+		if (trigger.tagName && trigger.tagName.toLowerCase() === 'a') e.preventDefault();
+		// Ensure modal function exists
+		try { console.debug('[cart.js] delegated click caught on', trigger); } catch (err) {}
+		if (typeof mostrarCarrinho === 'function') {
+			mostrarCarrinho();
+		} else if (typeof openCartModal === 'function') {
+			openCartModal();
+		}
+	} catch (err) {
+		// swallow to avoid breaking page
+		console.warn('Delegated cart click handler error:', err);
+	}
+}, false);
+
+// Additional cross-page bindings: support product-detail pages and sites where header uses a button
+document.addEventListener('DOMContentLoaded', () => {
+	// Bind product detail 'add-to-cart' button(s) — some pages use .add-to-cart (single) or .add-to-cart-btn (list)
+	const detailBtns = document.querySelectorAll('.add-to-cart, .add-to-cart-btn');
+	detailBtns.forEach(btn => {
+		if (btn.dataset.__cartBound) return;
+		btn.addEventListener('click', (e) => {
+			try {
+				// If product page, try to collect sensible info
+				const card = e.target.closest('.product-main, .outfit-card, .related-card') || document;
+				const nameEl = card.querySelector('.product-title, h3, .product-card-title');
+				const productName = nameEl ? nameEl.textContent.trim() : 'Produto';
+				const priceEl = card.querySelector('.product-price') || card.querySelector('.related-price') || null;
+				let priceNumber = 0;
+				if (priceEl) {
+					priceNumber = parseFloat(String(priceEl.textContent).replace(/[^0-9,\.]/g, '').replace(',', '.')) || 0;
+				}
+				const imgEl = card.querySelector('img') || document.querySelector('img.product-image-main');
+				const imgSrc = imgEl ? imgEl.getAttribute('src') : '';
+				const id = btn.dataset && btn.dataset.id ? btn.dataset.id : undefined;
+				adicionarAoCarrinho({ id: id, nome: productName, preco: priceNumber, quantidade: 1, imagem: imgSrc });
+			} catch (err) {
+				console.error('Failed to add product via detail button:', err);
+			}
+		});
+		btn.dataset.__cartBound = '1';
+	});
+
+	// Ensure header cart button opens modal. Support both <a class="cart-link"> and <button id="cart-button">
+	const cartBtn = document.getElementById('cart-button') || document.querySelector('a.cart-link, a[data-cart], button.cart-button');
+	if (cartBtn && !cartBtn.dataset.__cartClick) {
+		cartBtn.addEventListener('click', (e) => {
+			// If anchor, prevent navigation to open modal
+			if (cartBtn.tagName.toLowerCase() === 'a') e.preventDefault();
+			mostrarCarrinho();
+		});
+		cartBtn.dataset.__cartClick = '1';
+	}
 });

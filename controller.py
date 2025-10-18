@@ -47,6 +47,14 @@ async def carrinho_page(request: Request):
         {"request": request}
     )
 
+# Login page route (named 'login' so templates can call url_for('login'))
+@router.get("/login", response_class=HTMLResponse, name="login")
+async def login_page(request: Request):
+    return templates.TemplateResponse(
+        "pages/login/login.html",
+        {"request": request}
+    )
+
 # -----------------------------
 # ROTAS DE API (JSON)
 # -----------------------------

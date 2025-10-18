@@ -752,8 +752,8 @@ body.scrolled .main-nav {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  /* Fixed height like original design so cards keep consistent visual size */
-  height: 300px;
+  /* Slightly larger card for visual preference */
+  height: 340px;
   transition: transform 0.3s ease;
   cursor: pointer;
 }
@@ -795,7 +795,7 @@ body.scrolled .main-nav {
 }
 
 /* Ensure the cart count badge sits on the top-right of the icon inside header on products page */
-.products-page .user-actions a { position: relative; display: inline-flex; align-items: center; }
+.products-page .user-actions a, .products-page .user-actions button { position: relative; display: inline-flex; align-items: center; }
 .products-page .user-actions #cart-count,
 .products-page .user-actions .cart-count {
   position: absolute !important;
@@ -838,6 +838,9 @@ body.scrolled .main-nav {
   padding: 2rem 1.5rem 1.5rem;
   transform: translateY(100%);
   transition: transform 0.3s ease;
+  /* Allow clicks to pass through to underlying link; enable only interactive children */
+  pointer-events: none;
+  z-index: 2;
 }
 
 .outfit-card:hover .outfit-overlay {
@@ -859,10 +862,18 @@ body.scrolled .main-nav {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s;
+  pointer-events: auto; /* make the button clickable despite overlay */
 }
 
 .outfit-btn:hover {
   background-color: #e05b2d;
+}
+
+/* Ensure overlay interactive elements (add-to-cart) are clickable */
+.outfit-overlay .add-to-cart-btn,
+.outfit-overlay .outfit-btn,
+.outfit-overlay a {
+  pointer-events: auto;
 }
 
 /* ===== RESPONSIVIDADE ===== */

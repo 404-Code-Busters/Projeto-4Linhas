@@ -108,7 +108,8 @@
   // Add to cart functionality
   const addToCartBtn = document.querySelector('.add-to-cart');
   if (addToCartBtn) {
-    addToCartBtn.addEventListener('click', () => {
+    if (!addToCartBtn.dataset.__cartBound) {
+      addToCartBtn.addEventListener('click', () => {
       const titleEl = document.querySelector('.product-title');
       const priceEl = document.querySelector('.product-price');
       const imgEl = document.querySelector('.product-image-main');
@@ -116,12 +117,14 @@
       const productPriceText = priceEl ? priceEl.textContent : 'R$ 0,00';
       const productPrice = parseFloat(productPriceText.replace('R$', '').replace(/[\.\s]/g, '').replace(',', '.')) || 0;
       const imageSrc = imgEl ? imgEl.getAttribute('src') : '';
-      try {
-        adicionarAoCarrinho({ id: undefined, nome: productTitle, preco: productPrice, quantidade: 1, imagem: imageSrc });
-      } catch (e) {
-        console.error('adicionarAoCarrinho not available:', e);
-      }
-    });
+        try {
+          adicionarAoCarrinho({ id: undefined, nome: productTitle, preco: productPrice, quantidade: 1, imagem: imageSrc });
+        } catch (e) {
+          console.error('adicionarAoCarrinho not available:', e);
+        }
+      });
+      addToCartBtn.dataset.__cartBound = '1';
+    }
   }
 
   // Add to wishlist functionality (placeholder)

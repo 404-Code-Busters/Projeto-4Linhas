@@ -18,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
 <script src="{{ url_for('static', path='js/pages/acompanhe.js') }}"></script>
+  <script src="{{ url_for('static', path='js/cart.js') }}"></script>
 </head>
 <body>
 
@@ -62,9 +63,9 @@
     <!-- Linha 2: Navegação principal -->
     <nav class="main-nav" aria-label="Menu principal">
       <!-- Logo na esquerda -->
-      <a href="home.html" class="logo">
+    <a href="home.html" class="logo">
   <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
-      </a>
+    </a>
 
       <!-- Links principais centralizados -->
       <ul class="menu-links">
@@ -107,9 +108,10 @@
             <a href="{{ url_for('index') }}">
               <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
             </a>
-            <a href="{{ url_for('catalogo') }}">
+            <button id="cart-button" class="cart-button" aria-label="Abrir carrinho">
               <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt= "Carrinho" class="nav-icons">
-            </a>
+              <span id="cart-count" class="cart-count">0</span>
+            </button>
           </div>
       </div>
     </nav>
@@ -203,7 +205,7 @@
         <div class="footer-social">
           <a href="#"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
           <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>
-          <a href="#"><img src="{{ url_for('static', path='assets/icons/twitter.svg') }}" alt="Twitter"></a>
+          <!-- Twitter removed per request -->
         </div>
       </div>
       <div class="footer-col">

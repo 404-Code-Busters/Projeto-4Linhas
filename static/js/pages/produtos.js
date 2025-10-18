@@ -128,18 +128,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
 
   addToCartButtons.forEach(button => {
+    if (button.dataset.__cartBound) return;
     button.addEventListener('click', (event) => {
       const card = event.target.closest('.outfit-card');
       if (!card) return;
 
-      const productName = card.querySelector('h3') ? card.querySelector('h3').textContent : 'Produto';
-      const priceText = card.querySelector('p') ? card.querySelector('p').textContent : 'R$ 0,00';
-        const priceNumber = parseFloat(priceText.replace(/[^\\d,]/g, '').replace(',', '.')) || 0;
+      const productName = card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : 'Produto';
+      // Prefer explicit price element, fallback to data-price on card, fallback to any <p>
+      let priceText = '';
+      const priceEl = card.querySelector('.product-price');
+      if (priceEl) {
+        priceText = priceEl.textContent || '';
+      } else if (card.dataset && card.dataset.price) {
+        priceText = card.dataset.price;
+      } else {
+        const p = card.querySelector('p');
+        priceText = p ? p.textContent : 'R$ 0,00';
+      }
+      const priceNumber = parseFloat(String(priceText).replace(/[^0-9,\.]/g, '').replace(',', '.')) || 0;
         const btn = event.currentTarget;
         const id = btn.dataset && btn.dataset.id ? btn.dataset.id : undefined;
         // Try to find image inside card
-        const imgEl = card.querySelector('img') || card.querySelector('.product-card-img');
-        const imgSrc = imgEl ? imgEl.getAttribute('src') : '';
+  const imgEl = card.querySelector('img.product-card-img') || card.querySelector('img');
+  const imgSrc = imgEl ? imgEl.getAttribute('src') : '';
 
         // Call adicionarAoCarrinho with an object (cart.js expects an item object)
         try {
@@ -148,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('adicionarAoCarrinho not available:', e);
         }
     });
+    button.dataset.__cartBound = '1';
   });
 
   // Update cart count
