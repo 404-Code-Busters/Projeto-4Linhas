@@ -2,7 +2,10 @@ from fastapi import FastAPI, APIRouter, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String, Float
+from database import Base, engine, SessionLocal
 import mysql.connector
+
 
 def conexao_db():
     conexao = mysql.connector.connect(
@@ -82,4 +85,11 @@ class Item(BaseModel):
     estoque: int
     data: str"""
 
-# PREÇO
+# ------------------------------------------------
+
+class Usuario(Base):
+    __tablename__="usuarios"
+    id = Column(Integer,primary_key=True, index=True)
+    nome = Column(String(50))
+    email = Column(String(100), unique=True)
+    senha = Column(String(200))
