@@ -10,13 +10,23 @@
     <ul>
         {% for p in produtos %}
         <li>
-            <a href="/produto/{{ p.id_produto }}">
+            <a href="/produto/id/{{ p.id_produto }}">
                 {{ p.nome }} - R$ {{ "%.2f"|format(p.preco) }}
             </a>
             <br>
             <small>Tamanho: {{ p.tamanho }} | Estoque: {{ p.estoque }}</small>
+
+            <div>
+                <img src="" alt="">
+            </div>
+
+            <form action="/carrinho/adicionar/{{ p.id_produto }}" method="post">
+                <input type="number" name="quantidade" value="1" min="1">
+                <button type="submit">Adicionar ao carrinho</button>
+            </form>
         </li>
         {% endfor %}
     </ul>
+    <a href="/carrinho">Ver o carrinho</a>
 </body>
 </html>
