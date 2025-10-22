@@ -71,8 +71,8 @@ def cadastrar_Clientes(request:Request,
     nome:str = Form(...), email:str = Form(...),
     senha:str = Form(...), db:Session = Depends(get_db)
 ):
-    Clientes = db.query(Clientes).filter(Clientes.email == email).first()
-    if Clientes:
+    cliente = db.query(Clientes).filter(Clientes.email == email).first()
+    if cliente:
         return {"mensagem":"E-mail já cadastrado!"}
     senha_hash = gerar_senha(senha)
     novo_Clientes = Clientes(nome=nome, email=email, senha=senha_hash)
@@ -126,12 +126,12 @@ async def adicionar_carrinho(request:Request, produto_id:int, quantidade:int=For
         return RedirectResponse(url="/login", status_code=303)
     email = payload.get("sub")
     clientes = db.query(Clientes).filter_by(email=email).first()
-    produto = db.query(Produtos).filter_by(id = produto_id).first()
+    produto = db.query(Produtos).filter_by(id_produto = produto_id).first()
     if not produto:
         return {"mensagem":"Produto não encontrado"}
     carrinho = carrinhos.get(clientes.id_cliente,[])
     carrinho.append({
-        "id":produto.id,
+        "id":produto.id_produto,
         "nome":produto.nome,
         "preco":produto.preco,
         "quantidade":quantidade
@@ -148,7 +148,7 @@ def ver_carrinho(request:Request,db:Session=Depends(get_db)):
         return RedirectResponse(url="/login",status_code=303)
     email=payload.get("sub")
     clientes=db.query(Clientes).filter_by(email=email).first()
-    carrinho=carrinhos.get(Clientes.id,[])
+    carrinho=carrinhos.get(clientes.id_cliente,[])
     total=sum(item["preco"]*item["quantidade"] for item in carrinho)
     return templates.TemplateResponse("carrinho.html",{
         "request":request,"carrinho":carrinho,"total":total
@@ -172,7 +172,7 @@ def checkout(request:Request,db:Session=Depends(get_db)):
     db.commit()
     db.refresh(pedido)
 
-"""    #novo item ao carrinho
+#novo item ao carrinho
     for item in carrinho:
         novo_item=ItemPedido(
             pedido_id=pedido.id,
@@ -183,9 +183,8 @@ def checkout(request:Request,db:Session=Depends(get_db)):
         db.add(novo_item)
     db.commit()
     #limpar o carrinho
-    carrinhos[usuario.id]=[]
-    return RedirectResponse(url="/meus-pedidos",
-                            status_code=303)
+    carrinhos[cliente.id]=[]
+    return RedirectResponse(url="/meus-pedidos",status_code=303)
 
 #listar pedidos do usuário
 @router.get("/meus-pedidos",response_class=HTMLResponse)
@@ -195,7 +194,6 @@ def meus_pedidos(request:Request,db:Session=Depends(get_db)):
     if not payload:
         return RedirectResponse(url="/login",status_code=303)
     email=payload.get("sub")
-    usuario=db.query(Usuario).filter_by(email=email).first()
-    pedidos=db.query(Pedido).filter_by(usuario_id=usuario.id).all()
-    return templates.TemplateResponse("meus_pedidos.html",
-            {"request":request,"pedidos":pedidos})"""
+    usuario=db.query(Clientes).filter_by(email=email).first()
+    pedidos=db.query(Pedidos).filter_by(usuario_id=usuario.id).all()
+    return templates.TemplateResponse("meus_pedidos.html", {"request":request,"pedidos":pedidos})

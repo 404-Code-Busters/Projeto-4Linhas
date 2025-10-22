@@ -11,6 +11,7 @@ class Clientes(Base):
     nome = Column(String(50))
     email = Column(String(100), unique=True)
     senha = Column(String(200))
+    pedidos=relationship("Pedidos",back_populates="clientes")
 
 # tabela produtos
 class Produtos(Base):
@@ -23,6 +24,7 @@ class Produtos(Base):
     tamanho = Column(String, nullable=False)
     estoque = Column(Integer, nullable=False)
     data_cadastro = Column(Integer, nullable=False)
+    
 
 # tabela pedidos
 class Pedidos(Base):
@@ -33,5 +35,17 @@ class Pedidos(Base):
     data_pedido = Column(String, nullable=False)
     status = Column(String, nullable=False)
     valor_total = Column(Float, nullable=False)
+    clientes = relationship("Clientes",back_populates="pedidos")
+    itens = relationship("ItemPedido",back_populates="pedido")
+
+class ItemPedido(Base):
+    __tablename__="itens_pedido"
+    id = Column(Integer,primary_key=True,index=True)
+    pedido_id = Column(Integer,ForeignKey("pedidos.id_pedido"))
+    produto_id = Column(Integer,ForeignKey("produtos.id_produto"))
+    quantidade = Column(Integer)
+    preco_unitario = Column(Float)
+    pedido = relationship("Pedidos",back_populates="itens")
+
 
 #Base.metadata.create_all(bind=engine)

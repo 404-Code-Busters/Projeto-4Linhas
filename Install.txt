@@ -1,0 +1,5 @@
+pip install fastapi['standard']
+pip install python-jose[cryptography] PyJWT
+pip install uvicorn
+pip install passlib
+pip install pymysql

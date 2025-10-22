@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho</title>
+</head>
+<body>
+    <h2>Meu Carrinho</h2>
+    {% if carrinho %}
+    <ul>
+        {% for i in carrinho %}
+        <li> {{i.nome}} - {{i.quantidade}} R$ {{i.preco}} </li>
+        {% endfor %}
+    </ul>
+    <p>Total: R$ {{total}}</p>
+   
+    <br><br>
+    <form action="/checkout" method="post">
+        <button type="submit">Finalizar compra</button>
+    </form>
+    {% else %}
+        <p>Carrinho Vazio</p>
+    {% endif %}
+    <a href="/">Voltar a home</a>
+</body>
+</html>

@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 #Conexão com o banco de dados sqlite
-DATABASE_URL = "mysql+pymysql://root:dev1t_24@localhost:3306/ecommerce_esportes"
+DATABASE_URL = "mysql+pymysql://roott:dev1t_24@localhost:3306/ecommerce_esportes"
 
 #Criar engine
 engine = create_engine(DATABASE_URL)
