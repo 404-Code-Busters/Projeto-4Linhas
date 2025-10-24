@@ -5,3 +5,5 @@ from controller import router
 app = FastAPI(title="Ecommerce Esportes")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(router)
+
+# python -m uvicorn main:app --reload

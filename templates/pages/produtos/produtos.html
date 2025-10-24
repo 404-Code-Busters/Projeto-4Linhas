@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +13,115 @@
   <link rel="stylesheet" href="{{ url_for('static', path='css/pages/home.css') }}">
   <!-- CSS inline -->
   <link rel="stylesheet" href="{{ url_for('static', path='css/inline/produtos-inline.css') }}">
+  
+  <style>
+    /* Estilo dos cards de produtos */
+    .outfit-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 2rem;
+    }
+
+    .outfit-card {
+        position: relative;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .outfit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .product-link {
+        display: block;
+        padding: 1rem;
+        flex: 1;
+    }
+
+    .product-card-img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 4px;
+        background-color: #f5f5f5;
+    }
+
+    .outfit-overlay {
+        padding: 1.5rem;
+        background: #fff;
+        border-top: 1px solid #eee;
+    }
+
+    .outfit-overlay h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .product-desc {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-price {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #FF6B35;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-size {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .add-to-cart-btn {
+        width: 100%;
+        padding: 1rem;
+        background-color: #FF6B35;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .add-to-cart-btn:hover {
+        background-color: #e85a2c;
+    }
+
+    .add-to-cart-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    /* Ajuste responsivo */
+    @media (max-width: 768px) {
+        .outfit-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            padding: 1rem;
+        }
+
+        .outfit-card {
+            min-height: 350px;
+        }
+    }
+  </style>
 
   <!-- JS específico da página (loaded at page end to avoid duplicate execution) -->
 
@@ -22,6 +133,45 @@
   <script src="{{ url_for('static', path='js/cart.js') }}"></script>
   <script src="{{ url_for('static', path='js/pages/home.js') }}"></script>
   <script src="{{ url_for('static', path='js/pages/produtos.js') }}"></script>
+  <!-- Inicialização do carrinho -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Adiciona listeners para todos os botões de "Adicionar ao Carrinho"
+      const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+      addToCartButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+          e.preventDefault();
+          const productId = this.getAttribute('data-product-id');
+          console.log('Clique no botão de adicionar ao carrinho:', productId);
+          
+          try {
+            // Desabilita o botão durante o processamento
+            this.disabled = true;
+            
+            await adicionarAoCarrinho(productId);
+            
+            // Mostra feedback visual
+            this.textContent = 'Adicionado!';
+            setTimeout(() => {
+              this.textContent = 'Adicionar ao Carrinho';
+              this.disabled = false;
+            }, 2000);
+            
+          } catch (error) {
+            console.error('Erro ao adicionar ao carrinho:', error);
+            this.textContent = 'Erro!';
+            setTimeout(() => {
+              this.textContent = 'Adicionar ao Carrinho';
+              this.disabled = false;
+            }, 2000);
+          }
+        });
+      });
+
+      // Atualiza o contador do carrinho ao carregar a página
+      atualizarContadorCarrinho();
+    });
+  </script>
   <!-- Ensure cart button opens modal (fallback if cart.js didn't bind) -->
 
   <script>
@@ -133,6 +283,9 @@
             <button class="search-button" aria-label="Buscar">
               <img src="{{ url_for('static', path='assets/icons/magnifying-glass.png') }}" alt="Buscar" class="search-icon">
             </button>
+            <a href="{{ url_for('perfil') }}" class="profile-link" aria-label="Perfil">
+              <img src="{{ url_for('static', path='assets/icons/user.png') }}" alt="Perfil" class="nav-icons profile-icon">
+            </a>
             <a href="{{ url_for('catalogo') }}">
               <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
             </a>
@@ -208,22 +361,21 @@
           {% for p in produtos %}
           <div class="outfit-card" data-price="{{ "%.2f"|format(p.preco) }}">
             <a href="{{ url_for('detalhe_produto', id_produto=p.id_produto) }}" class="product-link">
-              {# Simple image resolution: use p.imagem_caminho if present, otherwise fallback to placeholder under static/img/ #}
-              {% set img_rel = (p.imagem_caminho or '') | trim %}
-              {# Strip leading 'static/' if present in DB value so url_for receives a filename relative to static/ #}
-              {% if img_rel.startswith('static/') %}
-                {% set img_rel = img_rel.replace('static/', '') %}
+              {% if p.imagem_caminho %}
+                <img class="product-card-img" src="{{ url_for('static', path=p.imagem_caminho.replace('static/', '')) }}" alt="{{ p.nome }}">
+              {% else %}
+                <img class="product-card-img" src="{{ url_for('static', path='img/placeholder.png') }}" alt="{{ p.nome }}">
               {% endif %}
-              {% if img_rel == '' %}
-                {% set img_rel = 'img/placeholder.png' %}
-              {% endif %}
-              <img class="product-card-img" src="{{ url_for('static', path=img_rel) }}" alt="{{ p.nome }}">
             </a>
             <div class="outfit-overlay">
               <h3>{{ p.nome }}</h3>
               <p class="product-desc">{{ p.descricao }}</p>
               <p class="product-price">R$ {{ "%.2f"|format(p.preco) }}</p>
-              <button class="add-to-cart-btn" data-id="{{ p.id_produto }}">Adicionar ao Carrinho</button>
+              <p class="product-size">Tamanho: {{ p.tamanho }}</p>
+              <button class="add-to-cart-btn" data-product-id="{{ p.id_produto }}"
+                      {% if p.estoque <= 0 %}disabled{% endif %}>
+                {% if p.estoque > 0 %}Adicionar ao Carrinho{% else %}Fora de Estoque{% endif %}
+              </button>
             </div>
           </div>
           {% endfor %}
@@ -233,7 +385,7 @@
     </section>
   </main>
 
-</footer>
+  <!-- FOOTER -->
 
   <!-- FOOTER -->
   <footer class="site-footer">

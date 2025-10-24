@@ -1,0 +1,63 @@
+/* Fundo geral */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #0d1b2a;
+  margin: 0;
+  padding: 0;
+} /* Ícones da barra */
+.menu-icon,
+.search-icon {
+  font-size: 20px;
+  cursor: pointer;
+} /* Centralização do conteúdo */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 85vh;
+} /* Card de formulário */
+.form-card {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  width: 320px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+.form-card h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+} /* Campos do formulário */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+button {
+  background-color: #ff5c2b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover {
+  background-color: #e14c1a;
+} /* Link de login */
+.link-login {
+  margin-top: 10px;
+  font-size: 14px;
+}
+.link-login a {
+  color: #ff5c2b;
+  text-decoration: none;
+}
+.link-login a:hover {
+  text-decoration: underline;
+}

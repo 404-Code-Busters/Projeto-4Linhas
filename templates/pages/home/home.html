@@ -131,6 +131,9 @@
             <button class="search-button" aria-label="Buscar">
               <img src="{{ url_for('static', path='assets/icons/magnifying-glass.png') }}" alt="Buscar" class="search-icon">
             </button>
+            <a href="{{ url_for('perfil') }}" class="profile-link" aria-label="Perfil">
+              <img src="{{ url_for('static', path='assets/icons/user.png') }}" alt="Perfil" class="nav-icons profile-icon">
+            </a>
                   <a href="{{ url_for('index') }}">
                     <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
                   </a>

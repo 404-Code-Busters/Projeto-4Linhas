@@ -6,7 +6,10 @@
 </head>
 <body>
     <h2>Ocorreu um erro!</h2>
-    <p>{{ mensagem }}</p>
+    <p>{{ erro }}</p>
+    {% if traceback %}
+    <pre>{{ traceback }}</pre>
+    {% endif %}
     <a href="/">Voltar</a>
 </body>
 </html>

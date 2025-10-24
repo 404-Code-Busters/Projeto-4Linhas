@@ -51,6 +51,9 @@
       <button class="search-button" aria-label="Buscar">
   <img src="{{ url_for('static', path='assets/icons/magnifying-glass.png') }}" alt="Buscar" class="search-icon">
       </button>
+      <a href="{{ url_for('perfil') }}" class="profile-link" aria-label="Perfil">
+        <img src="{{ url_for('static', path='assets/icons/user.png') }}" alt="Perfil" class="nav-icons profile-icon">
+      </a>
 
       <!-- Botão hambúrguer para mobile -->
       <button class="hamburger" aria-label="Menu">
@@ -95,9 +98,10 @@
 
     <section class="login-content">
       <div class="login-box">
-        <form action="/dashboard" method="POST">
+        <form action="/login" method="post">
           <input type="email" name="email" placeholder="Email" required>
-          <input type="password" name="password" placeholder="Senha" required>
+          <!-- backend espera o campo 'senha' -->
+          <input type="password" name="senha" placeholder="Senha" required>
           <button type="submit">Entrar</button>
         </form>
         <div class="forgot">
