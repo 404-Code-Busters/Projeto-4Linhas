@@ -1,30 +1,135 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tela de Cadastro</title>
-    <link rel="stylesheet" href="/static/css/pages/cadastre-se.css" />
+    <title>Cadastro - 4linhas</title>
+
+    <!-- CSS base (reset, variáveis, estilos globais) -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+    <!-- Full header/home styles (required for header layout) -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/home.css') }}">
+  <!-- Header component styles -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
+    <!-- CSS especifico da página -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/cadastre-se.css') }}">
+
+    <!-- Fonte Google Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+    <script src="{{ url_for('static', path='js/cart.js') }}"></script>
   </head>
   <body>
-    <section class="container">
-      <div class="form-card">
-        <h2>Cadastro</h2>
 
-        
+    <!-- =============== HEADER (partial) =============== -->
+    {% include 'partials/header.html' %}
 
-        <h2>Cadastro de Usuário</h2>
-        <form action="/register" method="post">
-            <label>Nome:</label> <br>
-            <input type="text" name="nome"> <br>
-            <label>E-mail:</label> <br>
-            <input type="text" name="email"> <br>
-            <label>Senha:</label> <br>
-            <input type="password" name="senha"> <br>
+    <!-- MAIN: formulário centralizado com espaçamento correto -->
+    <main class="page-main">
+      <section class="container">
+        <div class="form-card">
+          <h2>Cadastro de Usuário</h2>
+          <form action="/register" method="post" id="register-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" id="nome" name="nome" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" required />
+                <div class="password-meter" id="password-meter">
+                  <div class="password-meter-bar" id="password-meter-bar"></div>
+                </div>
+                <div class="password-hint" id="password-hint">Use ao menos 8 caracteres, incluindo letras e números.</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="confirmar">Confirmar Senha</label>
+                <input type="password" id="confirmar" name="confirmar" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="tel" id="telefone" name="telefone" placeholder="(99) 99999-9999" />
+              </div>
+            </div>
+
             <button type="submit">Cadastrar</button>
-        </form>
+
+            <p class="link-login">Já tem uma conta? <a href="{{ url_for('login') }}">Entrar</a></p>
+          </form>
         </div>
-    </section>
+      </section>
+    </main>
+
+  <!-- Header behavior and page scripts -->
+  <script src="{{ url_for('static', path='js/pages/home.js') }}"></script>
+  <script>
+      // Indicador simples de força de senha
+      (function(){
+        const pwd = document.getElementById('senha');
+        const meter = document.getElementById('password-meter-bar');
+        const hint = document.getElementById('password-hint');
+        const form = document.getElementById('register-form');
+
+        function scorePassword(s){
+          let score = 0;
+          if (!s) return 0;
+          if (s.length >= 8) score += 1;
+          if (/[A-Z]/.test(s)) score += 1;
+          if (/[0-9]/.test(s)) score += 1;
+          if (/[^A-Za-z0-9]/.test(s)) score += 1;
+          if (s.length >= 12) score += 1;
+          return score; // 0..5
+        }
+
+        function updateMeter(){
+          const val = pwd.value || '';
+          const s = scorePassword(val);
+          const pct = (s / 5) * 100;
+          meter.style.width = pct + '%';
+          meter.style.background = s <= 1 ? '#e74c3c' : s <= 3 ? '#f1c40f' : '#2ecc71';
+          if (val.length === 0) hint.textContent = 'Use ao menos 8 caracteres, incluindo letras e números.';
+          else if (s <= 1) hint.textContent = 'Senha fraca';
+          else if (s <= 3) hint.textContent = 'Senha média';
+          else hint.textContent = 'Senha forte';
+        }
+
+        pwd && pwd.addEventListener('input', updateMeter);
+
+        form && form.addEventListener('submit', (e)=>{
+          const a = pwd.value || '';
+          const b = document.getElementById('confirmar').value || '';
+          if (a !== b){
+            e.preventDefault();
+            alert('As senhas não coincidem.');
+            return false;
+          }
+          if (scorePassword(a) < 2){
+            e.preventDefault();
+            alert('Escolha uma senha mais forte.');
+            return false;
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
 

@@ -146,8 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
         priceText = p ? p.textContent : 'R$ 0,00';
       }
       const priceNumber = parseFloat(String(priceText).replace(/[^0-9,\.]/g, '').replace(',', '.')) || 0;
-        const btn = event.currentTarget;
-        const id = btn.dataset && btn.dataset.id ? btn.dataset.id : undefined;
+  const btn = event.currentTarget;
+  const id = btn.dataset && (btn.dataset.productId || btn.dataset.id) ? (btn.dataset.productId || btn.dataset.id) : btn.getAttribute('data-product-id');
         // Try to find image inside card
   const imgEl = card.querySelector('img.product-card-img') || card.querySelector('img');
   const imgSrc = imgEl ? imgEl.getAttribute('src') : '';

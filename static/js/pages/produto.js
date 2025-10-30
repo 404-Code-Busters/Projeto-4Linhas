@@ -117,11 +117,13 @@
       const productPriceText = priceEl ? priceEl.textContent : 'R$ 0,00';
       const productPrice = parseFloat(productPriceText.replace('R$', '').replace(/[\.\s]/g, '').replace(',', '.')) || 0;
       const imageSrc = imgEl ? imgEl.getAttribute('src') : '';
-        try {
-          adicionarAoCarrinho({ id: undefined, nome: productTitle, preco: productPrice, quantidade: 1, imagem: imageSrc });
-        } catch (e) {
-          console.error('adicionarAoCarrinho not available:', e);
-        }
+          try {
+            const btn = addToCartBtn;
+            const id = btn && (btn.dataset.productId || btn.dataset.id) ? (btn.dataset.productId || btn.dataset.id) : btn.getAttribute('data-product-id');
+            adicionarAoCarrinho({ id: id, nome: productTitle, preco: productPrice, quantidade: 1, imagem: imageSrc });
+          } catch (e) {
+            console.error('adicionarAoCarrinho not available:', e);
+          }
       });
       addToCartBtn.dataset.__cartBound = '1';
     }

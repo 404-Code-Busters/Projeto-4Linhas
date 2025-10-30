@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Administrativo</title>
+    <link rel="stylesheet" href="/static/css/pages/admin.css" />
+  </head>
+  <body>
+    <header class="admin-header">
+      <div class="wrap">
+        <h1>Painel Administrativo</h1>
+        <nav class="admin-nav">
+          <a href="/admin/produtos">Produtos</a>
+          <a href="/admin/pedidos">Pedidos</a>
+          <a href="/admin/usuarios">Usuários</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="admin-main wrap">
+      <section class="card">
+        <h2>Visão Geral</h2>
+        <p>Aqui você verá métricas e atalhos para gerenciar o site.</p>
+        <div class="tiles">
+          <div class="tile">Pedidos pendentes<br><strong>—</strong></div>
+          <div class="tile">Produtos cadastrados<br><strong>—</strong></div>
+          <div class="tile">Usuários<br><strong>—</strong></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Ações rápidas</h2>
+        <div class="actions">
+          <a class="btn" href="/admin/produtos/novo">Novo produto</a>
+          <a class="btn" href="/admin/pedidos">Ver pedidos</a>
+        </div>
+      </section>
+    </main>
+  </body>
+  </html>

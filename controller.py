@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Form, UploadFile, File, Depends
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import os, shutil
@@ -121,7 +121,7 @@ def cadastro_page(request:Request):
     })
 
 # Rota para processar cadastro
-@router.post("/cadastro")
+@router.post("/register")
 def cadastrar_cliente(
     request:Request,
     nome:str = Form(...), 
@@ -228,14 +228,19 @@ def carrinho_conteudo(request:Request, db:Session = Depends(get_db)):
 @router.get("/carrinho/contador")
 def carrinho_contador(request:Request, db:Session = Depends(get_db)):
     token = request.cookies.get("token")
-    if not token or not verificar_token(token):
+    if not token:
         return {"quantidade": 0}
-    
+
     payload = verificar_token(token)
+    if not payload:
+        return {"quantidade": 0}
+
     email = payload.get("sub")
     cliente = db.query(Clientes).filter_by(email=email).first()
+    if not cliente:
+        return {"quantidade": 0}
+
     carrinho = carrinhos.get(cliente.id_cliente, [])
-    
     quantidade = sum(item["quantidade"] for item in carrinho)
     return {"quantidade": quantidade}
 
@@ -250,14 +255,16 @@ async def adicionar_carrinho(
     token = request.cookies.get("token")
     payload = verificar_token(token)
     if not payload:
-        return RedirectResponse(url="/login", status_code=303)
-    
+        return JSONResponse({"mensagem": "Login necessário"}, status_code=401)
+
     email = payload.get("sub")
     cliente = db.query(Clientes).filter_by(email=email).first()
+    if not cliente:
+        return JSONResponse({"mensagem": "Cliente não encontrado"}, status_code=401)
+
     produto = db.query(Produtos).filter_by(id_produto=produto_id).first()
-    
     if not produto:
-        return {"mensagem": "Produto não encontrado"}
+        return JSONResponse({"mensagem": "Produto não encontrado"}, status_code=404)
     
     carrinho = carrinhos.get(cliente.id_cliente, [])
     
@@ -265,7 +272,12 @@ async def adicionar_carrinho(
     print(f"Produto encontrado: {produto.nome}, preço: {produto.preco}, imagem: {produto.imagem_caminho}")
     
     # Verifica se o produto já existe no carrinho
-    produto_existente = next((item for item in carrinho if item["id"] == produto_id), None)
+    produto_existente = None
+    for item in carrinho:
+        if item["id"] == produto_id:
+            produto_existente = item
+            break
+            
     if produto_existente:
         produto_existente["quantidade"] += quantidade
         print(f"Produto já existe no carrinho, nova quantidade: {produto_existente['quantidade']}")
@@ -282,7 +294,7 @@ async def adicionar_carrinho(
     
     carrinhos[cliente.id_cliente] = carrinho
     print(f"Carrinho atualizado para cliente {cliente.id_cliente}: {carrinho}")
-    return {"mensagem": "Produto adicionado ao carrinho"}
+    return JSONResponse({"mensagem": "Produto adicionado ao carrinho", "success": True}, status_code=200)
 
 # Rota para atualizar quantidade de item no carrinho
 @router.post("/carrinho/atualizar/{produto_id}")

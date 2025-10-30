@@ -1,0 +1,15 @@
+/* Estilos simples para painel administrativo */
+body { font-family: Inter, system-ui, Arial, sans-serif; background:#f6f8fa; margin:0; color:#0f1721; }
+.wrap { max-width:1100px; margin:0 auto; padding:20px; }
+.admin-header { background:#0d1b2a; color:#fff; padding:18px 0; }
+.admin-header h1 { margin:0; font-size:20px; display:inline-block; }
+.admin-nav { float:right; }
+.admin-nav a { color:#fff; text-decoration:none; margin-left:14px; font-weight:600; }
+.admin-main { display:flex; gap:20px; padding:28px 20px; box-sizing:border-box; }
+.card { background:#fff; padding:18px; border-radius:10px; box-shadow:0 6px 18px rgba(2,6,23,0.06); flex:1; }
+.tiles { display:flex; gap:12px; margin-top:12px; }
+.tile { background:#fbfcfd; padding:14px; border-radius:8px; flex:1; text-align:center; font-weight:600; }
+.actions { margin-top:12px; display:flex; gap:10px; }
+.btn { background:#0d1b2a; color:#fff; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:700; }
+
+@media (max-width:900px){ .admin-main { flex-direction:column; } .admin-nav { float:none; margin-top:8px; } }
