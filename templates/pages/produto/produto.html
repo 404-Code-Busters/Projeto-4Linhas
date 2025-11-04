@@ -125,6 +125,30 @@
   <!-- Produto Principal -->
   <main class="product-main">
     <div class="product-gallery">
+
+      {# Pega caminho da imagem do produto #}
+      {% set img_path = produto.imagem_caminho or '' %}
+
+      {# Normaliza o caminho: remove 'static/' e adiciona 'img/' se necessário #}
+      {% if img_path.startswith('static/') %}
+        {% set img_path = img_path[7:] %}
+      {% elif '/' not in img_path and img_path %}
+        {% set img_path = 'img/' ~ img_path %}
+      {% endif %}
+
+      {# Exibe imagem principal e miniatura #}
+      <img src="{{ url_for('static', path=img_path) }}" alt="{{ produto.nome }}" class="product-image-main">
+
+      <div class="product-thumbnails">
+        <img src="{{ url_for('static', path=img_path) }}" alt="{{ produto.nome }}" class="thumbnail active">
+      </div>
+
+    </div>
+
+    <!-- versão antiga 
+
+  <main class="product-main">
+    <div class="product-gallery">
       {# Resolve imagem do DB: se começar com 'static/' remove a parte estática e usa url_for #}
       {% set img_path = (produto.imagem_caminho or '') %}
       {% if img_path.startswith('static/') %}
@@ -146,6 +170,7 @@
   <img src="{{ url_for('static', path=img_rel) }}" alt="{{ produto.nome }}" class="thumbnail active">
       </div>
     </div>
+    -->
 
     <div class="product-info">
       <h1 class="product-title">{{ produto.nome }}</h1>

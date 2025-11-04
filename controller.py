@@ -108,8 +108,16 @@ def login(request: Request,
     if not cliente or not verificar_hash_senha(senha, cliente.senha):
         return {'mensagem': "Credenciais inválidas"}
     
-    token = criar_token({"sub": cliente.email})
-    response = RedirectResponse(url="/perfil", status_code=303)
+    token = criar_token({"sub": cliente.email,
+    "is_admin":cliente.is_admin})
+
+    #Criar um if de admin ou user normal
+    if cliente.is_admin:
+        destino = "/admin"
+    else:
+        destino = "/perfil"
+
+    response = RedirectResponse(url=destino, status_code=303)
     response.set_cookie(key="token", value=token, httponly=True)
     return response
 
@@ -398,3 +406,124 @@ async def acompanhe(request:Request):
 
 # Duplicate/older route definitions removed to avoid conflicts.
 # The routes above provide the canonical implementations for perfil, carrinho and related endpoints.
+
+####################################################################################
+####################################################################################
+#------------------------------AÇÕES DE UM ADMIN-------------------------------------------
+#------------------------------FOI ATUALIZADO SÓ AS FUNÇÕES DESTE BLOCO--------------------
+
+#Rota admin crud nos produtos
+@router.get("/admin", response_class=HTMLResponse)
+def pagina_admin(request:Request, db:Session=Depends(get_db)):
+    #Token do admin
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload or not payload.get("is_admin"):
+        return RedirectResponse(url="/", status_code=303)
+    
+    # Buscar dados necessários
+    produtos = db.query(Produtos).all()
+    pedidos = db.query(Pedidos).all()
+    clientes = db.query(Clientes).all()
+    
+    return templates.TemplateResponse("pages/admin/admin.html", {
+        "request": request,
+        "produtos": produtos,
+        "pedidos": pedidos,
+        "clientes": clientes
+    })
+
+#Rota criar produto
+@router.post("/admin/produto")
+def criar_produto(request: Request,
+    nome: str = Form(...),
+    descricao: str = Form(None),
+    preco: float = Form(...),
+    tamanho: str = Form(...),
+    cor: str = Form(...), 
+    imagem: UploadFile = File(None),
+    imagem1: UploadFile = File(None),
+    imagem2: UploadFile = File(None),
+    imagem3: UploadFile = File(None),
+    estoque: int = Form(...),
+    db: Session = Depends(get_db)
+):
+    caminho_arquivo = None
+    if imagem:
+        caminho_arquivo = f"{UPLOAD_DIR}/{imagem.filename}"
+        with open(caminho_arquivo, "wb") as arquivo:
+            shutil.copyfileobj(imagem.file, arquivo)
+    
+    novo_produto = Produtos(
+        nome=nome,
+        descricao=descricao,
+        preco=preco,
+        tamanho=tamanho,
+        cor=cor,
+        imagem_caminho=imagem.filename if imagem else None,
+        imagem_caminho1=imagem.filename if imagem1 else None,
+        imagem_caminho2=imagem.filename if imagem2 else None,
+        imagem_caminho3=imagem.filename if imagem3 else None,
+        estoque=estoque)
+    
+    db.add(novo_produto)
+    db.commit()
+    db.refresh(novo_produto)
+    return RedirectResponse(url="/admin", status_code=303)
+
+
+
+#Editar produto get edição do produto
+@router.get("/admin/produto/editar/{id}", response_class=HTMLResponse)
+def editar_produto(id: int, request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload or not payload.get("is_admin"):
+        return RedirectResponse(url="/", status_code=303)
+    produto = db.query(Produtos).filter(Produtos.id == id).first()
+    return templates.TemplateResponse("editar.html", {"request": request, "produto": produto})
+
+
+@router.post("/admin/produto/atualizar/{id}")
+def atualizar_produto(id: int,
+    nome: str = Form(...),
+    descricao: str = Form(None),
+    categoria: str = Form(...),
+    preco: float = Form(...),
+    tamanho: str = Form(...),
+    estoque: int = Form(...),
+    imagem: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
+    produto = db.query(Produtos).filter(Produtos.id == id).first()
+    if not produto:
+        return RedirectResponse(url="/admin", status_code=303)
+    
+    produto.nome = nome
+    produto.descricao = descricao
+    produto.categoria = categoria
+    produto.preco = preco
+    produto.tamanho = tamanho
+    produto.estoque = estoque
+    
+    if imagem and imagem.filename != "":
+        caminho_arquivo = f"{UPLOAD_DIR}/{imagem.filename}"
+        with open(caminho_arquivo, "wb") as arquivo:
+            shutil.copyfileobj(imagem.file, arquivo)
+        produto.imagem_caminho = imagem.filename
+    
+    db.commit()
+    db.refresh(produto)
+    return RedirectResponse(url="/admin", status_code=303)
+
+
+#Deletar produto
+@router.post("/admin/produto/deletar/{id}")
+def deletar_produto(id: int, db: Session = Depends(get_db)):
+    produto = db.query(Produtos).filter(Produtos.id == id).first()
+    if produto:
+        db.delete(produto)
+        db.commit()
+    return RedirectResponse(url="/admin", status_code=303)
+
+#--------------------------------------------------------FIM DAS AÇÕES DE UM ADMIN------------------------------------------------------------------------

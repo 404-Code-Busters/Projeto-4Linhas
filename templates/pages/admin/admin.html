@@ -1,41 +1,238 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Painel Administrativo</title>
-    <link rel="stylesheet" href="/static/css/pages/admin.css" />
-  </head>
-  <body>
-    <header class="admin-header">
-      <div class="wrap">
-        <h1>Painel Administrativo</h1>
-        <nav class="admin-nav">
-          <a href="/admin/produtos">Produtos</a>
-          <a href="/admin/pedidos">Pedidos</a>
-          <a href="/admin/usuarios">Usuários</a>
-        </nav>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4Linhas - Painel Administrativo</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/admin.css') }}">
+  <link rel="icon" href="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}">
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    section {
+      margin-bottom: 20px;
+      scroll-margin-top: 80px;
+    }
+    .form-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .danger {
+      background-color: #c1121f !important;
+    }
+    .danger:hover {
+      background-color: #a10f1a !important;
+    }
+  </style>
+</head>
+<body>
+  <header class="admin-header">
+    <div class="wrap">
+      <h1>Painel Administrativo</h1>
+      <nav class="admin-nav">
+        <a href="#produtos">Produtos</a>
+        <a href="#pedidos">Pedidos</a>
+        <a href="#usuarios">Usuários</a>
+        <a href="/">Voltar ao Site</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-main wrap">
+
+    <!-- Seção de Boas-vindas -->
+    <section id="inicio" class="card destaque">
+      <h2>Bem-vindo ao Painel Administrativo 👋</h2>
+      <p>Gerencie os produtos, pedidos e usuários de forma prática e centralizada.</p>
+      <div class="tiles">
+        <div class="tile">
+          <span>Produtos Cadastrados</span>
+          <strong id="produtosCount">{{ produtos|length }}</strong>
+        </div>
+        <div class="tile">
+          <span>Total de Pedidos</span>
+          <strong>{{ pedidos|length }}</strong>
+        </div>
+        <div class="tile">
+          <span>Usuários Cadastrados</span>
+          <strong>{{ clientes|length }}</strong>
+        </div>
       </div>
-    </header>
+    </section>
 
-    <main class="admin-main wrap">
-      <section class="card">
-        <h2>Visão Geral</h2>
-        <p>Aqui você verá métricas e atalhos para gerenciar o site.</p>
-        <div class="tiles">
-          <div class="tile">Pedidos pendentes<br><strong>—</strong></div>
-          <div class="tile">Produtos cadastrados<br><strong>—</strong></div>
-          <div class="tile">Usuários<br><strong>—</strong></div>
-        </div>
-      </section>
+    <!-- Seção de Produtos -->
+    <section id="produtos" class="card">
+      <h2>📦 Gerenciar Produtos</h2>
+      
+      <!-- Formulário para Novo Produto -->
+      <div class="form-section">
+        <h3>➕ Adicionar Novo Produto</h3>
+        <form action="/admin/produto" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <input type="text" name="nome" placeholder="Nome do produto" required>
+            <textarea name="descricao" placeholder="Descrição do produto"></textarea>
+            <input type="number" name="preco" placeholder="Preço" step="0.01" required>
+            <select name="tamanho" required>
+              <option value="">Selecione o tamanho</option>
+              <option value="PP">PP</option>
+              <option value="P">P</option>
+              <option value="M">M</option>
+              <option value="G">G</option>
+              <option value="GG">GG</option>
+              <option value="XG">XG</option>
+            </select>
+            <textarea name="cor" placeholder="Descrição de cor"></textarea>
+            <input type="file" name="imagem" accept="img/*">
+            <input type="file" name="imagem1" accept="img/*">
+            <input type="file" name="imagem2" accept="img/*">
+            <input type="file" name="imagem3" accept="img/*">
+            <input type="number" name="estoque" placeholder="Quantidade em estoque" required>
+          </div>
+          <button type="submit" class="btn">Cadastrar Produto</button>
+        </form>
+      </div>
 
-      <section class="card">
-        <h2>Ações rápidas</h2>
-        <div class="actions">
-          <a class="btn" href="/admin/produtos/novo">Novo produto</a>
-          <a class="btn" href="/admin/pedidos">Ver pedidos</a>
-        </div>
-      </section>
-    </main>
-  </body>
-  </html>
+      <!-- Tabela de Produtos -->
+      <div class="table-section">
+        <h3>Lista de Produtos</h3>
+        <input type="text" class="busca" id="buscaProdutos" placeholder="Buscar produtos...">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Preço</th>
+              <th>Estoque</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if produtos %}
+              {% for p in produtos %}
+              <tr>
+                <td>{{ p.id_produto }}</td>
+                <td>{{ p.nome }}</td>
+                <td>R$ {{ "%.2f"|format(p.preco) }}</td>
+                <td>{{ p.estoque if p.estoque is not none else '-' }}</td>
+                <td>
+                  <form action="/admin/produto/{{ p.id_produto }}/delete" method="POST" style="display:inline;" onsubmit="return confirmarExclusao({{ p.id_produto }})">
+                    <button type="submit" class="btn small danger">Excluir</button>
+                  </form>
+                  <a href="/admin/produto/{{ p.id_produto }}/editar" class="btn small">Editar</a>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+    </section>
+
+    <!-- Seção de Pedidos -->
+    <section id="pedidos" class="card">
+      <h2>📋 Gerenciar Pedidos</h2>
+      {% if pedidos %}
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>ID Pedido</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+      </table>
+      {% else %}
+      <p>Nenhum pedido encontrado.</p>
+      {% endif %}
+    </section>
+
+    <!-- Seção de Usuários -->
+    <section id="usuarios" class="card">
+      <h2>� Gerenciar Usuários</h2>
+      {% if clientes %}
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cliente in clientes %}
+          <tr>
+            <td>{{ cliente.id_cliente }}</td>
+            <td>{{ cliente.nome }}</td>
+            <td>{{ cliente.email }}</td>
+            <td>{{ 'Admin' if cliente.is_admin else 'Cliente' }}</td>
+            <td>
+              <button class="btn small">Editar</button>
+              <button class="btn small danger">Desativar</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>Nenhum usuário encontrado.</p>
+      {% endif %}
+    </section>
+
+    <!-- Seção de Gráficos -->
+    <section id="graficos" class="card graficos">
+      <h2>📊 Resumo de Vendas</h2>
+      <img src="#" alt="Gráfico ilustrativo">
+    </section>
+
+  </main>
+
+  <script>
+    // Busca de produtos
+    document.getElementById('buscaProdutos')?.addEventListener('input', function(e) {
+      const termo = e.target.value.toLowerCase();
+      const linhas = document.querySelectorAll('.tabela tbody tr');
+      
+      linhas.forEach(linha => {
+        const texto = linha.textContent.toLowerCase();
+        linha.style.display = texto.includes(termo) ? '' : 'none';
+      });
+    });
+
+    // Confirmações
+    function confirmarExclusao(id) {
+      return confirm('Tem certeza que deseja excluir este produto?');
+    }
+
+    function confirmarDesativacao(id) {
+      return confirm('Tem certeza que deseja desativar este usuário?');
+    }
+
+    // Atualização automática dos tiles
+    document.addEventListener('DOMContentLoaded', function() {
+      const produtosCount = document.querySelectorAll('.tabela tbody tr').length;
+      const countElement = document.querySelector('.tile strong');
+      if (countElement) {
+        countElement.textContent = produtosCount;
+      }
+    });
+  </script>
+</body>
+</html>

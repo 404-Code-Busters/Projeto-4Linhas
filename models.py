@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DECIMAL
+from sqlalchemy import Column, Integer, String, Float, DECIMAL, Boolean, ForeignKey
 from database import Base, engine, SessionLocal
 from sqlalchemy.orm import relationship
 from auth import *
@@ -12,6 +12,7 @@ class Clientes(Base):
     email = Column(String(100), unique=True)
     senha = Column(String(200))
     pedidos=relationship("Pedidos",back_populates="clientes")
+    is_admin = Column(Boolean,default=False)
 
 # tabela produtos
 class Produtos(Base):
@@ -21,7 +22,11 @@ class Produtos(Base):
     descricao = Column(String, nullable=True)
     preco = Column(DECIMAL(10,2), nullable=False)
     tamanho = Column(String(5), nullable=False)
+    cor = Column(String(50), nullable=False)
     imagem_caminho = Column(String(255), nullable=True)
+    imagem_caminho1 = Column(String(255), nullable=True)
+    imagem_caminho2 = Column(String(255), nullable=True)
+    imagem_caminho3 = Column(String(255), nullable=True)
     estoque = Column(Integer, nullable=False)
     data_cadastro = Column(String, nullable=True)
     
