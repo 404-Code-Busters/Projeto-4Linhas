@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>4Linhas - Painel Administrativo</title>
   <link rel="stylesheet" href="{{ url_for('static', path='css/pages/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/modal.css') }}">
   <link rel="icon" href="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}">
   <style>
     html {
@@ -14,25 +15,229 @@
       margin-bottom: 20px;
       scroll-margin-top: 80px;
     }
+    .admin-section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .admin-section h2 {
+      color: var(--cor--laranja, #FF6B35);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
     .form-group {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
-      margin-bottom: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
     }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+      font-weight: 500;
+    }
+
     .form-group input,
     .form-group select,
     .form-group textarea {
       width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
       border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
     }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--cor--laranja, #FF6B35);
+      outline: none;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .btn-primary {
+      background: var(--cor--laranja, #FF6B35);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #e85a2a;
+    }
+
     .danger {
       background-color: #c1121f !important;
     }
+
     .danger:hover {
       background-color: #a10f1a !important;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f8f8f8;
+      font-weight: 600;
+      color: #333;
+    }
+
+    tr:hover {
+      background: #f5f5f5;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-edit,
+    .btn-delete {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-edit {
+      background: var(--cor--laranja, #FF6B35);
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background: #e85a2a;
+    }
+
+    .btn-delete {
+      background: #c1121f;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #a10f1a;
+    }
+
+
+    /* Inline inputs (label + input side-by-side) for new-product form */
+    .new-product-form .field-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .new-product-form .field-label {
+      min-width: 160px;
+      color: #333;
+      font-weight: 600;
+      margin: 0;
+      text-align: right;
+    }
+
+    .small-input {
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      width: 100%;
+    }
+
+    .file-buttons-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .file-button-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      width: 160px;
+    }
+
+    .file-preview {
+      width: 140px;
+      height: 140px;
+      background: #f8f8f8;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+
+    .file-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-btn {
+      background: var(--cor--laranja, #FF6B35);
+      color: white;
+      border: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s, transform 0.08s;
+    }
+
+    .image-btn:hover { background: #e85a2a; transform: translateY(-1px); }
+
+    .file-name {
+      font-size: 0.9rem;
+      color: #555;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 720px) {
+      .new-product-form .field-row { flex-direction: column; align-items: stretch; }
+      .new-product-form .field-label { min-width: 110px; text-align: left; }
+      .file-name { max-width: 120px; }
     }
   </style>
 </head>
@@ -76,30 +281,77 @@
       <h2>📦 Gerenciar Produtos</h2>
       
       <!-- Formulário para Novo Produto -->
-      <div class="form-section">
+      <div class="form-section admin-section">
         <h3>➕ Adicionar Novo Produto</h3>
-        <form action="/admin/produto" method="POST" enctype="multipart/form-data">
+        <form action="/admin/produto" method="POST" enctype="multipart/form-data" class="new-product-form">
           <div class="form-group">
-            <input type="text" name="nome" placeholder="Nome do produto" required>
-            <textarea name="descricao" placeholder="Descrição do produto"></textarea>
-            <input type="number" name="preco" placeholder="Preço" step="0.01" required>
-            <select name="tamanho" required>
-              <option value="">Selecione o tamanho</option>
-              <option value="PP">PP</option>
-              <option value="P">P</option>
-              <option value="M">M</option>
-              <option value="G">G</option>
-              <option value="GG">GG</option>
-              <option value="XG">XG</option>
-            </select>
-            <textarea name="cor" placeholder="Descrição de cor"></textarea>
-            <input type="file" name="imagem" accept="img/*">
-            <input type="file" name="imagem1" accept="img/*">
-            <input type="file" name="imagem2" accept="img/*">
-            <input type="file" name="imagem3" accept="img/*">
-            <input type="number" name="estoque" placeholder="Quantidade em estoque" required>
+            <div class="field-row">
+              <label class="field-label">Nome do produto:</label>
+              <input type="text" name="nome" class="small-input" placeholder="Nome do produto" required>
+            </div>
+
+            <div class="field-row">
+              <label class="field-label">Descrição:</label>
+              <textarea name="descricao" class="small-input" placeholder="Descrição do produto"></textarea>
+            </div>
+
+            <div class="field-row">
+              <label class="field-label">Preço (R$):</label>
+              <input type="number" name="preco" class="small-input" placeholder="0.00" step="0.01" required>
+            </div>
+
+            <div class="field-row">
+              <label class="field-label">Tamanho:</label>
+              <select name="tamanho" class="small-input" required>
+                <option value="">Selecione o tamanho</option>
+                <option value="PP">PP</option>
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+                <option value="XG">XG</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <label class="field-label">Cor:</label>
+              <input type="text" name="cor" class="small-input" placeholder="Descrição de cor">
+            </div>
+
+            <div class="field-row">
+              <label class="field-label">Quantidade em estoque:</label>
+              <input type="number" name="estoque" class="small-input" placeholder="0" required>
+            </div>
+
+            <div class="field-row file-buttons-row">
+              <!-- hidden file inputs -->
+              <input type="file" id="file_imagem" name="imagem" accept="image/*" style="display:none">
+              <input type="file" id="file_imagem1" name="imagem1" accept="image/*" style="display:none">
+              <input type="file" id="file_imagem2" name="imagem2" accept="image/*" style="display:none">
+              <input type="file" id="file_imagem3" name="imagem3" accept="image/*" style="display:none">
+
+              <div class="file-button-group">
+                <button type="button" class="image-btn" data-target="file_imagem">Imagem</button>
+                <div class="file-preview" id="preview_imagem"><span class="file-name" id="fname_imagem">Nenhuma</span></div>
+              </div>
+              <div class="file-button-group">
+                <button type="button" class="image-btn" data-target="file_imagem1">Imagem 2</button>
+                <div class="file-preview" id="preview_imagem1"><span class="file-name" id="fname_imagem1">Nenhuma</span></div>
+              </div>
+              <div class="file-button-group">
+                <button type="button" class="image-btn" data-target="file_imagem2">Imagem 3</button>
+                <div class="file-preview" id="preview_imagem2"><span class="file-name" id="fname_imagem2">Nenhuma</span></div>
+              </div>
+              <div class="file-button-group">
+                <button type="button" class="image-btn" data-target="file_imagem3">Imagem 4</button>
+                <div class="file-preview" id="preview_imagem3"><span class="file-name" id="fname_imagem3">Nenhuma</span></div>
+              </div>
+            </div>
           </div>
-          <button type="submit" class="btn">Cadastrar Produto</button>
+
+          <div class="btn-container">
+            <button type="submit" class="btn-primary">Cadastrar Produto</button>
+          </div>
         </form>
       </div>
 
@@ -126,10 +378,22 @@
                 <td>R$ {{ "%.2f"|format(p.preco) }}</td>
                 <td>{{ p.estoque if p.estoque is not none else '-' }}</td>
                 <td>
-                  <form action="/admin/produto/{{ p.id_produto }}/delete" method="POST" style="display:inline;" onsubmit="return confirmarExclusao({{ p.id_produto }})">
+                  <form action="/admin/produto/deletar/{{ p.id_produto }}" method="POST" style="display:inline;" onsubmit="return confirmarExclusao('{{ p.id_produto }}')">
                     <button type="submit" class="btn small danger">Excluir</button>
                   </form>
-                  <a href="/admin/produto/{{ p.id_produto }}/editar" class="btn small">Editar</a>
+                  <button type="button" class="btn small editar-produto-btn"
+                    data-id="{{ p.id_produto }}"
+                    data-nome="{{ p.nome|e }}"
+                    data-descricao="{{ p.descricao|e }}"
+                    data-preco="{{ p.preco }}"
+                    data-tamanho="{{ p.tamanho }}"
+                    data-cor="{{ p.cor }}"
+                    data-estoque="{{ p.estoque if p.estoque is not none else '' }}"
+                    data-imagem="{{ p.imagem_caminho if p.imagem_caminho else '' }}"
+                    data-imagem1="{{ p.imagem_caminho1 if p.imagem_caminho1 else '' }}"
+                    data-imagem2="{{ p.imagem_caminho2 if p.imagem_caminho2 else '' }}"
+                    data-imagem3="{{ p.imagem_caminho3 if p.imagem_caminho3 else '' }}"
+                  >Editar</button>
                 </td>
               </tr>
               {% endfor %}
@@ -204,34 +468,263 @@
 
   </main>
 
+  <style>
+    /* Simple modal styles (improved) */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal { background: #fff; padding: 1.5rem; border-radius: 10px; width: 100%; max-width: 960px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+    .modal header { position: relative; text-align: center; margin-bottom: 0.75rem; }
+    .modal header h2 { margin: 0; padding: 0.6rem 1rem; display: inline-block; border-radius: 6px; color: #fff; background: var(--cor--laranja, #FF6B35); font-size: 1.25rem; }
+    .modal header button { position: absolute; right: 0.5rem; top: 0.25rem; background: transparent; border: none; font-size: 1.1rem; cursor: pointer; color: #333; }
+    .modal .fields { display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+    .modal .fields .full { grid-column: 1 / -1; }
+    .modal .image-previews { display:flex; gap:0.5rem; align-items:center; }
+    .modal .image-previews img { width: 128px; height: 128px; object-fit:cover; border-radius:6px; border:1px solid #eee; }
+    .modal .image-previews .preview-item { position: relative; display: inline-block; }
+    .modal .image-previews .remove-btn { position: absolute; top: -6px; right: -6px; background: #fff; border-radius: 50%; border: 1px solid #ddd; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
+    .modal .image-previews .preview-item .no-image { width:128px; height:128px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; color:#999; border-radius:6px; border:1px dashed #eee; }
+    .modal .file-inputs { display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; }
+    .modal .actions { display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem; }
+    @media (max-width:640px) { .modal .fields { grid-template-columns: 1fr; } .modal .file-inputs { grid-template-columns: 1fr; } }
+  </style>
+
+  <!-- Edit product modal (hidden) -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header>
+        <h2 id="modalTitle">Editar Produto</h2>
+        <button id="modalClose" type="button" aria-label="Fechar">✕</button>
+      </header>
+      <form id="editProductForm" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="post">
+        <input type="hidden" name="remove_imagem" id="remove_imagem" value="0">
+        <input type="hidden" name="remove_imagem1" id="remove_imagem1" value="0">
+        <input type="hidden" name="remove_imagem2" id="remove_imagem2" value="0">
+        <input type="hidden" name="remove_imagem3" id="remove_imagem3" value="0">
+        <div class="fields">
+          <div>
+            <label>Nome</label>
+            <input type="text" name="nome" id="modal_nome" required>
+          </div>
+          <div>
+            <label>Preço</label>
+            <input type="number" step="0.01" name="preco" id="modal_preco" required>
+          </div>
+          <div>
+            <label>Tamanho</label>
+            <input type="text" name="tamanho" id="modal_tamanho" required>
+          </div>
+          <div>
+            <label>Estoque</label>
+            <input type="number" name="estoque" id="modal_estoque" required>
+          </div>
+          <div class="full">
+            <label>Descrição</label>
+            <textarea name="descricao" id="modal_descricao" rows="3"></textarea>
+          </div>
+          <div>
+            <label>Categoria</label>
+            <input type="text" name="categoria" id="modal_categoria">
+          </div>
+          <div>
+            <label>Cor</label>
+            <input type="text" name="cor" id="modal_cor">
+          </div>
+          <div class="full">
+            <label>Imagens (substituir até 4)</label>
+            <div class="image-previews" id="modal_image_previews">
+              <!-- previews inserted by JS -->
+            </div>
+          </div>
+          <div class="full file-inputs">
+            <div>
+              <label>Imagem 1</label>
+              <input type="file" name="imagem" id="modal_imagem" accept="image/*">
+            </div>
+            <div>
+              <label>Imagem 2</label>
+              <input type="file" name="imagem1" id="modal_imagem1" accept="image/*">
+            </div>
+            <div>
+              <label>Imagem 3</label>
+              <input type="file" name="imagem2" id="modal_imagem2" accept="image/*">
+            </div>
+            <div>
+              <label>Imagem 4</label>
+              <input type="file" name="imagem3" id="modal_imagem3" accept="image/*">
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="modalCancel">Cancelar</button>
+          <button type="submit" class="btn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
-    // Busca de produtos
-    document.getElementById('buscaProdutos')?.addEventListener('input', function(e) {
-      const termo = e.target.value.toLowerCase();
-      const linhas = document.querySelectorAll('.tabela tbody tr');
-      
-      linhas.forEach(linha => {
-        const texto = linha.textContent.toLowerCase();
-        linha.style.display = texto.includes(termo) ? '' : 'none';
+    // Busca de produtos (filtro simples)
+    function configurarBusca(inputId, tabelaSelector) {
+      document.getElementById(inputId)?.addEventListener('input', function(e) {
+        const termo = e.target.value.toLowerCase();
+        const linhas = document.querySelectorAll(tabelaSelector + ' tbody tr');
+        linhas.forEach(linha => {
+          const texto = linha.textContent.toLowerCase();
+          linha.style.display = texto.includes(termo) ? '' : 'none';
+        });
       });
-    });
+    }
+    configurarBusca('buscaProdutos', '.tabela');
 
     // Confirmações
     function confirmarExclusao(id) {
-      return confirm('Tem certeza que deseja excluir este produto?');
+      return confirm('Tem certeza que deseja excluir o produto ' + id + '?');
     }
-
     function confirmarDesativacao(id) {
-      return confirm('Tem certeza que deseja desativar este usuário?');
+      return confirm('Tem certeza que deseja excluir este usuário?\nEsta ação não pode ser desfeita.');
     }
 
-    // Atualização automática dos tiles
+    // Modal logic
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalClose = document.getElementById('modalClose');
+    const modalCancel = document.getElementById('modalCancel');
+    const editForm = document.getElementById('editProductForm');
+
+    function openEditModal(data) {
+      // populate fields
+      editForm.action = '/admin/produto/atualizar/' + data.id;
+      document.getElementById('modal_nome').value = data.nome || '';
+      document.getElementById('modal_preco').value = data.preco || '';
+      document.getElementById('modal_tamanho').value = data.tamanho || '';
+      document.getElementById('modal_estoque').value = data.estoque || '';
+      document.getElementById('modal_descricao').value = data.descricao || '';
+      document.getElementById('modal_categoria').value = data.categoria || data.cor || '';
+      document.getElementById('modal_cor').value = data.cor || '';
+      // set image previews (if filenames provided)
+      const previews = document.getElementById('modal_image_previews');
+      previews.innerHTML = '';
+      const imgBase = '/static/uploads/';
+      const imgs = [data.imagem, data.imagem1, data.imagem2, data.imagem3];
+      imgs.forEach((src, idx) => {
+        const item = document.createElement('div');
+        item.className = 'preview-item';
+        if (src) {
+          const img = document.createElement('img');
+          img.src = imgBase + src;
+          img.alt = 'Imagem do produto';
+          item.appendChild(img);
+        } else {
+          const no = document.createElement('div');
+          no.className = 'no-image';
+          no.textContent = 'Sem imagem';
+          item.appendChild(no);
+        }
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-btn';
+        removeBtn.innerHTML = '×';
+        removeBtn.title = 'Remover imagem';
+        removeBtn.addEventListener('click', function() {
+          // mark hidden input to signal removal
+          const hid = document.getElementById('remove_imagem' + (idx === 0 ? '' : idx));
+          if (hid) hid.value = '1';
+          // criar e mostrar mensagem de remoção
+          const msg = document.createElement('div');
+          msg.className = 'remove-message';
+          msg.textContent = 'Imagem marcada para remoção';
+          msg.style.color = '#ff6b35';
+          msg.style.padding = '8px';
+          msg.style.textAlign = 'center';
+          msg.style.backgroundColor = '#fff3ef';
+          msg.style.border = '1px solid #ff6b35';
+          msg.style.borderRadius = '4px';
+          msg.style.margin = '4px 0';
+          item.innerHTML = '';
+          item.appendChild(msg);
+        });
+        item.appendChild(removeBtn);
+        previews.appendChild(item);
+      });
+      // show modal
+      modalOverlay.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modalOverlay.style.display = 'none';
+      editForm.reset();
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modalCancel.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) closeModal(); });
+
+    // Attach listeners to edit buttons
+    document.querySelectorAll('.editar-produto-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const dataset = btn.dataset;
+        const data = {
+          id: dataset.id,
+          nome: dataset.nome,
+          descricao: dataset.descricao,
+          preco: dataset.preco,
+          tamanho: dataset.tamanho,
+          cor: dataset.cor,
+          estoque: dataset.estoque,
+          categoria: dataset.categoria
+        };
+        openEditModal(data);
+      });
+    });
+
+    // New-product form: wire image buttons to hidden file inputs and show selected filename
+    document.querySelectorAll('.image-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const targetId = btn.dataset.target;
+        const input = document.getElementById(targetId);
+        if (input) input.click();
+      });
+    });
+
+    const filePairs = [
+      {id: 'file_imagem', name: 'imagem'},
+      {id: 'file_imagem1', name: 'imagem1'},
+      {id: 'file_imagem2', name: 'imagem2'},
+      {id: 'file_imagem3', name: 'imagem3'}
+    ];
+    filePairs.forEach(pair => {
+      const inp = document.getElementById(pair.id);
+      const label = document.getElementById('fname_' + pair.name);
+      const previewContainer = document.getElementById('preview_' + pair.name);
+      if (inp) {
+        inp.addEventListener('change', function() {
+          if (inp.files && inp.files.length) {
+            const file = inp.files[0];
+            if (label) label.textContent = file.name;
+            // create preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              if (previewContainer) {
+                previewContainer.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = file.name;
+                previewContainer.appendChild(img);
+              }
+            };
+            reader.readAsDataURL(file);
+          } else {
+            if (label) label.textContent = 'Nenhuma';
+            if (previewContainer) previewContainer.innerHTML = '<span class="file-name">Nenhuma</span>';
+          }
+        });
+      }
+    });
+
+    // Update tiles count on load
     document.addEventListener('DOMContentLoaded', function() {
       const produtosCount = document.querySelectorAll('.tabela tbody tr').length;
-      const countElement = document.querySelector('.tile strong');
-      if (countElement) {
-        countElement.textContent = produtosCount;
-      }
+      const produtosElement = document.getElementById('produtosCount');
+      if (produtosElement) produtosElement.textContent = produtosCount;
     });
   </script>
 </body>
