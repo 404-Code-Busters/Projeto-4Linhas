@@ -10,9 +10,11 @@
 
   <!-- CSS base (reset, variáveis, estilos globais) -->
   <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+  <!-- Header component styles -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
   <!-- CSS específico do produto -->
   <link rel="stylesheet" href="{{ url_for('static', path='css/pages/produto.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', path='css/inline/produto-inline.css') }}">
+  <!-- inline styles migrated to components/header.css -->
 
   <!-- Fonte Google Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

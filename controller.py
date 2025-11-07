@@ -31,16 +31,35 @@ async def home(request:Request):
 
 # Rota para catálogo de produtos
 @router.get("/catalogo", response_class=HTMLResponse, name="catalogo")
-async def catalogo(request:Request, db:Session = Depends(get_db)):
+async def catalogo(
+    request:Request, 
+    db:Session = Depends(get_db),
+    q: str = None, # Alteração feita pelo : Parâmetro para a busca por texto (query).
+    tamanho: str = None, # Alteração feita pelo : Parâmetro para o filtro de tamanho.
+    cor: str = None, # Alteração feita pelo : Parâmetro para o filtro de cor.
+    preco_max: float = None # Alteração feita pelo : Parâmetro para o filtro de preço máximo.
+):
     try:
-        # Debug: testar conexão
-        produtos = db.query(Produtos).all()
+        # Alteração feita pelo : A lógica de busca foi movida para o backend para maior eficiência.
+        # Em vez de carregar todos os produtos e filtrar no navegador (o que seria lento com muitos itens),
+        # o banco de dados, que é otimizado para isso, retorna apenas os produtos que correspondem aos filtros.
+        query = db.query(Produtos)
+                # Alteração feita pelo : Filtro de busca por nome.
+        # Usa 'ilike' para uma busca parcial e que não diferencia maiúsculas de minúsculas (ex: "camisa" encontra "Camisa Polo").
+        if q:
+            query = query.filter(Produtos.nome.ilike(f"%{q}%"))
         
-        # Debug: verificar produtos retornados
-        print(f"Número de produtos encontrados: {len(produtos)}")
-        if produtos:
-            for p in produtos:
-                print(f"Produto: {p.nome}, Preço: {p.preco}, Imagem: {p.imagem_caminho}")
+        # Alteração feita pelo : Filtros por atributos específicos.
+        if tamanho:
+            query = query.filter(Produtos.tamanho == tamanho)
+        if cor:
+            query = query.filter(Produtos.cor == cor)
+        
+        # Alteração feita pelo : Filtro por preço máximo.
+        if preco_max:
+            query = query.filter(Produtos.preco <= preco_max)
+
+        produtos = query.all()
         
         return templates.TemplateResponse("pages/produtos/produtos.html", {
             "request": request,
@@ -68,27 +87,8 @@ async def detalhe_produto(request:Request, id_produto:int, db:Session=Depends(ge
         'request':request, 'produto':produto
     })
 
-# Rota de busca de produtos (substitui as rotas individuais de nome, tamanho e preço)
-@router.get("/produtos/busca", response_class=HTMLResponse, name="busca_produtos")
-async def buscar_produtos(
-    request:Request, 
-    nome: str = None, 
-    tamanho: str = None, 
-    preco: float = None,
-    db:Session = Depends(get_db)
-):
-    query = db.query(Produtos)
-    if nome:
-        query = query.filter(Produtos.nome == nome)
-    if tamanho:
-        query = query.filter(Produtos.tamanho == tamanho)
-    if preco:
-        query = query.filter(Produtos.preco == preco)
-    
-    produtos = query.all()
-    return templates.TemplateResponse("pages/produtos/produtos.html", {
-        "request": request, "produtos": produtos
-    })
+# Alteração feita pelo : A rota '/produtos/busca' foi removida.
+# Sua funcionalidade foi unificada na rota '/catalogo' para simplificar o código e centralizar a lógica.
 
 # ---------- Autenticação e Perfil ----------
 
@@ -162,12 +162,19 @@ def perfil(request:Request, db:Session = Depends(get_db)):
     # Buscar itens do carrinho do usuário
     carrinho = carrinhos.get(cliente.id_cliente, [])
     total = sum(item["preco"] * item["quantidade"] for item in carrinho)
-    
+    # Buscar pedidos do usuário e enviar ao template (aba Pedidos)
+    try:
+        pedidos = db.query(Pedidos).filter(Pedidos.id_cliente == cliente.id_cliente).all()
+    except Exception:
+        # Em caso de modelos diferentes ou erro, fallback para lista vazia
+        pedidos = []
+
     return templates.TemplateResponse("pages/perfil/perfil.html", {
         "request": request,
         "cliente": cliente,
         "carrinho": carrinho,
-        "total": total
+        "total": total,
+        "pedidos": pedidos
     })
 
 # Rota para atualizar senha do perfil
@@ -364,40 +371,25 @@ def checkout(request:Request, db:Session = Depends(get_db)):
         return {"mensagem": "Carrinho vazio"}
     
     total = sum(item["preco"] * item["quantidade"] for item in carrinho)
-    pedido = Pedidos(cliente_id=cliente.id_cliente, total=total)
+    # Correção: Usar os nomes de campo corretos do modelo Pedidos (id_cliente, valor_total)
+    # e adicionar valores padrão para os campos obrigatórios (data_pedido, status)
+    from datetime import datetime
+    pedido = Pedidos(id_cliente=cliente.id_cliente, valor_total=total, data_pedido=datetime.now().strftime("%Y-%m-%d"), status="Processando")
     db.add(pedido)
     db.commit()
     db.refresh(pedido)
 
     for item in carrinho:
         novo_item = ItemPedido(
-            pedido_id=pedido.id,
+            pedido_id=pedido.id_pedido, # Correção: A chave primária de Pedidos é id_pedido
             produto_id=item["id"],
             quantidade=item["quantidade"],
             preco_unitario=item["preco"]
         )
         db.add(novo_item)
     db.commit()
-    
     carrinhos[cliente.id_cliente] = []
-    return RedirectResponse(url="/pedidos", status_code=303)
-
-# Rota para listar pedidos
-@router.get("/pedidos", response_class=HTMLResponse, name="pedidos")
-def listar_pedidos(request:Request, db:Session = Depends(get_db)):
-    token = request.cookies.get("token")
-    payload = verificar_token(token)
-    if not payload:
-        return RedirectResponse(url="/login", status_code=303)
-    
-    email = payload.get("sub")
-    cliente = db.query(Clientes).filter_by(email=email).first()
-    pedidos = db.query(Pedidos).filter_by(cliente_id=cliente.id_cliente).all()
-    
-    return templates.TemplateResponse("pages/pedidos/pedidos.html", {
-        "request": request,
-        "pedidos": pedidos
-    })
+    return RedirectResponse(url="/perfil", status_code=303) # Correção: Redirecionar para a página de perfil
 
 # rota para acompanhe
 @router.get("/acompanhe", response_class=HTMLResponse, name="acompanhe")
@@ -494,8 +486,8 @@ def atualizar_produto(id: int,
     estoque: int = Form(...),
     imagem: UploadFile = File(None),
     db: Session = Depends(get_db)
-):
-    produto = db.query(Produtos).filter(Produtos.id == id).first()
+): # O 'id' aqui é o id_produto do caminho da URL
+    produto = db.query(Produtos).filter(Produtos.id_produto == id).first()
     if not produto:
         return RedirectResponse(url="/admin", status_code=303)
     
@@ -519,8 +511,8 @@ def atualizar_produto(id: int,
 
 #Deletar produto
 @router.post("/admin/produto/deletar/{id}")
-def deletar_produto(id: int, db: Session = Depends(get_db)):
-    produto = db.query(Produtos).filter(Produtos.id == id).first()
+def deletar_produto(id: int, db: Session = Depends(get_db)): # O 'id' aqui é o id_produto do caminho da URL
+    produto = db.query(Produtos).filter(Produtos.id_produto == id).first()
     if produto:
         db.delete(produto)
         db.commit()

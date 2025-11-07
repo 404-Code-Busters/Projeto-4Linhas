@@ -2,14 +2,27 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Erro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro no Servidor</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f4f4f4; color: #333; text-align: center; padding: 50px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #d9534f; }
+        pre { background: #eee; padding: 15px; border-radius: 4px; text-align: left; white-space: pre-wrap; word-wrap: break-word; }
+        a { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #FF6B35; color: white; text-decoration: none; border-radius: 4px; }
+    </style>
 </head>
 <body>
-    <h2>Ocorreu um erro!</h2>
-    <p>{{ erro }}</p>
-    {% if traceback %}
-    <pre>{{ traceback }}</pre>
-    {% endif %}
-    <a href="/">Voltar</a>
+    <div class="container">
+        <h1>Ocorreu um Erro Interno</h1>
+        <p>Nossa equipe foi notificada e já está trabalhando para resolver o problema.</p>
+        
+        {% if erro %}
+            <p><strong>Detalhes do Erro:</strong></p>
+            <pre>{{ erro }}</pre>
+        {% endif %}
+        
+        <a href="{{ url_for('index') }}">Voltar para a Página Inicial</a>
+    </div>
 </body>
 </html>

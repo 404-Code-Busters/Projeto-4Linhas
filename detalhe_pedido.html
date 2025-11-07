@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Pedido #{{ pedido.id_pedido }} - Painel Administrativo</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/admin.css') }}">
+  <link rel="icon" href="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}">
+  <style>
+    .order-details-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .order-details-container h1 {
+      color: #333;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+    .order-info p {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .order-info p strong {
+      color: #555;
+    }
+    .order-items {
+      margin-top: 2rem;
+    }
+    .order-items h2 {
+      color: #333;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .order-items table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .order-items th, .order-items td {
+      border: 1px solid #ddd;
+      padding: 0.8rem;
+      text-align: left;
+    }
+    .order-items th {
+      background-color: #f2f2f2;
+      font-weight: 600;
+      color: #333;
+    }
+    .order-items td img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+    .back-button {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.8rem 1.5rem;
+      background-color: var(--cor-laranja, #FF6B35);
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+    .back-button:hover {
+      background-color: #e05b2d;
+    }
+  </style>
+  <script>
+    // Comentário Gemini: Função para confirmar a exclusão do pedido.
+    function confirmarExclusaoPedido(id) { return confirm(`Tem certeza que deseja excluir o pedido #${id}? Esta ação é irreversível.`); }
+  </script>
+</head>
+<body>
+  <header class="admin-header">
+    <div class="wrap">
+      <h1>Painel Administrativo</h1>
+      <nav class="admin-nav">
+        <a href="{{ url_for('pagina_admin') }}#produtos">Produtos</a>
+        <a href="{{ url_for('pagina_admin') }}#pedidos">Pedidos</a>
+        <a href="/">Voltar ao Site</a>
+      </nav>
+    </div>
+  </header>
+  <main class="admin-main wrap">
+    <div class="order-details-container">
+      <h1>Detalhes do Pedido #{{ pedido.id_pedido }}</h1>
+      <div class="order-info">
+        <p><strong>Cliente:</strong> {{ pedido.clientes.nome }} ({{ pedido.clientes.email }})</p>
+        <p><strong>Data do Pedido:</strong> {{ pedido.data_pedido }}</p>
+        <p><strong>Status:</strong> {{ pedido.status }}</p>
+        <p><strong>Valor Total:</strong> R$ {{ "%.2f"|format(pedido.valor_total) }}</p>
+      </div>
+
+      <div class="order-management" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+        <h2>Gerenciar Pedido</h2>
+        
+        <!-- Comentário Gemini: Formulário para atualizar o status do pedido. -->
+        <form action="{{ url_for('atualizar_status_pedido', id_pedido=pedido.id_pedido) }}" method="POST" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+          <label for="novo_status" style="font-weight: 600;">Alterar Status:</label>
+          <select name="novo_status" id="novo_status" style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+            <option value="Pendente" {% if pedido.status == 'Pendente' %}selected{% endif %}>Pendente</option>
+            <option value="Processando" {% if pedido.status == 'Processando' %}selected{% endif %}>Processando</option>
+            <option value="Enviado" {% if pedido.status == 'Enviado' %}selected{% endif %}>Enviado</option>
+            <option value="Entregue" {% if pedido.status == 'Entregue' %}selected{% endif %}>Entregue</option>
+            <option value="Cancelado" {% if pedido.status == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+          </select>
+          <button type="submit" class="back-button" style="background-color: #28a745;">Atualizar Status</button>
+        </form>
+
+        <!-- Comentário Gemini: Formulário para excluir o pedido. -->
+        <form action="{{ url_for('deletar_pedido_admin', id_pedido=pedido.id_pedido) }}" method="POST" onsubmit="return confirmarExclusaoPedido({{ pedido.id_pedido }});">
+          <button type="submit" class="back-button" style="background-color: #dc3545;">Excluir Pedido</button>
+        </form>
+
+        <!-- Comentário Gemini: Exibe mensagens de erro, se houver. -->
+        {% if request.query_params.get('erro') %}
+          <p style="color: #dc3545; margin-top: 1rem;">{{ request.query_params.get('erro') }}</p>
+        {% endif %}
+
+      </div>
+
+      <div class="order-items">
+        <h2>Itens do Pedido</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Preço Unitário</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in pedido.itens %}
+            <tr>
+              <td>
+                {% if item.produto.imagem_caminho %}
+                  <img src="{{ url_for('static', path=item.produto.imagem_caminho) }}" alt="{{ item.produto.nome }}">
+                {% endif %}
+                {{ item.produto.nome }}
+              </td>
+              <td>{{ item.quantidade }}</td>
+              <td>R$ {{ "%.2f"|format(item.preco_unitario) }}</td>
+              <td>R$ {{ "%.2f"|format(item.quantidade * item.preco_unitario) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <a href="{{ url_for('pagina_admin') }}#pedidos" class="back-button">Voltar para Gerenciar Pedidos</a>
+    </div>
+  </main>
+</body>
+</html>

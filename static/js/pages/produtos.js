@@ -129,39 +129,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
   addToCartButtons.forEach(button => {
     if (button.dataset.__cartBound) return;
-    button.addEventListener('click', (event) => {
-      const card = event.target.closest('.outfit-card');
+    button.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const btn = event.currentTarget;
+      const card = btn.closest('.outfit-card');
       if (!card) return;
 
+      const productId = btn.getAttribute('data-product-id') || btn.dataset.productId || btn.dataset.id;
       const productName = card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : 'Produto';
-      // Prefer explicit price element, fallback to data-price on card, fallback to any <p>
-      let priceText = '';
       const priceEl = card.querySelector('.product-price');
-      if (priceEl) {
-        priceText = priceEl.textContent || '';
-      } else if (card.dataset && card.dataset.price) {
-        priceText = card.dataset.price;
-      } else {
-        const p = card.querySelector('p');
-        priceText = p ? p.textContent : 'R$ 0,00';
-      }
+      const priceText = priceEl ? priceEl.textContent : (card.dataset && card.dataset.price ? card.dataset.price : 'R$ 0,00');
       const priceNumber = parseFloat(String(priceText).replace(/[^0-9,\.]/g, '').replace(',', '.')) || 0;
-  const btn = event.currentTarget;
-  const id = btn.dataset && (btn.dataset.productId || btn.dataset.id) ? (btn.dataset.productId || btn.dataset.id) : btn.getAttribute('data-product-id');
-        // Try to find image inside card
-  const imgEl = card.querySelector('img.product-card-img') || card.querySelector('img');
-  const imgSrc = imgEl ? imgEl.getAttribute('src') : '';
+      const imgEl = card.querySelector('img.product-card-img') || card.querySelector('img');
+      const imgSrc = imgEl ? imgEl.getAttribute('src') : '';
 
-        // Call adicionarAoCarrinho with an object (cart.js expects an item object)
-        try {
-          adicionarAoCarrinho({ id: id, nome: productName, preco: priceNumber, quantidade: 1, imagem: imgSrc });
-        } catch (e) {
-          console.error('adicionarAoCarrinho not available:', e);
+      try {
+        // Disable button during processing and preserve label
+        const originalLabel = btn.textContent;
+        btn.disabled = true;
+
+        // Try calling adicionarAoCarrinho with id first, fallback to object payload
+        if (typeof adicionarAoCarrinho === 'function') {
+          try {
+            // some implementations expect just the id/string
+            await adicionarAoCarrinho(productId);
+          } catch (err) {
+            // fallback to object form used elsewhere
+            await adicionarAoCarrinho({ id: productId, nome: productName, preco: priceNumber, quantidade: 1, imagem: imgSrc });
+          }
+        } else {
+          console.warn('adicionarAoCarrinho is not defined');
         }
+
+        // Visual feedback
+        btn.textContent = 'Adicionado!';
+        setTimeout(() => {
+          btn.textContent = originalLabel || 'Adicionar ao Carrinho';
+          btn.disabled = false;
+        }, 2000);
+      } catch (error) {
+        console.error('Erro ao adicionar ao carrinho:', error);
+        const originalLabel = btn.textContent;
+        btn.textContent = 'Erro!';
+        setTimeout(() => {
+          btn.textContent = originalLabel || 'Adicionar ao Carrinho';
+          btn.disabled = false;
+        }, 2000);
+      }
     });
     button.dataset.__cartBound = '1';
   });
 
-  // Update cart count
-  updateCartCount();
+  // Update cart count (support both function names)
+  if (typeof updateCartCount === 'function') {
+    try { updateCartCount(); } catch (e) { console.warn(e); }
+  }
+  if (typeof atualizarContadorCarrinho === 'function') {
+    try { atualizarContadorCarrinho(); } catch (e) { console.warn(e); }
+  }
+
+  // Ensure cart button opens modal (fallback if cart.js didn't bind)
+  const cartBtn = document.getElementById('cart-button');
+  if (cartBtn) {
+    cartBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (typeof mostrarCarrinho === 'function') {
+        mostrarCarrinho();
+        return;
+      }
+      if (typeof openCartModal === 'function') {
+        openCartModal();
+        return;
+      }
+      const fake = document.querySelector('a[data-cart]');
+      if (fake) fake.click();
+    });
+  }
 });

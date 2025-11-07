@@ -7,246 +7,12 @@
   <link rel="stylesheet" href="{{ url_for('static', path='css/pages/admin.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', path='css/components/modal.css') }}">
   <link rel="icon" href="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}">
-  <style>
-    html {
-      scroll-behavior: smooth;
-    }
-    section {
-      margin-bottom: 20px;
-      scroll-margin-top: 80px;
-    }
-    .admin-section {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .admin-section h2 {
-      color: var(--cor--laranja, #FF6B35);
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-
-    .form-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #333;
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.2s;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--cor--laranja, #FF6B35);
-      outline: none;
-    }
-
-    .btn-container {
-      display: flex;
-      justify-content: center;
-      margin: 2rem 0;
-    }
-
-    .btn-primary {
-      background: var(--cor--laranja, #FF6B35);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-primary:hover {
-      background: #e85a2a;
-    }
-
-    .danger {
-      background-color: #c1121f !important;
-    }
-
-    .danger:hover {
-      background-color: #a10f1a !important;
-    }
-
-    .table-responsive {
-      overflow-x: auto;
-      margin-top: 1.5rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    th, td {
-      padding: 1rem;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-
-    th {
-      background: #f8f8f8;
-      font-weight: 600;
-      color: #333;
-    }
-
-    tr:hover {
-      background: #f5f5f5;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .btn-edit,
-    .btn-delete {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .btn-edit {
-      background: var(--cor--laranja, #FF6B35);
-      color: white;
-    }
-
-    .btn-edit:hover {
-      background: #e85a2a;
-    }
-
-    .btn-delete {
-      background: #c1121f;
-      color: white;
-    }
-
-    .btn-delete:hover {
-      background: #a10f1a;
-    }
-
-
-    /* Inline inputs (label + input side-by-side) for new-product form */
-    .new-product-form .field-row {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .new-product-form .field-label {
-      min-width: 160px;
-      color: #333;
-      font-weight: 600;
-      margin: 0;
-      text-align: right;
-    }
-
-    .small-input {
-      padding: 0.5rem;
-      font-size: 0.95rem;
-      border-radius: 6px;
-      border: 1px solid #e0e0e0;
-      width: 100%;
-    }
-
-    .file-buttons-row {
-      display: flex;
-      flex-direction: row;
-      gap: 1rem;
-      margin-top: 0.5rem;
-      flex-wrap: wrap;
-      align-items: flex-start;
-    }
-
-    .file-button-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      width: 160px;
-    }
-
-    .file-preview {
-      width: 140px;
-      height: 140px;
-      background: #f8f8f8;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border: 1px solid #eee;
-    }
-
-    .file-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .image-btn {
-      background: var(--cor--laranja, #FF6B35);
-      color: white;
-      border: none;
-      padding: 0.5rem 0.9rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.15s, transform 0.08s;
-    }
-
-    .image-btn:hover { background: #e85a2a; transform: translateY(-1px); }
-
-    .file-name {
-      font-size: 0.9rem;
-      color: #555;
-      max-width: 180px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    @media (max-width: 720px) {
-      .new-product-form .field-row { flex-direction: column; align-items: stretch; }
-      .new-product-form .field-label { min-width: 110px; text-align: left; }
-      .file-name { max-width: 120px; }
-    }
-  </style>
 </head>
 <body>
   <header class="admin-header">
     <div class="wrap">
       <h1>Painel Administrativo</h1>
       <nav class="admin-nav">
-        <a href="#produtos">Produtos</a>
         <a href="#pedidos">Pedidos</a>
         <a href="#usuarios">Usuários</a>
         <a href="/">Voltar ao Site</a>
@@ -387,6 +153,7 @@
                     data-descricao="{{ p.descricao|e }}"
                     data-preco="{{ p.preco }}"
                     data-tamanho="{{ p.tamanho }}"
+                    data-categoria="{{ p.categoria if p.categoria else '' }}" {# Adicionado data-categoria #}
                     data-cor="{{ p.cor }}"
                     data-estoque="{{ p.estoque if p.estoque is not none else '' }}"
                     data-imagem="{{ p.imagem_caminho if p.imagem_caminho else '' }}"
@@ -425,41 +192,6 @@
       <p>Nenhum pedido encontrado.</p>
       {% endif %}
     </section>
-
-    <!-- Seção de Usuários -->
-    <section id="usuarios" class="card">
-      <h2>� Gerenciar Usuários</h2>
-      {% if clientes %}
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Tipo</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for cliente in clientes %}
-          <tr>
-            <td>{{ cliente.id_cliente }}</td>
-            <td>{{ cliente.nome }}</td>
-            <td>{{ cliente.email }}</td>
-            <td>{{ 'Admin' if cliente.is_admin else 'Cliente' }}</td>
-            <td>
-              <button class="btn small">Editar</button>
-              <button class="btn small danger">Desativar</button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <p>Nenhum usuário encontrado.</p>
-      {% endif %}
-    </section>
-
     <!-- Seção de Gráficos -->
     <section id="graficos" class="card graficos">
       <h2>📊 Resumo de Vendas</h2>
@@ -468,23 +200,238 @@
 
   </main>
 
+  <!-- Alteração feita pelo Gemini: Estilos do modal foram aprimorados para uma melhor experiência visual. -->
   <style>
-    /* Simple modal styles (improved) */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
-    .modal { background: #fff; padding: 1.5rem; border-radius: 10px; width: 100%; max-width: 960px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
-    .modal header { position: relative; text-align: center; margin-bottom: 0.75rem; }
-    .modal header h2 { margin: 0; padding: 0.6rem 1rem; display: inline-block; border-radius: 6px; color: #fff; background: var(--cor--laranja, #FF6B35); font-size: 1.25rem; }
-    .modal header button { position: absolute; right: 0.5rem; top: 0.25rem; background: transparent; border: none; font-size: 1.1rem; cursor: pointer; color: #333; }
-    .modal .fields { display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
-    .modal .fields .full { grid-column: 1 / -1; }
-    .modal .image-previews { display:flex; gap:0.5rem; align-items:center; }
-    .modal .image-previews img { width: 128px; height: 128px; object-fit:cover; border-radius:6px; border:1px solid #eee; }
-    .modal .image-previews .preview-item { position: relative; display: inline-block; }
-    .modal .image-previews .remove-btn { position: absolute; top: -6px; right: -6px; background: #fff; border-radius: 50%; border: 1px solid #ddd; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
-    .modal .image-previews .preview-item .no-image { width:128px; height:128px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; color:#999; border-radius:6px; border:1px dashed #eee; }
-    .modal .file-inputs { display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; }
-    .modal .actions { display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem; }
-    @media (max-width:640px) { .modal .fields { grid-template-columns: 1fr; } .modal .file-inputs { grid-template-columns: 1fr; } }
+    /* Alteração feita pelo Gemini: Estilos para alinhar os botões de upload de imagem lado a lado. */
+    .file-buttons-row {
+      display: flex;
+      flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas pequenas */
+      gap: 1rem; /* Espaçamento entre os grupos de botões */
+      align-items: flex-start;
+    }
+    .file-button-group {
+      flex: 1; /* Faz com que cada grupo tente ocupar o mesmo espaço */
+      min-width: 150px; /* Largura mínima antes de quebrar a linha */
+      display: flex;
+      flex-direction: row; /* Alteração feita pelo Gemini: Alinha o botão e a pré-visualização lado a lado */
+      align-items: center; /* Centraliza verticalmente o botão e a pré-visualização */
+      gap: 0.5rem; /* Espaçamento entre o botão e a pré-visualização */
+      padding: 0.5rem; /* Adiciona um pouco de padding para melhor visual */
+      border: 1px solid #eee; /* Borda para cada grupo */
+      border-radius: 6px;
+      background-color: #fcfcfc;
+    }
+    .file-button-group .image-btn {
+      padding: 8px 12px; /* Padding menor para o botão */
+      font-size: 0.9rem; /* Fonte menor */
+      white-space: nowrap; /* Evita que o texto do botão quebre */
+      flex-shrink: 0; /* Impede que o botão encolha */
+    }
+    .file-button-group .file-preview {
+      width: 60px; /* Tamanho fixo para a pré-visualização */
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #ccc;
+      border-radius: 4px;
+      overflow: hidden;
+      flex-shrink: 0; /* Impede que a pré-visualização encolha */
+      background-color: #fff;
+    }
+    .file-button-group .file-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Garante que a imagem preencha o espaço */
+    }
+    .file-button-group .file-preview .file-name {
+      font-size: 0.75rem; /* Fonte menor para o texto "Nenhuma" */
+      color: #888;
+      text-align: center;
+    }
+
+    /* Estilos do Modal de Edição */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 2rem;
+    }
+    .modal {
+      background: #fff;
+      padding: 2rem; /* Ajustado o espaçamento interno para menor */
+      border-radius: 12px;
+      width: 100%;
+      max-width: 900px; /* Ajustado o tamanho máximo para menor */
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem; /* Ajustado o espaçamento */
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 1rem;
+    }
+    .modal header h2 {
+      margin: 0;
+      font-size: 1.5rem; /* Título ajustado para menor */
+      color: #333;
+    }
+    .modal header button#modalClose {
+      background: #f0f0f0;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #555;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .modal header button#modalClose:hover {
+      background-color: #e0e0e0;
+      color: #111;
+    }
+    .modal .fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem; /* Aumentado o espaçamento entre os campos */
+    }
+    .modal .fields .full {
+      grid-column: 1 / -1;
+    }
+    .modal .fields label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem; /* Espaçamento entre label e input */
+      color: #444;
+    }
+    .modal .fields input[type="text"],
+    .modal .fields input[type="number"],
+    .modal .fields textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .modal .fields input:focus,
+    .modal .fields textarea:focus {
+      outline: none;
+      border-color: var(--cor-laranja, #FF6B35);
+      box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+    }
+    .modal .image-previews {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      background-color: #f9f9f9;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+    .modal .image-previews .preview-item {
+      position: relative;
+    }
+    .modal .image-previews img,
+    .modal .image-previews .no-image {
+      width: 140px; /* Imagens de preview maiores */
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .modal .image-previews .no-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      color: #999;
+      border-style: dashed;
+    }
+    .modal .image-previews .remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: white;
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+    .modal .image-previews .remove-btn:hover {
+      transform: scale(1.1);
+      background-color: #fdecec;
+      color: #c53030;
+    }
+    .modal .file-inputs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .modal .actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e5e5e5;
+    }
+    .modal .actions .btn {
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .modal .actions .btn-primary {
+      background-color: var(--cor-laranja, #FF6B35);
+      color: white;
+    }
+    .modal .actions .btn-primary:hover {
+      background-color: #e05b2d;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
+    }
+    .modal .actions .btn-secondary {
+      background-color: #e2e8f0;
+      color: #4a5568;
+    }
+    .modal .actions .btn-secondary:hover {
+      background-color: #cbd5e0;
+    }
+    @media (max-width: 768px) {
+      .modal .fields, .modal .file-inputs {
+        grid-template-columns: 1fr;
+      }
+      .modal {
+        padding: 1.5rem;
+      }
+      .modal .image-previews {
+        flex-wrap: wrap;
+      }
+    }
   </style>
 
   <!-- Edit product modal (hidden) -->
@@ -492,7 +439,7 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <header>
         <h2 id="modalTitle">Editar Produto</h2>
-        <button id="modalClose" type="button" aria-label="Fechar">✕</button>
+        <button id="modalClose" type="button" aria-label="Fechar">&times;</button>
       </header>
       <form id="editProductForm" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_method" value="post">
@@ -500,6 +447,7 @@
         <input type="hidden" name="remove_imagem1" id="remove_imagem1" value="0">
         <input type="hidden" name="remove_imagem2" id="remove_imagem2" value="0">
         <input type="hidden" name="remove_imagem3" id="remove_imagem3" value="0">
+        <input type="hidden" name="id_produto" id="modal_id"> {# Campo oculto para o ID do produto #}
         <div class="fields">
           <div>
             <label>Nome</label>
@@ -522,10 +470,10 @@
             <textarea name="descricao" id="modal_descricao" rows="3"></textarea>
           </div>
           <div>
-            <label>Categoria</label>
-            <input type="text" name="categoria" id="modal_categoria">
+            <label>Categoria</label> {# Campo de categoria adicionado #}
+            <input type="text" name="categoria" id="modal_categoria" placeholder="Ex: Camisa, Calça">
           </div>
-          <div>
+          <div> {# Campo de cor adicionado #}
             <label>Cor</label>
             <input type="text" name="cor" id="modal_cor">
           </div>
@@ -555,176 +503,167 @@
           </div>
         </div>
         <div class="actions">
-          <button type="button" class="btn" id="modalCancel">Cancelar</button>
-          <button type="submit" class="btn">Salvar</button>
+          <button type="button" class="btn btn-secondary" id="modalCancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Alterações</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // Busca de produtos (filtro simples)
-    function configurarBusca(inputId, tabelaSelector) {
-      document.getElementById(inputId)?.addEventListener('input', function(e) {
-        const termo = e.target.value.toLowerCase();
-        const linhas = document.querySelectorAll(tabelaSelector + ' tbody tr');
-        linhas.forEach(linha => {
-          const texto = linha.textContent.toLowerCase();
-          linha.style.display = texto.includes(termo) ? '' : 'none';
-        });
-      });
-    }
-    configurarBusca('buscaProdutos', '.tabela');
+    document.addEventListener('DOMContentLoaded', function() {
+      const modalOverlay = document.getElementById('modalOverlay');
+      const modalCloseBtn = document.getElementById('modalClose');
+      const editProductForm = document.getElementById('editProductForm');
+      const editButtons = document.querySelectorAll('.editar-produto-btn');
 
-    // Confirmações
-    function confirmarExclusao(id) {
-      return confirm('Tem certeza que deseja excluir o produto ' + id + '?');
-    }
-    function confirmarDesativacao(id) {
-      return confirm('Tem certeza que deseja excluir este usuário?\nEsta ação não pode ser desfeita.');
-    }
+      // Campos do formulário no modal
+      const modalId = document.getElementById('modal_id');
+      const modalNome = document.getElementById('modal_nome');
+      const modalDescricao = document.getElementById('modal_descricao');
+      const modalPreco = document.getElementById('modal_preco');
+      const modalTamanho = document.getElementById('modal_tamanho');
+      const modalCor = document.getElementById('modal_cor');
+      const modalEstoque = document.getElementById('modal_estoque');
+      const modalCategoria = document.getElementById('modal_categoria');
 
-    // Modal logic
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalClose = document.getElementById('modalClose');
-    const modalCancel = document.getElementById('modalCancel');
-    const editForm = document.getElementById('editProductForm');
+      // Pré-visualizações e inputs de imagem
+      const modalImagePreviews = document.getElementById('modal_image_previews');
+      const modalImagemInput = document.getElementById('modal_imagem');
+      const modalImagem1Input = document.getElementById('modal_imagem1');
+      const modalImagem2Input = document.getElementById('modal_imagem2');
+      const modalImagem3Input = document.getElementById('modal_imagem3');
 
-    function openEditModal(data) {
-      // populate fields
-      editForm.action = '/admin/produto/atualizar/' + data.id;
-      document.getElementById('modal_nome').value = data.nome || '';
-      document.getElementById('modal_preco').value = data.preco || '';
-      document.getElementById('modal_tamanho').value = data.tamanho || '';
-      document.getElementById('modal_estoque').value = data.estoque || '';
-      document.getElementById('modal_descricao').value = data.descricao || '';
-      document.getElementById('modal_categoria').value = data.categoria || data.cor || '';
-      document.getElementById('modal_cor').value = data.cor || '';
-      // set image previews (if filenames provided)
-      const previews = document.getElementById('modal_image_previews');
-      previews.innerHTML = '';
-      const imgBase = '/static/uploads/';
-      const imgs = [data.imagem, data.imagem1, data.imagem2, data.imagem3];
-      imgs.forEach((src, idx) => {
-        const item = document.createElement('div');
-        item.className = 'preview-item';
-        if (src) {
-          const img = document.createElement('img');
-          img.src = imgBase + src;
-          img.alt = 'Imagem do produto';
-          item.appendChild(img);
-        } else {
-          const no = document.createElement('div');
-          no.className = 'no-image';
-          no.textContent = 'Sem imagem';
-          item.appendChild(no);
+      // Inputs ocultos para remoção de imagem
+      const removeImagem = document.getElementById('remove_imagem');
+      const removeImagem1 = document.getElementById('remove_imagem1');
+      const removeImagem2 = document.getElementById('remove_imagem2');
+      const removeImagem3 = document.getElementById('remove_imagem3');
+
+      function openModal() {
+        modalOverlay.style.display = 'flex';
+        modalOverlay.classList.add('open');
+      }
+
+      function closeModal() {
+        modalOverlay.style.display = 'none';
+        modalOverlay.classList.remove('open');
+        // Resetar formulário e pré-visualizações de imagem
+        editProductForm.reset();
+        modalImagePreviews.innerHTML = '';
+        removeImagem.value = '0';
+        removeImagem1.value = '0';
+        removeImagem2.value = '0';
+        removeImagem3.value = '0';
+        // Limpar inputs de arquivo
+        modalImagemInput.value = '';
+        modalImagem1Input.value = '';
+        modalImagem2Input.value = '';
+        modalImagem3Input.value = '';
+      }
+
+      modalCloseBtn.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+          closeModal();
         }
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'remove-btn';
-        removeBtn.innerHTML = '×';
-        removeBtn.title = 'Remover imagem';
-        removeBtn.addEventListener('click', function() {
-          // mark hidden input to signal removal
-          const hid = document.getElementById('remove_imagem' + (idx === 0 ? '' : idx));
-          if (hid) hid.value = '1';
-          // criar e mostrar mensagem de remoção
-          const msg = document.createElement('div');
-          msg.className = 'remove-message';
-          msg.textContent = 'Imagem marcada para remoção';
-          msg.style.color = '#ff6b35';
-          msg.style.padding = '8px';
-          msg.style.textAlign = 'center';
-          msg.style.backgroundColor = '#fff3ef';
-          msg.style.border = '1px solid #ff6b35';
-          msg.style.borderRadius = '4px';
-          msg.style.margin = '4px 0';
-          item.innerHTML = '';
-          item.appendChild(msg);
+      });
+
+      editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const productId = this.dataset.id;
+          const nome = this.dataset.nome;
+          const descricao = this.dataset.descricao;
+          const preco = this.dataset.preco;
+          const tamanho = this.dataset.tamanho;
+          const cor = this.dataset.cor;
+          const estoque = this.dataset.estoque;
+          const categoria = this.dataset.categoria;
+
+          // Definir a ação do formulário
+          editProductForm.action = `/admin/produto/atualizar/${productId}`;
+
+          // Preencher os campos do formulário
+          modalId.value = productId;
+          modalNome.value = nome;
+          modalDescricao.value = descricao;
+          modalPreco.value = preco;
+          modalTamanho.value = tamanho;
+          modalCor.value = cor;
+          modalEstoque.value = estoque;
+          modalCategoria.value = categoria;
+
+          // Lidar com as pré-visualizações de imagem
+          const images = [
+            this.dataset.imagem,
+            this.dataset.imagem1,
+            this.dataset.imagem2,
+            this.dataset.imagem3
+          ];
+          const imageInputs = [modalImagemInput, modalImagem1Input, modalImagem2Input, modalImagem3Input];
+          const removeImageFlags = [removeImagem, removeImagem1, removeImagem2, removeImagem3];
+
+          modalImagePreviews.innerHTML = ''; // Limpar pré-visualizações anteriores
+
+          images.forEach((imgPath, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            if (imgPath) {
+              const img = document.createElement('img');
+              img.src = `/static/${imgPath}`; // Assumindo que as imagens estão em static/
+              img.alt = `Imagem ${index + 1}`;
+              previewItem.appendChild(img);
+
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.className = 'remove-btn';
+              removeBtn.textContent = '✕';
+              removeBtn.addEventListener('click', () => {
+                imageInputs[index].value = ''; // Limpar input de arquivo
+                removeImageFlags[index].value = '1'; // Marcar para remoção
+                previewItem.remove(); // Remover pré-visualização
+              });
+              previewItem.appendChild(removeBtn);
+            } else {
+              const noImage = document.createElement('div');
+              noImage.className = 'no-image';
+              noImage.textContent = 'Sem imagem';
+              previewItem.appendChild(noImage);
+            }
+            modalImagePreviews.appendChild(previewItem);
+          });
+
+          openModal();
         });
-        item.appendChild(removeBtn);
-        previews.appendChild(item);
       });
-      // show modal
-      modalOverlay.style.display = 'flex';
-    }
 
-    function closeModal() {
-      modalOverlay.style.display = 'none';
-      editForm.reset();
-    }
+      // Lidar com as mudanças nos inputs de arquivo do formulário de novo produto (para pré-visualizações)
+      const fileInputs = document.querySelectorAll('.new-product-form input[type="file"]');
+      fileInputs.forEach(input => {
+        input.addEventListener('change', function() {
+          const previewId = `preview_${this.id.replace('file_', '')}`;
+          const fnameId = `fname_${this.id.replace('file_', '')}`;
+          const previewDiv = document.getElementById(previewId);
+          const fnameSpan = document.getElementById(fnameId);
 
-    modalClose.addEventListener('click', closeModal);
-    modalCancel.addEventListener('click', closeModal);
-    modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) closeModal(); });
-
-    // Attach listeners to edit buttons
-    document.querySelectorAll('.editar-produto-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const dataset = btn.dataset;
-        const data = {
-          id: dataset.id,
-          nome: dataset.nome,
-          descricao: dataset.descricao,
-          preco: dataset.preco,
-          tamanho: dataset.tamanho,
-          cor: dataset.cor,
-          estoque: dataset.estoque,
-          categoria: dataset.categoria
-        };
-        openEditModal(data);
-      });
-    });
-
-    // New-product form: wire image buttons to hidden file inputs and show selected filename
-    document.querySelectorAll('.image-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const targetId = btn.dataset.target;
-        const input = document.getElementById(targetId);
-        if (input) input.click();
-      });
-    });
-
-    const filePairs = [
-      {id: 'file_imagem', name: 'imagem'},
-      {id: 'file_imagem1', name: 'imagem1'},
-      {id: 'file_imagem2', name: 'imagem2'},
-      {id: 'file_imagem3', name: 'imagem3'}
-    ];
-    filePairs.forEach(pair => {
-      const inp = document.getElementById(pair.id);
-      const label = document.getElementById('fname_' + pair.name);
-      const previewContainer = document.getElementById('preview_' + pair.name);
-      if (inp) {
-        inp.addEventListener('change', function() {
-          if (inp.files && inp.files.length) {
-            const file = inp.files[0];
-            if (label) label.textContent = file.name;
-            // create preview
+          if (this.files && this.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-              if (previewContainer) {
-                previewContainer.innerHTML = '';
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.alt = file.name;
-                previewContainer.appendChild(img);
-              }
+              previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(this.files[0]);
+            fnameSpan.textContent = this.files[0].name;
           } else {
-            if (label) label.textContent = 'Nenhuma';
-            if (previewContainer) previewContainer.innerHTML = '<span class="file-name">Nenhuma</span>';
+            previewDiv.innerHTML = `<span class="file-name" id="${fnameId}">Nenhuma</span>`;
+            fnameSpan.textContent = 'Nenhuma';
           }
         });
-      }
-    });
+      });
 
-    // Update tiles count on load
-    document.addEventListener('DOMContentLoaded', function() {
-      const produtosCount = document.querySelectorAll('.tabela tbody tr').length;
-      const produtosElement = document.getElementById('produtosCount');
-      if (produtosElement) produtosElement.textContent = produtosCount;
+      // Confirmação para o botão de exclusão
+      window.confirmarExclusao = function(productId) {
+        return confirm(`Tem certeza que deseja excluir o produto ID ${productId}?`);
+      };
     });
   </script>
 </body>

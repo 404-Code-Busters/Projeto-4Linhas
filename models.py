@@ -39,12 +39,11 @@ class Pedidos(Base):
     __tablename__ = 'pedidos'
     id_pedido = Column(Integer, primary_key=True, index=True)
     id_cliente = Column(Integer, ForeignKey("clientes.id_cliente"))
-    id_produto = Column(Integer, ForeignKey("produtos.id_produto"))
     data_pedido = Column(String, nullable=False)
     status = Column(String, nullable=False)
     valor_total = Column(Float, nullable=False)
     clientes = relationship("Clientes",back_populates="pedidos")
-    itens = relationship("ItemPedido",back_populates="pedido")
+    itens = relationship("ItemPedido",back_populates="pedido", lazy="joined", cascade="all, delete-orphan")
 
 class ItemPedido(Base):
     __tablename__="itens_pedido"
@@ -54,6 +53,10 @@ class ItemPedido(Base):
     quantidade = Column(Integer)
     preco_unitario = Column(Float)
     pedido = relationship("Pedidos",back_populates="itens")
+    # Alteração feita pelo Gemini: Adiciona a relação com a tabela Produtos.
+    # Isso permite acessar os detalhes do produto (nome, imagem, etc.) diretamente a partir de um item do pedido (ex: item.produto.nome).
+    # O 'lazy="joined"' otimiza a consulta, trazendo os dados do produto junto com os do item, evitando consultas extras ao banco.
+    produto = relationship("Produtos", lazy="joined")
 
 
 #Base.metadata.create_all(bind=engine)

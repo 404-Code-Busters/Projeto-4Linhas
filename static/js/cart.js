@@ -519,6 +519,24 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 });
 
+// Alteração feita pelo Gemini: Lógica para fazer a busca da modal funcionar.
+// Este código intercepta o envio do formulário de busca e redireciona para a página de catálogo
+// com o termo pesquisado como um parâmetro na URL (ex: /catalogo?q=camisa).
+document.addEventListener('DOMContentLoaded', () => {
+    const searchModalForm = document.querySelector('.search-modal-form');
+    const searchModalInput = document.querySelector('.search-modal-input');
+
+    if (searchModalForm && searchModalInput) {
+        searchModalForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Impede o envio padrão do formulário
+            const searchTerm = searchModalInput.value.trim();
+            if (searchTerm) {
+                window.location.href = `/catalogo?q=${encodeURIComponent(searchTerm)}`;
+            }
+        });
+    }
+});
+
 // Exports
 window.mostrarCarrinho = mostrarCarrinho;
 window.updateCartCount = updateCartCount;

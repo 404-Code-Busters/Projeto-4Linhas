@@ -7,9 +7,7 @@
 
   <!-- CSS base (reset, variáveis, estilos globais) -->
   <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
-  <!-- Full header/home styles (required for header layout) -->
-  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/home.css') }}">
-  <!-- Header component styles -->
+  <!-- Header component styles (self-contained header for non-home pages) -->
   <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
   <!-- CSS especifico da página -->
   <link rel="stylesheet" href="{{ url_for('static', path='css/pages/login/login.css') }}">
@@ -19,13 +17,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
-  <style>
-    .promo-message {
-      transition: opacity 0.5s ease;
-    }
-  </style>
-  <script src="{{ url_for('static', path='js/cart.js') }}"></script>
-  <script src="{{ url_for('static', path='js/pages/home.js') }}"></script>
 </head>
 <body>
   <!-- =============== HEADER (partial) =============== -->

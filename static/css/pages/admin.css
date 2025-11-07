@@ -140,3 +140,253 @@ body {
   margin-top: 20px;
   border-radius: 10px 10px 0 0;
 }
+
+/* Estilos inline extraídos do admin.html */
+html {
+  scroll-behavior: smooth;
+}
+section {
+  margin-bottom: 20px;
+  scroll-margin-top: 80px;
+}
+.admin-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.admin-section h2 {
+  color: var(--cor--laranja, #FF6B35);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--cor--laranja, #FF6B35);
+  outline: none;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.btn-primary {
+  background: var(--cor--laranja, #FF6B35);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #e85a2a;
+}
+
+.danger {
+  background-color: #c1121f !important;
+}
+
+.danger:hover {
+  background-color: #a10f1a !important;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background: #f8f8f8;
+  font-weight: 600;
+  color: #333;
+}
+
+tr:hover {
+  background: #f5f5f5;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: var(--cor--laranja, #FF6B35);
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #e85a2a;
+}
+
+.btn-delete {
+  background: #c1121f;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #a10f1a;
+}
+
+/* Inline inputs (label + input side-by-side) for new-product form */
+.new-product-form .field-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.new-product-form .field-label {
+  min-width: 160px;
+  color: #333;
+  font-weight: 600;
+  margin: 0;
+  text-align: right;
+}
+
+.small-input {
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  width: 100%;
+}
+
+.file-buttons-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.file-button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 160px;
+}
+
+.file-preview {
+  width: 140px;
+  height: 140px;
+  background: #f8f8f8;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.file-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-btn {
+  background: var(--cor--laranja, #FF6B35);
+  color: white;
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s, transform 0.08s;
+}
+
+.image-btn:hover { background: #e85a2a; transform: translateY(-1px); }
+
+.file-name {
+  font-size: 0.9rem;
+  color: #555;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .new-product-form .field-row { flex-direction: column; align-items: stretch; }
+  .new-product-form .field-label { min-width: 110px; text-align: left; }
+  .file-name { max-width: 120px; }
+}
+
+/* Simple modal styles (improved) */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.modal { background: #fff; padding: 1.5rem; border-radius: 10px; width: 100%; max-width: 960px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+.modal header { position: relative; text-align: center; margin-bottom: 0.75rem; }
+.modal header h2 { margin: 0; padding: 0.6rem 1rem; display: inline-block; border-radius: 6px; color: #fff; background: var(--cor--laranja, #FF6B35); font-size: 1.25rem; }
+.modal header button { position: absolute; right: 0.5rem; top: 0.25rem; background: transparent; border: none; font-size: 1.1rem; cursor: pointer; color: #333; }
+.modal .fields { display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+.modal .fields .full { grid-column: 1 / -1; }
+.modal .image-previews { display:flex; gap:0.5rem; align-items:center; }
+.modal .image-previews img { width: 128px; height: 128px; object-fit:cover; border-radius:6px; border:1px solid #eee; }
+.modal .image-previews .preview-item { position: relative; display: inline-block; }
+.modal .image-previews .remove-btn { position: absolute; top: -6px; right: -6px; background: #fff; border-radius: 50%; border: 1px solid #ddd; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
+.modal .image-previews .preview-item .no-image { width:128px; height:128px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; color:#999; border-radius:6px; border:1px dashed #eee; }
+.modal .file-inputs { display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; }
+.modal .actions { display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem; }
+@media (max-width:640px) { .modal .fields { grid-template-columns: 1fr; } .modal .file-inputs { grid-template-columns: 1fr; } }
+

@@ -1,4 +1,8 @@
 <!-- Partial: site header (copiado de home) -->
+<!-- Component assets for header (CSS/JS) - included here so pages that use the partial
+  get the header behavior without importing full home.css/home.js. -->
+<link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
+<script defer src="{{ url_for('static', path='js/components/header.js') }}"></script>
 <header>
   <!-- Linha 1: Top Bar -->
   <div class="top-bar">
@@ -44,7 +48,7 @@
     </a>
 
   <!-- Links principais centralizados -->
-  <ul class="menu-links centered-absolute">
+  <ul class="menu-links">
       <li><a href="{{ url_for('catalogo') }}">Destaques</a></li>
       <li><a href="{{ url_for('catalogo') }}">Artigos Esportivos</a></li>
       <li><a href="{{ url_for('catalogo') }}">Homem</a></li>

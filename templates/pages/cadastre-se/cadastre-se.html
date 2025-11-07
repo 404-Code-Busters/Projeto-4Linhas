@@ -5,21 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cadastro - 4linhas</title>
 
-    <!-- CSS base (reset, variáveis, estilos globais) -->
-    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
-    <!-- Full header/home styles (required for header layout) -->
-    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/home.css') }}">
-  <!-- Header component styles -->
-  <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
-    <!-- CSS especifico da página -->
-    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/cadastre-se.css') }}">
-
     <!-- Fonte Google Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
-    <script src="{{ url_for('static', path='js/cart.js') }}"></script>
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+  <!-- Header CSS is provided by the partial (components/header.css) -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/cadastre-se.css') }}">
+
+    <!-- JavaScript -->
+    <script defer src="{{ url_for('static', path='js/cart.js') }}"></script>
+    <script defer src="{{ url_for('static', path='js/pages/cadastre-se.js') }}"></script>
   </head>
   <body>
 
@@ -79,139 +77,6 @@
       </section>
     </main>
 
-  <!-- Header behavior and page scripts -->
-  <script src="{{ url_for('static', path='js/pages/home.js') }}"></script>
-  <script>
-      // Indicador simples de força de senha
-      (function(){
-        const pwd = document.getElementById('senha');
-        const meter = document.getElementById('password-meter-bar');
-        const hint = document.getElementById('password-hint');
-        const form = document.getElementById('register-form');
-
-        function scorePassword(s){
-          let score = 0;
-          if (!s) return 0;
-          if (s.length >= 8) score += 1;
-          if (/[A-Z]/.test(s)) score += 1;
-          if (/[0-9]/.test(s)) score += 1;
-          if (/[^A-Za-z0-9]/.test(s)) score += 1;
-          if (s.length >= 12) score += 1;
-          return score; // 0..5
-        }
-
-        function updateMeter(){
-          const val = pwd.value || '';
-          const s = scorePassword(val);
-          const pct = (s / 5) * 100;
-          meter.style.width = pct + '%';
-          meter.style.background = s <= 1 ? '#e74c3c' : s <= 3 ? '#f1c40f' : '#2ecc71';
-          if (val.length === 0) hint.textContent = 'Use ao menos 8 caracteres, incluindo letras e números.';
-          else if (s <= 1) hint.textContent = 'Senha fraca';
-          else if (s <= 3) hint.textContent = 'Senha média';
-          else hint.textContent = 'Senha forte';
-        }
-
-        pwd && pwd.addEventListener('input', updateMeter);
-
-        form && form.addEventListener('submit', (e)=>{
-          const a = pwd.value || '';
-          const b = document.getElementById('confirmar').value || '';
-          if (a !== b){
-            e.preventDefault();
-            alert('As senhas não coincidem.');
-            return false;
-          }
-          if (scorePassword(a) < 2){
-            e.preventDefault();
-            alert('Escolha uma senha mais forte.');
-            return false;
-          }
-        });
-      })();
-    </script>
   </body>
 </html>
 
-<!-- Novo cadastro com mais informações
- ai vai da sua preferencia usar o mais simples ou esse mais "completo"
- qualquer coisa me avisa !! -->
- 
-<!-- <!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tela de Cadastro</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <section class="container">
-      <div class="form-card">
-        <h2>Cadastro</h2>
-
-        <form>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="nome">Nome:</label>
-              <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required />
-            </div>
-            <div class="form-group">
-              <label for="email">Email:</label>
-              <input type="email" id="email" name="email" placeholder="Digite seu email" required />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="senha">Senha:</label>
-              <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required />
-            </div>
-            <div class="form-group">
-              <label for="confirmar">Confirmar Senha:</label>
-              <input type="password" id="confirmar" name="confirmar" placeholder="Repita sua senha" required />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="telefone">Telefone:</label>
-              <input type="tel" id="telefone" name="telefone" placeholder="(99) 99999-9999" required />
-            </div>
-            <div class="form-group">
-              <label for="nascimento">Data de Nascimento:</label>
-              <input type="date" id="nascimento" name="nascimento" required />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="genero">Gênero:</label>
-              <select id="genero" name="genero" required>
-                <option value="" disabled selected>Selecione</option>
-                <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
-                <option value="outro">Outro</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="cpf">CPF:</label>
-              <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group full-width">
-              <label for="endereco">Endereço:</label>
-              <input type="text" id="endereco" name="endereco" placeholder="Rua, Número, Bairro, Cidade" required />
-            </div>
-          </div>
-
-          <button type="submit">Cadastrar</button>
-
-          <p class="link-login">Já tem uma conta? <a href="#">Entrar</a></p>
-        </form>
-      </div>
-    </section>
-  </body>
-</html> -->
