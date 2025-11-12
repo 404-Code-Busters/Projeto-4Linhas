@@ -21,6 +21,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
+  <!-- JS da página de produto -->
+  <script src="{{ url_for('static', path='js/pages/produto.js') }}" defer></script>
+
 </head>
 <body>
 </head>
@@ -127,52 +130,29 @@
   <!-- Produto Principal -->
   <main class="product-main">
     <div class="product-gallery">
+      {# Define a imagem principal. Usa a primeira imagem disponível. #}
+      {% set main_image_path = produto.imagem_caminho or produto.imagem_caminho1 or produto.imagem_caminho2 or produto.imagem_caminho3 or 'assets/logo/4linhas-bg-red.svg' %}
+      <img src="{{ url_for('static', path=main_image_path) }}" alt="{{ produto.nome }}" class="product-image-main" id="main-product-image">
 
-      {# Pega caminho da imagem do produto #}
-      {% set img_path = produto.imagem_caminho or '' %}
-
-      {# Normaliza o caminho: remove 'static/' e adiciona 'img/' se necessário #}
-      {% if img_path.startswith('static/') %}
-        {% set img_path = img_path[7:] %}
-      {% elif '/' not in img_path and img_path %}
-        {% set img_path = 'img/' ~ img_path %}
-      {% endif %}
-
-      {# Exibe imagem principal e miniatura #}
-      <img src="{{ url_for('static', path=img_path) }}" alt="{{ produto.nome }}" class="product-image-main">
+      {# Gera a lista de todas as imagens disponíveis para as miniaturas #}
+      {% set image_paths = [
+        produto.imagem_caminho,
+        produto.imagem_caminho1,
+        produto.imagem_caminho2,
+        produto.imagem_caminho3
+      ] %}
 
       <div class="product-thumbnails">
-        <img src="{{ url_for('static', path=img_path) }}" alt="{{ produto.nome }}" class="thumbnail active">
-      </div>
-
-    </div>
-
-    <!-- versão antiga 
-
-  <main class="product-main">
-    <div class="product-gallery">
-      {# Resolve imagem do DB: se começar com 'static/' remove a parte estática e usa url_for #}
-      {% set img_path = (produto.imagem_caminho or '') %}
-      {% if img_path.startswith('static/') %}
-        {% set img_rel = img_path.replace('static/', '') %}
-      {% else %}
-        {% set img_rel = img_path %}
-      {% endif %}
-      {# If the DB stored only a filename, assume it's under static/img/ #}
-      {% if not img_rel.startswith('img/') and not img_rel.startswith('assets/') and not img_rel.startswith('images/') and img_rel|length > 0 and '/' not in img_rel %}
-        {% set img_rel = 'img/' ~ img_rel %}
-      {% endif %}
-      {# Ensure img_rel is relative to static/ and use filename= #}
-      {% if img_rel.startswith('static/') %}
-        {% set img_rel = img_rel.replace('static/', '') %}
-      {% endif %}
-  <img src="{{ url_for('static', path=img_rel) }}" alt="{{ produto.nome }}" class="product-image-main">
-      <div class="product-thumbnails">
-        {# Render a single square thumbnail (you can expand to multiple images later) #}
-  <img src="{{ url_for('static', path=img_rel) }}" alt="{{ produto.nome }}" class="thumbnail active">
+      {% for img_path in image_paths %}
+        {% if img_path %}
+          <img src="{{ url_for('static', path=img_path) }}" 
+               alt="Miniatura de {{ produto.nome }}" 
+               class="thumbnail {% if loop.first %}active{% endif %}"
+               data-full-image="{{ url_for('static', path=img_path) }}">
+        {% endif %}
+      {% endfor %}
       </div>
     </div>
-    -->
 
     <div class="product-info">
       <h1 class="product-title">{{ produto.nome }}</h1>
@@ -339,6 +319,5 @@
 
   <!-- JS do Swiper (already included in head) -->
   <script src="{{ url_for('static', path='js/cart.js') }}"></script>
-  <script src="{{ url_for('static', path='js/pages/produto.js') }}"></script>
 </body>
 </html>

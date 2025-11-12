@@ -29,184 +29,225 @@
   <!-- =============== HEADER (partial) =============== -->
   {% include 'partials/header.html' %}
 
-  <!-- MAIN CONTENT: PERFIL DE USUÁRIO (Abas: Carrinho, Pedidos, Conta) -->
+  <!-- MAIN CONTENT: PERFIL DE USUÁRIO -->
   <main class="profile-page">
     <section class="profile-hero">
       <h1>Minha Conta</h1>
       <p>Visão geral da sua conta e pedidos.</p>
     </section>
 
-    <!-- Abas principais -->
-    <div class="profile-tabs" role="tablist" aria-label="Seções da conta">
-      <button class="tab-btn active" data-tab="cart" role="tab" aria-selected="true">Carrinho</button>
-      <button class="tab-btn" data-tab="orders" role="tab" aria-selected="false">Pedidos</button>
-      <button class="tab-btn" data-tab="account" role="tab" aria-selected="false">Conta</button>
-    </div>
+    <div class="profile-container">
+      <!-- Sidebar de Navegação -->
+      <aside class="profile-sidebar">
+        <div class="profile-user-box">
+          <div class="profile-pic-placeholder">
+            <span>{{ cliente.nome[0] if cliente and cliente.nome else 'U' }}</span>
+          </div>
+          <h3 class="profile-user-name">{{ cliente.nome if cliente else 'Usuário' }}</h3>
+          <p class="profile-user-email">{{ cliente.email if cliente else 'email@exemplo.com' }}</p>
+        </div>
+        <nav class="profile-nav" role="tablist" aria-label="Seções da conta">
+          <ul>
+            <li><a href="#carrinho" class="profile-nav-link" data-tab="cart" role="tab" aria-selected="false">Meu Carrinho</a></li>
+            <li><a href="#pedidos" class="profile-nav-link active" data-tab="orders" role="tab" aria-selected="true">Meus Pedidos</a></li>
+            <li><a href="#dados" class="profile-nav-link" data-tab="account" role="tab" aria-selected="false">Meus Dados</a></li>
+            <li><a href="#enderecos" class="profile-nav-link" data-tab="addresses" role="tab" aria-selected="false">Endereços</a></li>
+            <li><a href="#favoritos" class="profile-nav-link" data-tab="favorites" role="tab" aria-selected="false">Favoritos</a></li>
+            <li><a href="{{ url_for('logout') }}" class="profile-nav-link logout">Sair</a></li>
+          </ul>
+        </nav>
+      </aside>
 
-    <!-- Conteúdo das abas -->
-    <section class="tab-contents">
-      <!-- Aba CARRINHO: mantive todo o conteúdo existente do carrinho aqui -->
-      <div id="tab-cart" class="tab-content active" role="tabpanel">
-        <section class="cart-hero">
-          <h2>Seu Carrinho</h2>
-          <p>Revise os itens antes de finalizar a compra.</p>
-        </section>
-
-        <section class="cart-content">
-          <div class="cart-items">
-            {% if carrinho %}
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr>
-                    <th style="text-align: left; padding: 10px; border-bottom: 1px solid #ddd;">Produto</th>
-                    <th style="text-align: right; padding: 10px; border-bottom: 1px solid #ddd;">Preço</th>
-                    <th style="text-align: right; padding: 10px; border-bottom: 1px solid #ddd;">Quantidade</th>
-                    <th style="text-align: right; padding: 10px; border-bottom: 1px solid #ddd;">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for item in carrinho %}
-                  <tr>
-                    <td style="text-align: left; padding: 10px; border-bottom: 1px solid #eee;">{{ item.nome }}</td>
-                    <td style="text-align: right; padding: 10px; border-bottom: 1px solid #eee;">R$ {{ "%.2f"|format(item.preco) }}</td>
-                    <td style="text-align: right; padding: 10px; border-bottom: 1px solid #eee;">{{ item.quantidade }}</td>
-                    <td style="text-align: right; padding: 10px; border-bottom: 1px solid #eee;">R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</td>
-                  </tr>
-                  {% endfor %}
-                  <tr>
-                    <td colspan="3" style="text-align: right; padding: 10px; font-weight: bold;">Total:</td>
-                    <td style="text-align: right; padding: 10px; font-weight: bold;">R$ {{ "%.2f"|format(total) }}</td>
-                  </tr>
-                </tbody>
-              </table>
+      <!-- Conteúdo Principal -->
+      <div class="profile-content">
+        <!-- Seção: Meu Carrinho / Checkout -->
+        <section id="tab-cart" class="tab-content" role="tabpanel" hidden>
+          <div class="content-header">
+            <h2>Meu Carrinho</h2>
+            <p>Revise seus itens e finalize a compra.</p>
+          </div>
+          <div class="content-body">
+            {% if carrinho and carrinho|length > 0 %}
+              <div class="cart-page-content">
+                <div class="cart-items-list">
+                  <table class="cart-table">
+                    <thead>
+                      <tr>
+                        <th colspan="2">Produto</th>
+                        <th>Preço</th>
+                        <th>Quantidade</th>
+                        <th>Total</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in carrinho %}
+                      <tr>
+                        <td>
+                          <img src="{{ url_for('static', path=item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="{{ item.nome }}" class="item-image-large">
+                        </td>
+                        <td>{{ item.nome }}</td>
+                        <td>R$ {{ "%.2f"|format(item.preco) }}</td>
+                        <td>
+                          <form action="{{ url_for('atualizar_quantidade', produto_id=item.id) }}" method="post" class="qty-form">
+                            <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1" class="qty-input">
+                            <button type="submit" class="btn-update-qty">Atualizar</button>
+                          </form>
+                        </td>
+                        <td>R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</td>
+                        <td>
+                          <form action="{{ url_for('remover_do_carrinho', produto_id=item.id) }}" method="post">
+                            <button type="submit" class="btn-remove-item">&times;</button>
+                          </form>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="cart-summary-box">
+                  <h4>Resumo do Pedido</h4>
+                  <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>R$ {{ "%.2f"|format(total) }}</span>
+                  </div>
+                  <div class="summary-row total">
+                    <span>Total</span>
+                    <span>R$ {{ "%.2f"|format(total) }}</span>
+                  </div>
+                  <form action="{{ url_for('checkout') }}" method="post" style="margin-top: 1rem;">
+                    <button type="submit" class="btn-primary checkout-full-btn">Finalizar Compra</button>
+                  </form>
+                </div>
+              </div>
             {% else %}
-              <div class="empty-cart" style="text-align: center; padding: 20px;">
-                <p>Seu carrinho está vazio</p>
-                <a href="{{ url_for('catalogo') }}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #FF6B35; color: white; text-decoration: none; border-radius: 4px;">Ver produtos</a>
+              <div class="empty-state">
+                <p>Seu carrinho está vazio.</p>
+                <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver produtos</a>
               </div>
             {% endif %}
           </div>
+        </section>
 
-          <div class="cart-summary">
-            <h2>Resumo do Pedido</h2>
-            <div class="promo-code-section">
-              <label for="promo-code">Código Promocional</label>
-              <input type="text" id="promo-code" name="promo-code" placeholder="Insira seu código">
-              <button class="apply-promo-btn">Aplicar</button>
-            </div>
-            <div class="summary-row">
-              <span>Subtotal:</span>
-              <span>R$ {{ "%.2f"|format(total) }}</span>
-            </div>
-            <div class="summary-row">
-              <span>Frete:</span>
-              <span>R$ {{ "%.2f"|format(20.00) }}</span>
-            </div>
-            <div class="summary-row total">
-              <span>Total:</span>
-              <span>R$ {{ "%.2f"|format(total + 20.00) }}</span>
-            </div>
-            <form action="{{ url_for('checkout') }}" method="post">
-              <button type="submit" class="checkout-btn">Finalizar Compra</button>
-            </form>
+        <!-- Seção: Meus Pedidos -->
+        <section id="tab-orders" class="tab-content active" role="tabpanel">
+          <div class="content-header">
+            <h2>Meus Pedidos</h2>
+            <p>Acompanhe o histórico e o status dos seus pedidos.</p>
+          </div>
+          <div class="content-body">
+            {% if pedidos and pedidos|length > 0 %}
+              <div class="orders-list">
+                {% for pedido in pedidos %}
+                  <div class="order-card">
+                    <div class="order-card-header">
+                      <h3>Pedido #{{ pedido.id_pedido }}</h3>
+                      <span class="order-status">{{ pedido.status }}</span>
+                    </div>
+                    <div class="order-card-body">
+                      <p><strong>Data:</strong> {{ pedido.data_pedido }}</p>
+                      <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido.valor_total if pedido.valor_total is defined else 0) }}</p>
+                    </div>
+                    {% if pedido.itens %}
+                      <details class="order-card-details">
+                        <summary>Ver Itens ({{ pedido.itens|length }})</summary>
+                        <ul class="order-items-list">
+                          {% for item in pedido.itens %}
+                            <li class="order-item">
+                              {% if item.produto and item.produto.imagem_caminho %}
+                                <img src="{{ url_for('static', path=item.produto.imagem_caminho) }}" alt="{{ item.produto.nome }}" class="item-image">
+                              {% else %}
+                                <img src="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="Imagem não disponível" class="item-image">
+                              {% endif %}
+                              <div class="item-details">
+                                <span class="item-name">{{ item.produto.nome if item.produto else 'Produto não encontrado' }}</span>
+                                <span class="item-qty-price">{{ item.quantidade }} x R$ {{ "%.2f"|format(item.preco_unitario if item.preco_unitario is defined else 0) }}</span>
+                              </div>
+                              <span class="item-total">R$ {{ "%.2f"|format(item.quantidade * (item.preco_unitario if item.preco_unitario is defined else 0)) }}</span>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </details>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <p>Nenhum pedido encontrado.</p>
+                <a href="{{ url_for('catalogo') }}" class="btn-primary">Começar a comprar</a>
+              </div>
+            {% endif %}
           </div>
         </section>
 
-        <!-- Recomendações mantidas dentro da aba Carrinho -->
-        <section class="recommendations">
-          <h2>Recomendações para Você</h2>
-          <div class="recommendations-grid">
-            <div class="recommendation-item">
-              <img src="{{ url_for('static', path='assets/banners/Carrossel/austrian-national-library-h39HBKBclNM-unsplash.jpg') }}" alt="Produto Recomendado 1">
-              <h3>Produto Recomendado 1</h3>
-              <p>R$ 149,90</p>
-              <button class="add-to-cart-btn">Adicionar ao Carrinho</button>
-            </div>
-            <div class="recommendation-item">
-              <img src="{{ url_for('static', path='assets/banners/Carrossel/gentrit-sylejmani-JjUyjE-oEbM-unsplash.jpg') }}" alt="Produto Recomendado 2">
-              <h3>Produto Recomendado 2</h3>
-              <p>R$ 249,90</p>
-              <button class="add-to-cart-btn">Adicionar ao Carrinho</button>
-            </div>
-            <div class="recommendation-item">
-              <img src="{{ url_for('static', path='assets/banners/Carrossel/austrian-national-library-h39HBKBclNM-unsplash.jpg') }}" alt="Produto Recomendado 3">
-              <h3>Produto Recomendado 3</h3>
-              <p>R$ 199,90</p>
-              <button class="add-to-cart-btn">Adicionar ao Carrinho</button>
-            </div>
-            <div class="recommendation-item">
-              <img src="{{ url_for('static', path='assets/banners/Carrossel/gentrit-sylejmani-JjUyjE-oEbM-unsplash.jpg') }}" alt="Produto Recomendado 4">
-              <h3>Produto Recomendado 4</h3>
-              <p>R$ 299,90</p>
-              <button class="add-to-cart-btn">Adicionar ao Carrinho</button>
-            </div>
+        <!-- Seção: Meus Dados -->
+        <section id="tab-account" class="tab-content" role="tabpanel" hidden>
+          <div class="content-header">
+            <h2>Meus Dados</h2>
+            <p>Gerencie suas informações pessoais e de segurança.</p>
           </div>
-        </section>
-      </div>
-
-      <!-- Aba PEDIDOS: placeholder inicial -->
-      <div id="tab-orders" class="tab-content" role="tabpanel" hidden>
-        <section class="orders-section">
-          <h2>Seus Pedidos</h2>
-          {% if pedidos and pedidos|length > 0 %}
-            <div class="orders-list">
-              {% for pedido in pedidos %}
-                <div class="order-card" style="border:1px solid #eee; padding:12px; margin-bottom:12px; border-radius:6px;">
-                  <h3>Pedido #{{ pedido.id_pedido }}</h3>
-                  <p><strong>Data:</strong> {{ pedido.data_pedido }}</p>
-                  <p><strong>Status:</strong> {{ pedido.status }}</p>
-                  <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido.valor_total if pedido.valor_total is defined else 0) }}</p>
-                  {% if pedido.itens %}
-                    <details>
-                      <summary>Itens ({{ pedido.itens|length }})</summary>
-                      <ul class="order-items-list">
-                        {% for item in pedido.itens %}
-                          <li class="order-item">
-                            {% if item.produto and item.produto.imagem_caminho %}
-                              <img src="{{ url_for('static', path=item.produto.imagem_caminho) }}" alt="{{ item.produto.nome }}" class="item-image">
-                            {% else %}
-                              <img src="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="Imagem não disponível" class="item-image">
-                            {% endif %}
-                            <div class="item-details">
-                              <span class="item-name">{{ item.produto.nome if item.produto else 'Produto não encontrado' }}</span>
-                              <span class="item-qty-price">{{ item.quantidade }} x R$ {{ "%.2f"|format(item.preco_unitario if item.preco_unitario is defined else 0) }}</span>
-                            </div>
-                            <span class="item-total">R$ {{ "%.2f"|format(item.quantidade * (item.preco_unitario if item.preco_unitario is defined else 0)) }}</span>
-                          </li>
-                        {% endfor %}
-                      </ul>
-                    </details>
-                  {% endif %}
+          <div class="content-body">
+            <div class="data-card">
+              <h4>Informações Pessoais</h4>
+              <p><strong>Nome:</strong> {{ cliente.nome if cliente else 'Usuário' }}</p>
+              <p><strong>Email:</strong> {{ cliente.email if cliente else 'email@exemplo.com' }}</p>
+            </div>
+            <div class="data-card">
+              <h4>Alterar Senha</h4>
+              <form action="{{ url_for('atualizar_senha') }}" method="post" class="password-update-form">
+                <div class="form-group">
+                  <label for="nova_senha">Nova Senha</label>
+                  <input type="password" id="nova_senha" name="nova_senha" placeholder="••••••••" required>
                 </div>
-              {% endfor %}
+                <button type="submit" class="btn-primary">Atualizar Senha</button>
+              </form>
             </div>
-          {% else %}
-            <div class="orders-list">
-              <p>Nenhum pedido encontrado.</p>
-            </div>
-          {% endif %}
+          </div>
         </section>
-      </div>
 
-      <!-- Aba CONTA: informações do usuário e configurações -->
-      <div id="tab-account" class="tab-content" role="tabpanel" hidden>
-        <section class="account-section">
-          <h2>Informações da Conta</h2>
-          <form action="{{ url_for('atualizar_senha') }}" method="post">
-            <p>Nome: <strong>{{ cliente.nome if cliente is defined else 'Usuário' }}</strong></p>
-            <p>Email: <strong>{{ cliente.email if cliente is defined else 'email@exemplo.com' }}</strong></p>
-            <div class="password-update">
-              <label for="nova_senha">Nova senha</label>
-              <input type="password" id="nova_senha" name="nova_senha" placeholder="Digite a nova senha">
-              <button type="submit" class="btn">Atualizar senha</button>
+        <!-- Seção: Endereços -->
+        <section id="tab-addresses" class="tab-content" role="tabpanel" hidden>
+          <div class="content-header">
+            <h2>Meus Endereços</h2>
+            <p>Gerencie seus endereços de entrega e faturamento.</p>
+          </div>
+          <div class="content-body">
+            <div class="empty-state">
+              <p>Nenhum endereço cadastrado.</p>
+              <button class="btn-primary">Adicionar Novo Endereço</button>
             </div>
-          </form>
-          <a href="{{ url_for('logout') }}" class="btn-logout">Sair</a>
-          <h3>Endereços</h3>
-          <p>Gerencie seus endereços de entrega aqui. (Placeholder)</p>
+            <!-- Exemplo de como um endereço seria exibido -->
+            <!--
+            <div class="address-card">
+              <h4>Casa</h4>
+              <p>Rua das Flores, 123, Bairro Jardim</p>
+              <p>São Paulo, SP - 01234-567</p>
+              <div class="address-actions">
+                <button class="btn-secondary">Editar</button>
+                <button class="btn-danger">Excluir</button>
+              </div>
+            </div>
+            -->
+          </div>
+        </section>
+
+        <!-- Seção: Favoritos -->
+        <section id="tab-favorites" class="tab-content" role="tabpanel" hidden>
+          <div class="content-header">
+            <h2>Meus Favoritos</h2>
+            <p>Veja os produtos que você salvou.</p>
+          </div>
+          <div class="content-body">
+            <div class="empty-state">
+              <p>Você ainda não tem produtos favoritos.</p>
+              <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver Produtos</a>
+            </div>
+            <!-- A lista de favoritos seria renderizada aqui -->
+          </div>
         </section>
       </div>
-    </section>
+    </div>
   </main>
 
   <!-- Modal de Busca -->
@@ -288,70 +329,45 @@
 
   <!-- Script para alternância de abas da página de perfil -->
   <script>
-    (function() {
-      // Seleciona botões e conteúdos das abas
-      const tabButtons = Array.from(document.querySelectorAll('.tab-btn'));
-      const tabContents = Array.from(document.querySelectorAll('.tab-content'));
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.profile-nav-link[data-tab]');
+      const tabContents = document.querySelectorAll('.tab-content');
 
-      // Função que ativa a aba pelo nome (data-tab)
-      function activateTab(tabName, setFocus = false) {
-        tabButtons.forEach(btn => {
-          const isActive = btn.getAttribute('data-tab') === tabName;
-          btn.classList.toggle('active', isActive);
-          btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-          btn.setAttribute('tabindex', isActive ? '0' : '-1');
+      function activateTab(tabName) {
+        // Atualiza os links de navegação
+        navLinks.forEach(link => {
+          const isActive = link.getAttribute('data-tab') === tabName;
+          link.classList.toggle('active', isActive);
+          link.setAttribute('aria-selected', isActive);
         });
 
+        // Mostra/esconde o conteúdo da aba
         tabContents.forEach(content => {
-          const shouldShow = content.id === `tab-${tabName}`;
-          if (shouldShow) {
-            content.classList.add('active');
+          const isContentActive = content.id === `tab-${tabName}`;
+          content.classList.toggle('active', isContentActive);
+          if (isContentActive) {
             content.removeAttribute('hidden');
           } else {
-            content.classList.remove('active');
             content.setAttribute('hidden', '');
           }
         });
 
-        if (setFocus) {
-          const activeBtn = tabButtons.find(b => b.getAttribute('data-tab') === tabName);
-          if (activeBtn) activeBtn.focus();
-        }
+        // Atualiza a URL hash
+        window.location.hash = tabName;
       }
 
-      // Adiciona listeners aos botões
-      tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const tabName = btn.getAttribute('data-tab');
-          activateTab(tabName, true);
-        });
-
-        btn.addEventListener('keydown', (e) => {
-          const index = tabButtons.indexOf(document.activeElement);
-          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-            e.preventDefault();
-            const next = tabButtons[(index + 1) % tabButtons.length];
-            next.focus();
-          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-            e.preventDefault();
-            const prev = tabButtons[(index - 1 + tabButtons.length) % tabButtons.length];
-            prev.focus();
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            const tabName = btn.getAttribute('data-tab');
-            activateTab(tabName, true);
-          }
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const tabName = link.getAttribute('data-tab');
+          activateTab(tabName);
         });
       });
 
-      // Inicializa uma aba ativa por padrão (a que tiver a classe .active ou a primeira)
-      (function init() {
-        const activeBtn = tabButtons.find(b => b.classList.contains('active')) || tabButtons[0];
-        const activeTab = activeBtn ? activeBtn.getAttribute('data-tab') : null;
-        tabButtons.forEach(b => b.setAttribute('tabindex', b === activeBtn ? '0' : '-1'));
-        if (activeTab) activateTab(activeTab, false);
-      })();
-    })();
+      // Ativa a aba com base na URL hash na carga da página ou usa o padrão
+      const initialTab = window.location.hash.substring(1) || 'orders';
+      activateTab(initialTab);
+    });
   </script>
 
 </body>

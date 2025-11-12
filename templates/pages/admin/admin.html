@@ -47,79 +47,88 @@
       <h2>📦 Gerenciar Produtos</h2>
       
       <!-- Formulário para Novo Produto -->
-      <div class="form-section admin-section">
-        <h3>➕ Adicionar Novo Produto</h3>
-        <form action="/admin/produto" method="POST" enctype="multipart/form-data" class="new-product-form">
-          <div class="form-group">
-            <div class="field-row">
-              <label class="field-label">Nome do produto:</label>
-              <input type="text" name="nome" class="small-input" placeholder="Nome do produto" required>
-            </div>
-
-            <div class="field-row">
-              <label class="field-label">Descrição:</label>
-              <textarea name="descricao" class="small-input" placeholder="Descrição do produto"></textarea>
-            </div>
-
-            <div class="field-row">
-              <label class="field-label">Preço (R$):</label>
-              <input type="number" name="preco" class="small-input" placeholder="0.00" step="0.01" required>
-            </div>
-
-            <div class="field-row">
-              <label class="field-label">Tamanho:</label>
-              <select name="tamanho" class="small-input" required>
-                <option value="">Selecione o tamanho</option>
-                <option value="PP">PP</option>
-                <option value="P">P</option>
-                <option value="M">M</option>
-                <option value="G">G</option>
-                <option value="GG">GG</option>
-                <option value="XG">XG</option>
-              </select>
-            </div>
-
-            <div class="field-row">
-              <label class="field-label">Cor:</label>
-              <input type="text" name="cor" class="small-input" placeholder="Descrição de cor">
-            </div>
-
-            <div class="field-row">
-              <label class="field-label">Quantidade em estoque:</label>
-              <input type="number" name="estoque" class="small-input" placeholder="0" required>
-            </div>
-
-            <div class="field-row file-buttons-row">
-              <!-- hidden file inputs -->
-              <input type="file" id="file_imagem" name="imagem" accept="image/*" style="display:none">
-              <input type="file" id="file_imagem1" name="imagem1" accept="image/*" style="display:none">
-              <input type="file" id="file_imagem2" name="imagem2" accept="image/*" style="display:none">
-              <input type="file" id="file_imagem3" name="imagem3" accept="image/*" style="display:none">
-
-              <div class="file-button-group">
-                <button type="button" class="image-btn" data-target="file_imagem">Imagem</button>
-                <div class="file-preview" id="preview_imagem"><span class="file-name" id="fname_imagem">Nenhuma</span></div>
+      <section id="cadastrar-produto" class="admin-section">
+        <h2>Cadastrar Novo Produto</h2>
+        <form action="{{ url_for('criar_produto') }}" method="post" enctype="multipart/form-data" class="product-form">
+          
+          <div class="form-grid">
+            <!-- Coluna 1: Informações Básicas -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="nome">Nome do Produto</label>
+                <input type="text" id="nome" name="nome" placeholder="Ex: Camisa Esportiva" required>
               </div>
-              <div class="file-button-group">
-                <button type="button" class="image-btn" data-target="file_imagem1">Imagem 2</button>
-                <div class="file-preview" id="preview_imagem1"><span class="file-name" id="fname_imagem1">Nenhuma</span></div>
+              <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" rows="4" placeholder="Detalhes sobre o material, corte, etc."></textarea>
               </div>
-              <div class="file-button-group">
-                <button type="button" class="image-btn" data-target="file_imagem2">Imagem 3</button>
-                <div class="file-preview" id="preview_imagem2"><span class="file-name" id="fname_imagem2">Nenhuma</span></div>
+            </div>
+      
+            <!-- Coluna 2: Preço, Estoque e Atributos -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="preco">Preço (R$)</label>
+                <input type="number" id="preco" name="preco" step="0.01" placeholder="Ex: 149.90" required>
               </div>
-              <div class="file-button-group">
-                <button type="button" class="image-btn" data-target="file_imagem3">Imagem 4</button>
-                <div class="file-preview" id="preview_imagem3"><span class="file-name" id="fname_imagem3">Nenhuma</span></div>
+              <div class="form-group">
+                <label for="estoque">Estoque</label>
+                <input type="number" id="estoque" name="estoque" placeholder="Ex: 50" required>
+              </div>
+              <div class="form-group">
+                <label for="tamanho">Tamanho</label>
+                <input type="text" id="tamanho" name="tamanho" placeholder="Ex: P, M, G" required>
+              </div>
+              <div class="form-group">
+                <label for="cor">Cor</label>
+                <input type="text" id="cor" name="cor" placeholder="Ex: Azul Marinho" required>
               </div>
             </div>
           </div>
-
+      
+          <!-- Seção de Upload de Imagens -->
+          <div class="form-group">
+            <label>Imagens do Produto</label>
+            <div class="image-upload-container">
+              <!-- Imagem Principal -->
+              <div class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem">
+                  <span class="preview-text">Principal</span>
+                </div>
+                <label for="imagem" class="btn-upload">Adicionar</label>
+                <input type="file" id="imagem" name="imagem" accept="image/*" data-preview-target="preview-imagem">
+              </div>
+              <!-- Imagem 1 -->
+              <div class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem1">
+                  <span class="preview-text">Img. 2</span>
+                </div>
+                <label for="imagem1" class="btn-upload">Adicionar</label>
+                <input type="file" id="imagem1" name="imagem1" accept="image/*" data-preview-target="preview-imagem1">
+              </div>
+              <!-- Imagem 2 -->
+              <div class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem2">
+                  <span class="preview-text">Img. 3</span>
+                </div>
+                <label for="imagem2" class="btn-upload">Adicionar</label>
+                <input type="file" id="imagem2" name="imagem2" accept="image/*" data-preview-target="preview-imagem2">
+              </div>
+              <!-- Imagem 3 -->
+              <div class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem3">
+                  <span class="preview-text">Img. 4</span>
+                </div>
+                <label for="imagem3" class="btn-upload">Adicionar</label>
+                <input type="file" id="imagem3" name="imagem3" accept="image/*" data-preview-target="preview-imagem3">
+              </div>
+            </div>
+          </div>
+      
           <div class="btn-container">
-            <button type="submit" class="btn-primary">Cadastrar Produto</button>
+            <button type="submit" class="btn-primary">Salvar Produto</button>
           </div>
         </form>
-      </div>
+      </section>
 
       <!-- Tabela de Produtos -->
       <div class="table-section">
@@ -638,24 +647,21 @@
       });
 
       // Lidar com as mudanças nos inputs de arquivo do formulário de novo produto (para pré-visualizações)
-      const fileInputs = document.querySelectorAll('.new-product-form input[type="file"]');
-      fileInputs.forEach(input => {
+      const imageInputs = document.querySelectorAll('input[type="file"][data-preview-target]');
+      
+      imageInputs.forEach(input => {
         input.addEventListener('change', function() {
-          const previewId = `preview_${this.id.replace('file_', '')}`;
-          const fnameId = `fname_${this.id.replace('file_', '')}`;
-          const previewDiv = document.getElementById(previewId);
-          const fnameSpan = document.getElementById(fnameId);
-
+          const targetId = this.dataset.previewTarget;
+          const previewContainer = document.getElementById(targetId);
+          
           if (this.files && this.files[0]) {
             const reader = new FileReader();
+            
             reader.onload = function(e) {
-              previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-            };
+              previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview da imagem">`;
+            }
+            
             reader.readAsDataURL(this.files[0]);
-            fnameSpan.textContent = this.files[0].name;
-          } else {
-            previewDiv.innerHTML = `<span class="file-name" id="${fnameId}">Nenhuma</span>`;
-            fnameSpan.textContent = 'Nenhuma';
           }
         });
       });

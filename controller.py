@@ -259,6 +259,27 @@ def carrinho_contador(request:Request, db:Session = Depends(get_db)):
     quantidade = sum(item["quantidade"] for item in carrinho)
     return {"quantidade": quantidade}
 
+# Rota para obter os itens do carrinho em formato JSON (para o novo modal)
+@router.get("/carrinho/itens")
+def get_carrinho_itens(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload:
+        return JSONResponse({"error": "Não autenticado"}, status_code=401)
+
+    email = payload.get("sub")
+    cliente = db.query(Clientes).filter_by(email=email).first()
+    if not cliente:
+        return JSONResponse({"error": "Cliente não encontrado"}, status_code=401)
+
+    carrinho = carrinhos.get(cliente.id_cliente, [])
+    total = sum(item["preco"] * item["quantidade"] for item in carrinho)
+
+    return JSONResponse({
+        "itens": carrinho,
+        "total": total
+    })
+
 # Rota para adicionar item ao carrinho
 @router.post("/carrinho/adicionar/{produto_id}")
 async def adicionar_carrinho(
@@ -440,11 +461,20 @@ def criar_produto(request: Request,
     estoque: int = Form(...),
     db: Session = Depends(get_db)
 ):
-    caminho_arquivo = None
-    if imagem:
-        caminho_arquivo = f"{UPLOAD_DIR}/{imagem.filename}"
-        with open(caminho_arquivo, "wb") as arquivo:
-            shutil.copyfileobj(imagem.file, arquivo)
+    # Função auxiliar para salvar imagens e retornar o nome do arquivo
+    def salvar_upload_file(upload_file: UploadFile):
+        if upload_file and upload_file.filename:
+            caminho_arquivo = os.path.join(UPLOAD_DIR, upload_file.filename)
+            with open(caminho_arquivo, "wb") as buffer:
+                shutil.copyfileobj(upload_file.file, buffer)
+            return upload_file.filename
+        return None
+
+    # Salva cada imagem e obtém seu nome de arquivo
+    nome_imagem = salvar_upload_file(imagem)
+    nome_imagem1 = salvar_upload_file(imagem1)
+    nome_imagem2 = salvar_upload_file(imagem2)
+    nome_imagem3 = salvar_upload_file(imagem3)
     
     novo_produto = Produtos(
         nome=nome,
@@ -452,11 +482,12 @@ def criar_produto(request: Request,
         preco=preco,
         tamanho=tamanho,
         cor=cor,
-        imagem_caminho=imagem.filename if imagem else None,
-        imagem_caminho1=imagem.filename if imagem1 else None,
-        imagem_caminho2=imagem.filename if imagem2 else None,
-        imagem_caminho3=imagem.filename if imagem3 else None,
-        estoque=estoque)
+        imagem_caminho=nome_imagem,
+        imagem_caminho1=nome_imagem1,
+        imagem_caminho2=nome_imagem2,
+        imagem_caminho3=nome_imagem3,
+        estoque=estoque
+    )
     
     db.add(novo_produto)
     db.commit()
@@ -481,28 +512,47 @@ def atualizar_produto(id: int,
     nome: str = Form(...),
     descricao: str = Form(None),
     categoria: str = Form(...),
+    cor: str = Form(...),
     preco: float = Form(...),
     tamanho: str = Form(...),
     estoque: int = Form(...),
     imagem: UploadFile = File(None),
+    imagem1: UploadFile = File(None),
+    imagem2: UploadFile = File(None),
+    imagem3: UploadFile = File(None),
     db: Session = Depends(get_db)
 ): # O 'id' aqui é o id_produto do caminho da URL
     produto = db.query(Produtos).filter(Produtos.id_produto == id).first()
     if not produto:
         return RedirectResponse(url="/admin", status_code=303)
     
+    # Função auxiliar para salvar imagens
+    def salvar_upload_file(upload_file: UploadFile):
+        if upload_file and upload_file.filename:
+            caminho_arquivo = os.path.join(UPLOAD_DIR, upload_file.filename)
+            with open(caminho_arquivo, "wb") as buffer:
+                shutil.copyfileobj(upload_file.file, buffer)
+            return upload_file.filename
+        return None
+
+    # Atualiza os campos do produto
     produto.nome = nome
     produto.descricao = descricao
-    produto.categoria = categoria
+    # produto.categoria = categoria # O campo categoria não existe no modelo Produtos
+    produto.cor = cor
     produto.preco = preco
     produto.tamanho = tamanho
     produto.estoque = estoque
     
-    if imagem and imagem.filename != "":
-        caminho_arquivo = f"{UPLOAD_DIR}/{imagem.filename}"
-        with open(caminho_arquivo, "wb") as arquivo:
-            shutil.copyfileobj(imagem.file, arquivo)
-        produto.imagem_caminho = imagem.filename
+    # Atualiza as imagens se novos arquivos forem enviados
+    if nome_imagem := salvar_upload_file(imagem):
+        produto.imagem_caminho = nome_imagem
+    if nome_imagem1 := salvar_upload_file(imagem1):
+        produto.imagem_caminho1 = nome_imagem1
+    if nome_imagem2 := salvar_upload_file(imagem2):
+        produto.imagem_caminho2 = nome_imagem2
+    if nome_imagem3 := salvar_upload_file(imagem3):
+        produto.imagem_caminho3 = nome_imagem3
     
     db.commit()
     db.refresh(produto)
