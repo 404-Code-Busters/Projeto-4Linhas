@@ -1,5 +1,38 @@
-pip install fastapi['standard']
-pip install python-jose[cryptography] PyJWT
-pip install uvicorn
-pip install passlib
-pip install pymysql
+fastapi['standard']
+python-jose[cryptography] PyJWT
+uvicorn
+passlib
+pymysql
+
+# Framework principal
+fastapi==0.115.0
+
+# Servidor ASGI
+uvicorn[standard]==0.30.6
+
+# ORM e Banco de Dados
+SQLAlchemy==2.0.35
+
+# Banco SQLite já vem no Python, mas se quiser PostgreSQL no deploy:
+psycopg2
+
+# Gerenciamento de senhas (bcrypt / hashing)
+passlib[bcrypt]==1.7.4
+
+# Templates HTML (Jinja2)
+Jinja2==3.1.4
+
+# Manipulação de uploads e arquivos
+python-multipart==0.0.9
+
+# JWT tokens
+PyJWT==2.9.0
+python-jose
+
+# Tipos e dependências auxiliares
+typing-extensions==4.12.2
+#request
+requests
+sqlalchemy
+python-multipart
+bcrypt==4.0.1
