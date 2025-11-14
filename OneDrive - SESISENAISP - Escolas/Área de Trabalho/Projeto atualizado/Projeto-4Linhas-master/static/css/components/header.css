@@ -1,0 +1,467 @@
+@import url('../colors.css');
+
+/* Header styles extracted from `home.css`. This file contains only the
+   styles required by the header partial so pages that include the partial
+   don't need to import the entire home stylesheet. */
+
+/* Space for fixed header */
+body {
+  padding-top: 50px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 2rem;
+  background-color: rgba(255, 107, 53, 0.95);
+  backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  min-height: 50px;
+  transition: all 0.3s ease;
+  color: #fff;
+}
+
+.scroll-to-top {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1001;
+}
+
+body.scrolled .scroll-to-top {
+  opacity: 1;
+}
+
+.scroll-to-top:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.top-logo {
+  position: absolute;
+  left: 2rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1001;
+}
+
+.top-logo img {
+  width: 40px;
+  height: auto;
+  filter: brightness(0) invert(1);
+}
+
+.section-nav {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 4rem;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 107, 53, 0.95);
+  backdrop-filter: blur(10px);
+  flex-direction: row;
+  padding: 1rem 2rem;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.section-nav.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.section-nav li a {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.section-nav li a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  opacity: 1;
+}
+
+.promo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.promo-message {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: opacity 0.5s ease;
+}
+
+.promo-arrow {
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.promo-arrow:hover {
+  transform: rotate(180deg);
+}
+
+/* Benefits dropdown (hidden by default, shown when .active is added) */
+.benefits-dropdown {
+  position: absolute;
+  /* ensure a 1px gap to avoid overlap with the top bar */
+  top: calc(100% + 1px);
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.benefits-dropdown.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.benefits-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.benefits-content h3 {
+  color: #0D1B2A;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.benefits-content p {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  max-width: 280px;
+}
+
+.benefits-main,
+.benefits-secondary {
+  flex: 1;
+  padding: 0 2rem;
+}
+
+.benefits-divider {
+  width: 1px;
+  height: 200px;
+  background-color: #eee;
+  margin: 0 2rem;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 1.5rem 0;
+}
+
+.benefits-list li {
+  color: #333;
+  font-size: 0.85rem;
+  padding: 0.4rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.benefits-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #FF6B35;
+  font-size: 0.9rem;
+}
+
+.benefits-buttons {
+  margin-top: 1.5rem;
+}
+
+.btn-login,
+.btn-register {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  min-width: 160px;
+  text-align: center;
+}
+
+/* Login button (orange) - match home.css */
+.benefits-buttons .btn-login,
+.btn-login {
+  background-color: #FF6B35;
+  color: #fff;
+  border: none;
+}
+
+.benefits-buttons .btn-login:hover,
+.btn-login:hover {
+  background-color: #e05b2d;
+  transform: translateY(-2px);
+}
+
+/* Register button - outlined by default, fills on hover (match home.css) */
+.benefits-buttons .btn-register,
+.btn-register {
+  background-color: transparent;
+  color: #0D1B2A;
+  border: 2px solid #0D1B2A;
+}
+
+.benefits-buttons .btn-register:hover,
+.btn-register:hover {
+  background-color: #0D1B2A;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.user-login {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+body.scrolled .top-logo {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .section-nav {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .section-nav li a {
+    font-size: 0.9rem;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .top-bar {
+    justify-content: center;
+  }
+
+  .promo-container {
+    padding-right: 0;
+  }
+
+  .top-logo {
+    left: 1rem;
+  }
+}
+
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 2rem;
+  background-color: #D9D9D9;
+  position: relative;
+  transition: opacity 0.3s ease;
+}
+
+body.scrolled .main-nav {
+  opacity: 1;
+}
+
+@media (max-width: 1023px) {
+  body.scrolled .main-nav {
+    display: flex;
+  }
+}
+
+/* Logo */
+.main-nav .logo {
+  order: -1;
+  flex-shrink: 0;
+}
+
+.main-nav .logo img {
+  width: 60px;
+  height: auto;
+}
+
+/* Menu links */
+.menu-links {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0 auto 0 28rem;
+  align-self: center;
+}
+
+.menu-links li a {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #0D1B2A;
+  padding: 0.5rem 0;
+  transition: color 0.3s;
+}
+
+/* Botão de busca */
+.search-button {
+  display: inline-block;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search-button:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+}
+
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  gap: 6px;
+  flex-direction: column;
+}
+
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #0D1B2A;
+}
+
+.mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 2rem;
+  background: white;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+/* Right-side actions (search, profile, wishlist, cart) - horizontal layout */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.nav-icons,
+.search-icon {
+  width: 25px;
+  height: 25px;
+  transition: background 0.3s;
+  display: block;
+}
+
+.user-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.user-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+/* Override page-specific spacing that some pages add (e.g. login.css) */
+/* Keep icons tight and consistent across all pages that include the header partial */
+.nav-right .search-button,
+.user-actions .search-button {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  gap: 0.25rem;
+  padding: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-right .search-button .search-icon,
+.user-actions .search-button .search-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Ensure header action anchors and buttons can host absolute badges and behave like in base.css */
+.user-actions a, .user-actions button { position: relative; display: inline-flex; align-items: center; }
+.user-actions button { background: transparent; border: none; padding: 0.25rem; }
+.user-actions button:focus { outline: none; box-shadow: none; }
+.cart-button img, .nav-icons { display: block; }
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #FF6B35;
+  color: white;
+  font-size: 0.8rem;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .menu-links {
+    display: none;
+  }
+  .hamburger {
+    display: flex;
+  }
+  .top-logo {
+    left: 1rem;
+  }
+}

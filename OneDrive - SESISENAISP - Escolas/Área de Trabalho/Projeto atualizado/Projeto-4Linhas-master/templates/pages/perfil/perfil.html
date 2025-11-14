@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil - 4linhas</title>
+
+  <!-- CSS base (reset, variáveis, estilos globais) -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+  <!-- Header component styles -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
+  <!-- CSS especifico da página -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/carrinho.css') }}">
+  <!-- CSS perfil/abas -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/perfil.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/perfil-novo.css') }}">
+  <!-- CSS inline extraído -->
+  <!-- (migrado para components/header.css) -->
+  
+  <script src="{{ url_for('static', path='js/cart.js') }}"></script>
+
+  <!-- Fonte Google Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- =============== HEADER (partial) =============== -->
+  {% include 'partials/header.html' %}
+
+  <!-- MAIN CONTENT: PERFIL DE USUÁRIO -->
+  <main class="profile-page">
+    <section class="profile-hero">
+      <h1>Minha Conta</h1>
+      <p>Visão geral da sua conta e pedidos.</p>
+    </section>
+
+    <div class="profile-container">
+      <!-- Sidebar de Navegação -->
+      <aside class="profile-sidebar">
+        <div class="profile-user-box">
+          <div class="profile-pic-placeholder">
+            <span>{{ cliente.nome[0] if cliente and cliente.nome else 'U' }}</span> 
+          </div>
+          <h3 class="profile-user-name">{{ cliente.nome if cliente else 'Usuário' }}</h3>
+          <p class="profile-user-email">{{ cliente.email if cliente else 'email@exemplo.com' }}</p>
+        </div>
+        <nav class="profile-nav" role="tablist" aria-label="Seções da conta">
+          <ul>
+            <li><a href="#carrinho" class="profile-nav-link" data-tab="cart" role="tab" aria-selected="false">Meu Carrinho</a></li>
+            <li><a href="#pedidos" class="profile-nav-link active" data-tab="orders" role="tab" aria-selected="true">Meus Pedidos</a></li>
+            <li><a href="#dados" class="profile-nav-link" data-tab="account" role="tab" aria-selected="false">Meus Dados</a></li>
+            <li><a href="#enderecos" class="profile-nav-link" data-tab="addresses" role="tab" aria-selected="false">Endereços</a></li>
+            <li><a href="#favoritos" class="profile-nav-link" data-tab="favorites" role="tab" aria-selected="false">Favoritos</a></li>
+            <li><a href="{{ url_for('logout') }}" class="profile-nav-link logout">Sair</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Conteúdo Principal -->
+      <div class="profile-content">
+        <!-- Seção: Meu Carrinho / Checkout -->
+        <section id="tab-cart" class="tab-content" role="tabpanel" hidden>
+          <div class="content-header">
+            <h2>Meu Carrinho</h2>
+            <p>Revise seus itens e finalize a compra.</p>
+          </div>
+          <div class="content-body">
+            {% if carrinho and carrinho|length > 0 %}
+              <div class="cart-page-content">
+                <div class="cart-items-list">
+                  <table class="cart-table">
+                    <thead>
+                      <tr>
+                        <th colspan="2">Produto</th>
+                        <th>Preço</th>
+                        <th>Quantidade</th>
+                        <th>Total</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in carrinho %}
+                      <tr>
+                        <td>
+                          <img src="{{ url_for('static', path=item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="{{ item.nome }}" class="item-image-large">
+                        </td>
+                        <td>{{ item.nome }}</td>
+                        <td>R$ {{ "%.2f"|format(item.preco) }}</td>
+                        <td>
+                          <form action="{{ url_for('atualizar_quantidade', produto_id=item.id) }}" method="post" class="qty-form">
+                            <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1" class="qty-input">
+                            <button type="submit" class="btn-update-qty">Atualizar</button>
+                          </form>
+                        </td>
+                        <td>R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</td>
+                        <td>
+                          <form action="{{ url_for('remover_do_carrinho', produto_id=item.id) }}" method="post">
+                            <button type="submit" class="btn-remove-item">&times;</button>
+                          </form>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="cart-summary-box">
+                  <h4>Resumo do Pedido</h4>
+                  <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>R$ {{ "%.2f"|format(total) }}</span>
+                  </div>
+                  <div class="summary-row total">
+                    <span>Total</span>
+                    <span>R$ {{ "%.2f"|format(total) }}</span>
+                  </div>
+                  <form action="{{ url_for('checkout') }}" method="post" style="margin-top: 1rem;">
+                    <button type="submit" class="btn-primary checkout-full-btn">Finalizar Compra</button>
+                  </form>
+                </div>
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <p>Seu carrinho está vazio.</p>
+                <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver produtos</a>
+              </div>
+            {% endif %}
+          </div>
+          <!-- Botão para acessar o cálculo de frete --FEITO PELO PIETRO - TA FEIO PRA CARALHO -->
+          <div style="margin-top: 20px;">
+            <a href="/frete" class="btn-primary">Calcular Frete</a>
+          </div>
+        </section>
+
+        <!-- Seção: Meus Pedidos -->
+        <section id="tab-orders" class="tab-content active" role="tabpanel">
+          <div class="content-header">
+            <h2>Meus Pedidos</h2>
+            <p>Acompanhe o histórico e o status dos seus pedidos.</p>
+          </div>
+          <div class="content-body">
+            {% if pedidos and pedidos|length > 0 %}
+              <div class="orders-list">
+                {% for pedido in pedidos %}
+                  <div class="order-card">
+                    <div class="order-card-header">
+                      <h3>Pedido #{{ pedido.id_pedido }}</h3>
+                      <span class="order-status">{{ pedido.status }}</span>
+                    </div>
+                    <div class="order-card-body">
+                      <p><strong>Data:</strong> {{ pedido.data_pedido }}</p>
+                      <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido.valor_total if pedido.valor_total is defined else 0) }}</p>
+                    </div>
+                    {% if pedido.itens %}
+                      <details class="order-card-details">
+                        <summary>Ver Itens ({{ pedido.itens|length }})</summary>
+                        <ul class="order-items-list">
+                          {% for item in pedido.itens %}
+                            <li class="order-item">
+                              {% if item.produto and item.produto.imagem_caminho %}
+                                <img src="{{ url_for('static', path=item.produto.imagem_caminho) }}" alt="{{ item.produto.nome }}" class="item-image">
+                              {% else %}
+                                <img src="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="Imagem não disponível" class="item-image">
+                              {% endif %}
+                              <div class="item-details">
+                                <span class="item-name">{{ item.produto.nome if item.produto else 'Produto não encontrado' }}</span>
+                                <span class="item-qty-price">{{ item.quantidade }} x R$ {{ "%.2f"|format(item.preco_unitario if item.preco_unitario is defined else 0) }}</span>
+                              </div>
+                              <span class="item-total">R$ {{ "%.2f"|format(item.quantidade * (item.preco_unitario if item.preco_unitario is defined else 0)) }}</span>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </details>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <p>Nenhum pedido encontrado.</p>
+                <a href="{{ url_for('catalogo') }}" class="btn-primary">Começar a comprar</a>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+
+        <!-- Seção: Meus Dados -->
+        <section id="tab-account" class="tab-content" role="tabpanel" hidden>
+          <div class="content-header">
+            <h2>Meus Dados</h2>
+            <p>Gerencie suas informações pessoais e de segurança.</p>
+          </div>
+          <div class="content-body">
+            <div class="data-card">
+              <h4>Informações Pessoais</h4>
+              <p><strong>Nome:</strong> {{ cliente.nome if cliente else 'Usuário' }}</p>
+              <p><strong>Email:</strong> {{ cliente.email if cliente else 'email@exemplo.com' }}</p>
+              <p>CPF: <strong>{{ cliente.cpf if cliente is defined else '11122233344' }}</strong></p> <!--FEITO PELO PIETRO-->
+              <p>Telefone: <strong>{{ cliente.telefone if cliente is defined else '11222223333' }}</strong></p> <!--FEITO PELO PIETRO-->
+              <!-- <p>Endereço: <strong>{{ cliente.endereco if cliente is defined else 'rua catelhano' }}</strong></p> FEITO PELO PIETRO -->
+            </div>
+            <div class="data-card">
+              <h4>Alterar Senha</h4>
+              <form action="{{ url_for('atualizar_senha') }}" method="post" class="password-update-form">
+                <div class="form-group">
+                  <label for="nova_senha">Nova Senha</label>
+                  <input type="password" id="nova_senha" name="nova_senha" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary">Atualizar Senha</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Endereços TESTE-- FUNCIONANDO  FEITO PELO PIETRO - 13/11/2025-->--> 
+        <section id="tab-addresses" class="tab-content" role="tabpanel" hidden>
+          <div class="content-header">
+            <h2>Meus Endereços</h2>
+            <p>Gerencie seus endereços de entrega e faturamento.</p>
+          </div>
+          <div class="content-body"><!--FEITO PELO PIETRO - 13/11/2025-->
+            <form id="form-endereco" method="post" action="/salvar_endereco" class="address-form">
+              
+
+              <div class="form-group">
+                <label for="cep">CEP</label><!--FEITO PELO PIETRO - 13/11/2025-->
+                <input type="text" id="cep" name="cep" maxlength="8" placeholder="Digite seu CEP" required>
+              </div>
+
+              <div class="form-group">
+                <label for="logradouro">Endereço</label><!--FEITO PELO PIETRO - 13/11/2025-->
+                <input type="text" id="logradouro" name="logradouro" readonly>
+              </div>
+
+              <div class="form-group">
+                <label for="bairro">Bairro</label><!--FEITO PELO PIETRO - 13/11/2025-->
+                <input type="text" id="bairro" name="bairro" readonly>
+              </div>
+              
+              <div class="form-group">
+                <label for="cidade">Cidade</label><!--FEITO PELO PIETRO - 13/11/2025-->
+                <input type="text" id="cidade" name="cidade" readonly>
+              </div>
+
+              <div class="form-group"><!--FEITO PELO PIETRO - 13/11/2025-->
+                <label for="uf">Estado</label>
+                <input type="text" id="uf" name="uf" readonly>
+              </div>
+
+              <div class="form-group"><!--FEITO PELO PIETRO - 13/11/2025-->
+                <label for="pais">País</label>
+                <input type="text" id="pais" name="pais" required>
+              </div>
+
+              <div class="form-group"><!--FEITO PELO PIETRO - 13/11/2025-->
+                <label for="numero">Número</label>
+                <input type="text" id="numero" name="numero" required>
+              </div>
+              
+              <div class="form-group"><!--FEITO PELO PIETRO - 13/11/2025-->
+                <label for="complemento">Complemento</label>
+                <input type="text" id="complemento" name="complemento" required>
+              </div>
+              
+              <button type="submit" class="btn-primary">Salvar Endereço</button>
+            </form>
+          </div>
+          
+        </section>
+
+        <!-- Seção: Favoritos -->
+        <section id="tab-favorites" class="tab-content" role="tabpanel" hidden>
+          <div class="content-header">
+            <h2>Meus Favoritos</h2>
+            <p>Veja os produtos que você salvou.</p>
+          </div>
+          <div class="content-body">
+            <div class="empty-state">
+              <p>Você ainda não tem produtos favoritos.</p>
+              <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver Produtos</a>
+            </div>
+            <!-- A lista de favoritos seria renderizada aqui -->
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de Busca -->
+  <div id="search-modal" class="search-modal">
+    <div class="search-modal-content">
+      <div class="search-modal-header">
+        <h3>Buscar Produtos</h3>
+        <button class="close-modal" aria-label="Fechar">&times;</button>
+      </div>
+      <form class="search-modal-form">
+        <input type="text" placeholder="Digite o que você está procurando..." class="search-modal-input">
+        <button type="submit">Buscar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <!-- Bloco de Newsletter - Primeiro -->
+    <div class="newsletter">
+      <h3>Assine nossa newsletter</h3>
+      <p>Receba novidades, promoções e lançamentos em primeira mão.</p>
+      <form class="newsletter-form" action="/newsletter" method="post">
+        <input type="email" name="email" placeholder="Seu e-mail" required>
+        <button type="submit">Inscrever-se</button>
+      </form>
+    </div>
+
+    <div class="footer-content">
+      <div class="footer-col">
+        <a href="/" class="footer-logo">
+          <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
+        </a>
+        <p>Produtos de alta qualidade, estilo e conforto. Inspirados nas melhores marcas do mundo.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Institucional</h3>
+        <ul>
+          <li><a href="/sobre">Sobre nós</a></li>
+          <li><a href="/politica-de-privacidade">Política de Privacidade</a></li>
+          <li><a href="/termos">Termos de Uso</a></li>
+          <li><a href="/contato">Contato</a></li>
+          <li><a href="/carreiras">Carreiras</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Ajuda</h3>
+        <ul>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/acompanhe-pedido">Acompanhe seu pedido</a></li>
+          <li><a href="/suporte">Suporte</a></li>
+          <li><a href="/trocas">Trocas e Devoluções</a></li>
+          <li><a href="/entrega">Entrega</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Nos siga</h3>
+        <div class="footer-social">
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
+          <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>
+          <!-- Twitter removed per request -->
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>Produtos</h3>
+        <ul>
+          <li><a href="/homem">Homem</a></li>
+          <li><a href="/mulher">Mulher</a></li>
+          <li><a href="/artigos">Artigos</a></li>
+          <li><a href="/destaques">Destaques</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 4linhas. Todos os direitos reservados. | CNPJ: 12.345.678/0001-90</p>
+    </div>
+  </footer>
+
+  <!-- Script para alternância de abas da página de perfil -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.profile-nav-link[data-tab]');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      function activateTab(tabName) {
+        // Atualiza os links de navegação
+        navLinks.forEach(link => {
+          const isActive = link.getAttribute('data-tab') === tabName;
+          link.classList.toggle('active', isActive);
+          link.setAttribute('aria-selected', isActive);
+        });
+
+        // Mostra/esconde o conteúdo da aba
+        tabContents.forEach(content => {
+          const isContentActive = content.id === `tab-${tabName}`;
+          content.classList.toggle('active', isContentActive);
+          if (isContentActive) {
+            content.removeAttribute('hidden');
+          } else {
+            content.setAttribute('hidden', '');
+          }
+        });
+
+        // Atualiza a URL hash
+        window.location.hash = tabName;
+      }
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const tabName = link.getAttribute('data-tab');
+          activateTab(tabName);
+        });
+      });
+
+      // Ativa a aba com base na URL hash na carga da página ou usa o padrão
+      const initialTab = window.location.hash.substring(1) || 'orders';
+      activateTab(initialTab);
+    });
+  </script>
+
+  
+<!--TESTE DA SECTION ENDEREÇO --- ESTADO:FUNCIONANDO MAS NÃO ARMAZENA EM LUGAR NENHUM-->
+<script>
+document.getElementById("cep").addEventListener("input", async function () {
+  const cep = this.value.replace(/\D/g, ""); // remove caracteres não numéricos
+
+  if (cep.length === 8) {
+    try {
+      const response = await fetch(`/api/endereco?cep_destino=${cep}`);
+      if (!response.ok) {
+        throw new Error("Erro ao buscar CEP");
+      }
+
+      const data = await response.json();
+
+      // Preenche os campos do formulário
+      document.getElementById("logradouro").value = data.logradouro || "";
+      document.getElementById("bairro").value = data.bairro || "";
+      document.getElementById("cidade").value = data.localidade || "";
+      document.getElementById("uf").value = data.uf || "";
+    } catch (error) {
+      console.error("Erro:", error);
+      alert("Não foi possível buscar o CEP. Verifique e tente novamente.");
+    }
+  }
+});
+</script>
+
+</body>
+</html>
