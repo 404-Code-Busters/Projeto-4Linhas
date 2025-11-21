@@ -1,0 +1,6 @@
+fastapi['standard']
+python-jose[cryptography]
+PyJWT
+uvicorn
+passlib
+pymysql

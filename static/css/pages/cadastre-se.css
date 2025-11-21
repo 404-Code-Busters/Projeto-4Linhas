@@ -1,7 +1,7 @@
 /* Página de cadastro - estilos específicos */
 
 /* base.css fornece tipografia e cores; aqui posicionamos o formulário abaixo do header */
-.page-main { padding-top: 120px; display:flex; align-items:center; justify-content:center; min-height: calc(100vh - 120px); }
+.page-main { display:flex; align-items:center; justify-content:center; }
 
 .container { width:100%; display:flex; justify-content:center; align-items:center; padding: 24px; }
 

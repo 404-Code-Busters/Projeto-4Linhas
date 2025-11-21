@@ -9,8 +9,11 @@ class Clientes(Base):
     __tablename__='clientes'
     id_cliente = Column(Integer,primary_key=True, index=True)
     nome = Column(String(50))
+    cpf = Column(String(14),unique=True,nullable=False)
     email = Column(String(100), unique=True)
     senha = Column(String(200))
+    telefone = Column(String(50),nullable=False)
+    endereco = Column(String(100), nullable=False)
     pedidos=relationship("Pedidos",back_populates="clientes")
     is_admin = Column(Boolean,default=False)
 
@@ -30,33 +33,47 @@ class Produtos(Base):
     estoque = Column(Integer, nullable=False)
     data_cadastro = Column(String, nullable=True)
     
-
-# tabela pedidos
-    
-
 # tabela pedidos
 class Pedidos(Base):
     __tablename__ = 'pedidos'
     id_pedido = Column(Integer, primary_key=True, index=True)
     id_cliente = Column(Integer, ForeignKey("clientes.id_cliente"))
+    endereco_entrega = Column(String)
+    cep_entrega = Column(String)
+    valor_frete = Column(Float, nullable=False)
     data_pedido = Column(String, nullable=False)
     status = Column(String, nullable=False)
     valor_total = Column(Float, nullable=False)
-    clientes = relationship("Clientes",back_populates="pedidos")
-    itens = relationship("ItemPedido",back_populates="pedido", lazy="joined", cascade="all, delete-orphan")
+    clientes = relationship("Clientes", back_populates="pedidos")
+    itens = relationship("ItemPedido", back_populates="pedidos", cascade="all, delete-orphan")
+
 
 class ItemPedido(Base):
     __tablename__="itens_pedido"
-    id = Column(Integer,primary_key=True,index=True)
-    pedido_id = Column(Integer,ForeignKey("pedidos.id_pedido"))
-    produto_id = Column(Integer,ForeignKey("produtos.id_produto"))
+    id = Column(Integer, primary_key=True, index=True)
+    pedido_id = Column(Integer, ForeignKey("pedidos.id_pedido"))
+    produto_id = Column(Integer, ForeignKey("produtos.id_produto"))
     quantidade = Column(Integer)
     preco_unitario = Column(Float)
-    pedido = relationship("Pedidos",back_populates="itens")
+
+    pedidos = relationship("Pedidos", back_populates="itens")
     # Alteração feita pelo Gemini: Adiciona a relação com a tabela Produtos.
     # Isso permite acessar os detalhes do produto (nome, imagem, etc.) diretamente a partir de um item do pedido (ex: item.produto.nome).
     # O 'lazy="joined"' otimiza a consulta, trazendo os dados do produto junto com os do item, evitando consultas extras ao banco.
     produto = relationship("Produtos", lazy="joined")
+
+class Endereco(Base): #esperando o bda criar a tabela
+    __tablename__="enderecos_clientes"
+    id_endereco = Column(Integer,primary_key=True,index=True)
+    id_cliente = Column(Integer,ForeignKey("clientes.id_cliente"))
+    logradouro = Column(String, nullable=True)
+    numero = Column(String, nullable=True)
+    complemento = Column(String, nullable=True)
+    bairro = Column(String, nullable=True)
+    cidade = Column(String, nullable=True)
+    estado = Column(String, nullable=True)
+    pais = Column(String, nullable=True)
+    cep = Column(String, nullable=True)
 
 
 #Base.metadata.create_all(bind=engine)

@@ -1,170 +1,170 @@
-/* /* ============================
-   ESTILOS GERAIS DO PAINEL ADMINISTRATIVO
-   ============================ */
+@import url('../src/css/colors.css');
 
-body {
-  font-family: Inter, system-ui, Arial, sans-serif;
-  background: #f6f8fa;
+/* ===== BASE GERAL ===== */
+* {
   margin: 0;
-  color: #0f1721;
-}
-.wrap {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 20px;
-}
-.admin-header {
-  background: #0d1b2a;
-  color: #fff;
-  padding: 18px 0;
-}
-.admin-header h1 {
-  margin: 0;
-  font-size: 20px;
-  display: inline-block;
-}
-.admin-nav {
-  float: right;
-}
-.admin-nav a {
-  color: #fff;
-  text-decoration: none;
-  margin-left: 14px;
-  font-weight: 600;
-}
-.admin-main {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 28px 20px;
+  padding: 0;
   box-sizing: border-box;
 }
-.card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
-}
-.tiles {
-  display: flex;
-  gap: 12px;
-  margin-top: 12px;
-}
-.tile {
-  background: #fbfcfd;
-  padding: 14px;
-  border-radius: 8px;
-  flex: 1;
-  text-align: center;
-  font-weight: 600;
-}
-.tile strong {
-  font-size: 24px;
-  display: block;
-  color: #0d1b2a;
-  margin-top: 6px;
-}
-.actions {
-  margin-top: 12px;
-  display: flex;
-  gap: 10px;
-}
-.btn {
-  background: #0d1b2a;
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-block;
-}
-.btn:hover {
-  background: #132f4c;
-}
-.graficos img {
-  width: 100%;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-.busca {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 12px;
-}
-.tabela {
-  width: 100%;
-  border-collapse: collapse;
-}
-.tabela th,
-.tabela td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
-}
-.tabela th {
-  background: #e9edf2;
-  color: #0d1b2a;
-}
-.tabela tr:hover {
-  background: #f1f5f9;
-}
-.excluir {
-  color: #c1121f;
-  text-decoration: none;
-  font-weight: 600;
-}
-.editar {
-  color: #0077b6;
-  text-decoration: none;
-  font-weight: 600;
-}
-.formulario {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.formulario input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-.admin-footer {
-  text-align: center;
-  padding: 18px;
-  background: #0d1b2a;
-  color: #fff;
-  font-size: 14px;
-  margin-top: 20px;
-  border-radius: 10px 10px 0 0;
+
+body {
+  font-family: "Inter", sans-serif;
+  color: #0D1B2A;
+  background-color: #f9f9f9;
+  line-height: 1.6;
+  overflow-x: hidden;
 }
 
-/* Estilos inline extraídos do admin.html */
-html {
-  scroll-behavior: smooth;
+a {
+  text-decoration: none;
+  color: inherit;
 }
-section {
-  margin-bottom: 20px;
-  scroll-margin-top: 80px;
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
-.admin-section {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+/* ===== HEADER ===== */
+.admin-header {
+  background-color: #FF6B35;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.admin-nav a {
+  color: #fff;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.admin-nav a:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.hamburger-menu span {
+  width: 25px;
+  height: 3px;
+  background-color: #fff;
+  margin: 3px 0;
+  transition: 0.3s;
+}
+
+/* ===== MAIN CONTENT ===== */
+.admin-main {
   padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   margin-bottom: 2rem;
 }
 
-.admin-section h2 {
-  color: var(--cor--laranja, #FF6B35);
+.card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0D1B2A;
   margin-bottom: 1.5rem;
+}
+
+.destaque {
+  background: linear-gradient(135deg, #FF6B35, #FF8C42);
+  color: #fff;
+}
+
+.destaque h2 {
+  color: #fff;
+}
+
+.tiles {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.tile {
   text-align: center;
+  flex: 1;
+}
+
+.tile span {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.tile strong {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* ===== FORM STYLES ===== */
+.admin-section h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #0D1B2A;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .form-group {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #0D1B2A;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
@@ -436,7 +436,7 @@ tr:hover {
 .product-form input:focus,
 .product-form textarea:focus {
   outline: none;
-  border-color: var(--cor-laranja, #FF6B35);
+  border-color: var(--cor--laranja, #FF6B35);
   box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
 }
 
@@ -494,4 +494,59 @@ tr:hover {
 /* Esconde o input[type=file] padrão */
 .product-form input[type="file"] {
   display: none;
+}
+
+/* === ESTILOS RESPONSIVOS PARA O HEADER === */
+
+.hamburger-menu {
+  display: none; /* Escondido por padrão */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 101;
+}
+
+.hamburger-menu span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: #fff;
+  margin: 5px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .admin-header .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .admin-nav {
+    display: none;
+    position: absolute;
+    top: 68px; /* Altura do header */
+    left: 0;
+    right: 0;
+    background-color: #0d1b2a;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    gap: 1rem;
+    border-top: 1px solid #132f4c;
+  }
+
+  .admin-nav.active {
+    display: flex;
+  }
+
+  .admin-nav a {
+    margin-left: 0;
+    font-size: 1.1rem;
+  }
+
+  .hamburger-menu {
+    display: block; /* Visível em telas menores */
+  }
 }

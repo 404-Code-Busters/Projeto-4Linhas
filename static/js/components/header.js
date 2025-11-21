@@ -3,14 +3,26 @@
 // scroll handler (toggles `body.scrolled`), scroll-to-top button and cart count update.
 
 (function(){
-	// Scroll handler: toggle `body.scrolled` class
+	// Throttled Scroll handler: toggle `body.scrolled` class for better performance
+	let isThrottled = false;
+	const scrollThreshold = 50;
+
+	function handleScroll() {
+		// Use classList.toggle for simpler logic
+		document.body.classList.toggle('scrolled', window.scrollY > scrollThreshold);
+	}
+
 	window.addEventListener('scroll', () => {
-		if (window.scrollY > 50) {
-			document.body.classList.add('scrolled');
-		} else {
-			document.body.classList.remove('scrolled');
+		if (!isThrottled) {
+			window.requestAnimationFrame(() => {
+				handleScroll();
+				isThrottled = false;
+			});
+			isThrottled = true;
 		}
 	});
+	// Initial check in case the page loads already scrolled
+	handleScroll();
 
 	document.addEventListener('DOMContentLoaded', function() {
 		// Promo messages cycling
@@ -37,111 +49,98 @@
 
 		if (hamburger && mobileMenu) {
 			hamburger.addEventListener('click', () => {
-				mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
+				// Use a class on the body to toggle the menu. This is more flexible for styling.
+				document.body.classList.toggle('menu-open');
 			});
 
 			// Close menu when clicking outside
 			mobileMenu.addEventListener('click', (e) => {
 				if (e.target === mobileMenu) {
-					mobileMenu.style.display = 'none';
+					document.body.classList.remove('menu-open');
 				}
 			});
 		}
 
-		// Search behavior: prefer modal if present, otherwise focus the page search input
-		const searchButton = document.querySelector('.search-button');
-		const searchModal = document.getElementById('search-modal');
-		const closeModal = document.querySelector('.close-modal');
+// Search behavior: prefer modal if present, otherwise focus the page search input
+const searchButton = document.querySelector('.search-button');
+const searchModal = document.getElementById('search-modal');
+const closeModal = document.querySelector('.close-modal');
 
-		if (searchButton) {
-			searchButton.addEventListener('click', (e) => {
-				// If a dedicated search modal exists, use it (legacy behavior)
-				if (searchModal && closeModal) {
-					searchModal.style.display = 'flex';
-					return;
-				}
+if (searchButton) {
+  searchButton.addEventListener('click', (e) => {
+    // If a dedicated search modal exists, use it (legacy behavior)
+    if (searchModal && closeModal) {
+      searchModal.classList.add('open');
+      return;
+    }
+    // Otherwise, try to focus an in-page search input (#search-input)
+    const pageSearch = document.getElementById('search-input');
+    if (pageSearch) {
+      // Make sure it's visible (some pages may hide it), scroll into view and focus
+      pageSearch.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      setTimeout(() => pageSearch.focus(), 300);
+      return;
+    }
+    // Fallback: toggle a compact inline search field in the header if present
+    const headerSearch = document.querySelector('.header-inline-search');
+    if (headerSearch) {
+      headerSearch.classList.toggle('open');
+      const input = headerSearch.querySelector('input');
+      if (input && headerSearch.classList.contains('open')) input.focus();
+    }
+  });
 
-				// Otherwise, try to focus an in-page search input (#search-input)
-				const pageSearch = document.getElementById('search-input');
-				if (pageSearch) {
-					// Make sure it's visible (some pages may hide it), scroll into view and focus
-					pageSearch.scrollIntoView({ block: 'center', behavior: 'smooth' });
-					setTimeout(() => pageSearch.focus(), 300);
-					return;
-				}
-
-				// Fallback: toggle a compact inline search field in the header if present
-				const headerSearch = document.querySelector('.header-inline-search');
-				if (headerSearch) {
-					headerSearch.classList.toggle('open');
-					const input = headerSearch.querySelector('input');
-					if (input && headerSearch.classList.contains('open')) input.focus();
-				}
-			});
-
-			// If modal exists, wire close behavior too
-			if (searchModal && closeModal) {
-				closeModal.addEventListener('click', () => {
-					searchModal.style.display = 'none';
-				});
-
-				// Close modal when clicking outside
-				window.addEventListener('click', (e) => {
-					if (e.target === searchModal) {
-						searchModal.style.display = 'none';
-					}
-				});
-
-				// Close modal on Escape key
-				document.addEventListener('keydown', (e) => {
-					if (e.key === 'Escape' && searchModal.style.display === 'flex') {
-						searchModal.style.display = 'none';
-					}
-				});
-			}
-		}
+  // If modal exists, wire close behavior too
+  if (searchModal && closeModal) {
+    closeModal.addEventListener('click', () => {
+      searchModal.classList.remove('open');
+    });
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target === searchModal) {
+        searchModal.classList.remove('open');
+      }
+    });
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && searchModal.classList.contains('open')) {
+        searchModal.classList.remove('open');
+      }
+    });
+  }
+}
 
 		// Dropdown de benefícios (login/cadastro)
 		const promoArrow = document.querySelector('.promo-arrow');
 		const benefitsDropdown = document.querySelector('.benefits-dropdown');
-		let isDropdownOpen = false;
+		const userDropdown = document.querySelector('.user-dropdown');
+		const activeDropdown = benefitsDropdown || userDropdown; // Pega o dropdown que existir na página
 
-		if (promoArrow && benefitsDropdown) {
-			promoArrow.addEventListener('click', (e) => {
+		if (promoArrow && activeDropdown) {
+			const toggleDropdown = (e) => {
 				e.stopPropagation();
-				isDropdownOpen = !isDropdownOpen;
-				benefitsDropdown.classList.toggle('active');
-				promoArrow.style.transform = isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-				// Robust fallback: if some CSS prevents visibility, force inline styles when open
-				if (isDropdownOpen) {
-					benefitsDropdown.style.opacity = '1';
-					benefitsDropdown.style.visibility = 'visible';
-					benefitsDropdown.style.transform = 'translateY(0)';
-					benefitsDropdown.style.pointerEvents = 'auto';
-				} else {
-					// remove inline styles to fall back to CSS transitions
-					benefitsDropdown.style.opacity = '';
-					benefitsDropdown.style.visibility = '';
-					benefitsDropdown.style.transform = '';
-					benefitsDropdown.style.pointerEvents = '';
-				}
-			});
+				const isActive = activeDropdown.classList.toggle('active');
+				promoArrow.style.transform = isActive ? 'rotate(180deg)' : 'rotate(0deg)';
+			};
+
+			const closeDropdown = () => {
+				activeDropdown.classList.remove('active');
+				promoArrow.style.transform = 'rotate(0deg)';
+			};
+
+			promoArrow.addEventListener('click', toggleDropdown);
 
 			// Fecha o dropdown ao clicar fora
 			document.addEventListener('click', (e) => {
-				if (!promoArrow.contains(e.target) && !benefitsDropdown.contains(e.target) && isDropdownOpen) {
-					isDropdownOpen = false;
-					benefitsDropdown.classList.remove('active');
-					promoArrow.style.transform = 'rotate(0deg)';
+				if (activeDropdown.classList.contains('active') && !promoArrow.contains(e.target) && !activeDropdown.contains(e.target)) {
+					closeDropdown();
 				}
 			});
 
 			// Fecha com ESC
 			document.addEventListener('keydown', (e) => {
-				if (e.key === 'Escape' && isDropdownOpen) {
-					isDropdownOpen = false;
-					benefitsDropdown.classList.remove('active');
-					promoArrow.style.transform = 'rotate(0deg)';
+				if (e.key === 'Escape' && activeDropdown.classList.contains('active')) {
+					closeDropdown();
 				}
 			});
 		}

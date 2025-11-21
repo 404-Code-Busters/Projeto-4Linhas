@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, Form, UploadFile, File, Depends
+import requests
+from fastapi import APIRouter, Request, Form, UploadFile, File, Depends, HTTPException, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -22,12 +23,33 @@ UPLOAD_DIR = './static/'
 # caminho para o os
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# ---------- Função Auxiliar de Contexto (Adicionado por Gemini) ----------
+
+def get_user_from_token(request: Request, db: Session):
+    """Verifica o token no cookie e retorna o objeto do usuário se válido."""
+    token = request.cookies.get("token")
+    if not token:
+        return None
+    payload = verificar_token(token)
+    if not payload:
+        return None
+    email = payload.get("sub")
+    if not email:
+        return None
+    return db.query(Clientes).filter(Clientes.email == email).first()
+
+def get_base_context(request: Request, db: Session):
+    """Retorna o contexto base para os templates, incluindo o usuário."""
+    user = get_user_from_token(request, db)
+    return {"request": request, "user": user}
+
 # ---------- Rotas Principais ----------
 
 # Rota para página inicial (home)
 @router.get("/", response_class=HTMLResponse, name="index")
-async def home(request:Request):
-    return templates.TemplateResponse("pages/home/home.html", {"request":request})
+async def home(request:Request, db: Session = Depends(get_db)):
+    context = get_base_context(request, db)
+    return templates.TemplateResponse("pages/home/home.html", context)
 
 # Rota para catálogo de produtos
 @router.get("/catalogo", response_class=HTMLResponse, name="catalogo")
@@ -40,6 +62,9 @@ async def catalogo(
     preco_max: float = None # Alteração feita pelo : Parâmetro para o filtro de preço máximo.
 ):
     try:
+        # Alteração Gemini: Adiciona o contexto base com o usuário
+        context = get_base_context(request, db)
+
         # Alteração feita pelo : A lógica de busca foi movida para o backend para maior eficiência.
         # Em vez de carregar todos os produtos e filtrar no navegador (o que seria lento com muitos itens),
         # o banco de dados, que é otimizado para isso, retorna apenas os produtos que correspondem aos filtros.
@@ -61,10 +86,9 @@ async def catalogo(
 
         produtos = query.all()
         
-        return templates.TemplateResponse("pages/produtos/produtos.html", {
-            "request": request,
-            "produtos": produtos
-        })
+        # Adiciona os produtos ao contexto e renderiza
+        context["produtos"] = produtos
+        return templates.TemplateResponse("pages/produtos/produtos.html", context)
     except Exception as e:
         # Em desenvolvimento, mostra detalhes do erro
         import traceback
@@ -81,11 +105,13 @@ async def catalogo(
 
 # Rota para detalhes do produto
 @router.get("/produto/{id_produto}", response_class=HTMLResponse, name="detalhe_produto")
-async def detalhe_produto(request:Request, id_produto:int, db:Session=Depends(get_db)):
+async def detalhe_produto(request: Request, id_produto: int, db: Session = Depends(get_db)):
+    context = get_base_context(request, db)
     produto = db.query(Produtos).filter(Produtos.id_produto == id_produto).first()
-    return templates.TemplateResponse('pages/produto/produto.html', {
-        'request':request, 'produto':produto
-    })
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    context["produto"] = produto
+    return templates.TemplateResponse('pages/produto/produto.html', context)
 
 # Alteração feita pelo : A rota '/produtos/busca' foi removida.
 # Sua funcionalidade foi unificada na rota '/catalogo' para simplificar o código e centralizar a lógica.
@@ -94,8 +120,9 @@ async def detalhe_produto(request:Request, id_produto:int, db:Session=Depends(ge
 
 # Rota para página de login
 @router.get("/login", response_class=HTMLResponse, name="login")
-def login_page(request:Request):
-    return templates.TemplateResponse("pages/login/login.html", {"request":request})
+def login_page(request: Request, db: Session = Depends(get_db)):
+    context = get_base_context(request, db)
+    return templates.TemplateResponse("pages/login/login.html", context)
 
 # Rota para processar login
 @router.post("/login")
@@ -123,26 +150,131 @@ def login(request: Request,
 
 # Rota para página de cadastro
 @router.get("/cadastro", response_class=HTMLResponse, name="cadastro")
-def cadastro_page(request:Request):
-    return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
-        "request":request
+def cadastro_page(request: Request, db: Session = Depends(get_db)):
+    context = get_base_context(request, db)
+    return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", context)
+
+###############################################################
+#FALTA TESTAR E APLICAR
+#ROTA DE ENDEREÇO
+@router.get("/endereco", response_class=HTMLResponse)
+def pagina_endereco(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload:
+        return templates.TemplateResponse("perfil.html", {"request": request})
+
+    email = payload.get("sub")
+    cliente = db.query(Clientes).filter_by(email=email).first()
+
+    return templates.TemplateResponse("endereco.html", {
+        "request": request,
+        "email": cliente.email if cliente else ""
     })
 
-# Rota para processar cadastro
+
+#FALTA TESTAR E APLICAR
+@router.post("/salvar_endereco")
+def salvar_endereco(
+    request: Request,
+    logradouro: str = Form(...),
+    numero: str = Form(...),
+    complemento: str = Form(None),
+    bairro: str = Form(...),
+    cidade: str = Form(...),
+    uf: str = Form(...),
+    pais: str = Form(...),
+    cep: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    # Verifica token de autenticação
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload:
+        return RedirectResponse(url="/login", status_code=303)
+
+    email = payload.get("sub")
+    cliente = db.query(Clientes).filter_by(email=email).first()
+
+    if not cliente:
+        return {"erro": "Cliente não encontrado"}
+
+    # Cria um novo endereço vinculado ao cliente
+    #DADOS PEGOS DO BANCO E ATUALIZADOS - DIA 13/11/2025
+    novo_endereco = Endereco(
+        id_cliente=cliente.id_cliente,
+        logradouro=logradouro,
+        numero=numero,
+        complemento=complemento,
+        bairro=bairro,
+        cidade=cidade,
+        estado=uf,
+        pais=pais,
+        cep=cep
+    )
+
+    db.add(novo_endereco)
+    db.commit()
+##############################################################
+
+# Rota para processar cadastro #TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
 @router.post("/register")
 def cadastrar_cliente(
     request:Request,
     nome:str = Form(...), 
+    cpf:str = Form(...),
     email:str = Form(...),
-    senha:str = Form(...), 
+    senha:str = Form(...),
+    telefone:str = Form(...), 
+    # endereco:str = Form(...),
     db:Session = Depends(get_db)
 ):
+    
+    erro = None
+    if len(cpf) != 11:
+        erro = "CPF deve conter 11 dígitos."
+    elif len(telefone) != 11:
+        erro = "Telefone deve conter 11 dígitos."
+    if erro:
+        return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
+            "request": request,
+            "erro": erro,
+            "nome": nome,
+            "cpf": cpf,
+            "email": email,
+            "telefone": telefone
+        })
+    
     cliente = db.query(Clientes).filter(Clientes.email == email).first()
     if cliente:
-        return {"mensagem":"E-mail já cadastrado!"}
+        return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
+            "request": request,
+            "erro": "E-mail já cadastrado!",
+            "nome": nome,
+            "cpf": cpf,
+            "email": email,
+            "telefone": telefone
+        })
+    cliente = db.query(Clientes).filter(Clientes.cpf == cpf).first()
+    if cliente:
+        return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
+            "request": request,
+            "erro": "CPF já cadastrado!",
+            "nome": nome,
+            "cpf": cpf,
+            "email": email,
+            "telefone": telefone
+        })
     
-    senha_hash = gerar_senha(senha)
-    novo_cliente = Clientes(nome=nome, email=email, senha=senha_hash)
+    senha_hash = gerar_senha(senha) #TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
+    novo_cliente = Clientes(
+        nome=nome, 
+        cpf=cpf,
+        email=email, 
+        senha=senha_hash,
+        telefone=telefone,
+        # endereco=endereco
+         )
     db.add(novo_cliente)
     db.commit()
     db.refresh(novo_cliente)
@@ -152,13 +284,17 @@ def cadastrar_cliente(
 @router.get("/perfil", response_class=HTMLResponse, name="perfil")
 def perfil(request:Request, db:Session = Depends(get_db)):
     token = request.cookies.get("token")
-    if not token or not verificar_token(token):
-        return RedirectResponse(url="/login", status_code=303)
-    
     payload = verificar_token(token)
+    if not token or not payload:
+        # Passa mensagem de timeout para login
+        return templates.TemplateResponse("pages/login/login.html", {
+            "request": request,
+            "timeout": True
+        })
+
     email = payload.get("sub")
     cliente = db.query(Clientes).filter(Clientes.email == email).first()
-    
+
     # Buscar itens do carrinho do usuário
     carrinho = carrinhos.get(cliente.id_cliente, [])
     total = sum(item["preco"] * item["quantidade"] for item in carrinho)
@@ -176,6 +312,21 @@ def perfil(request:Request, db:Session = Depends(get_db)):
         "total": total,
         "pedidos": pedidos
     })
+
+
+# Rota para página de checkout
+# Observação: rota adicionada por GitHub Copilot (assistente)
+@router.get("/checkout", response_class=HTMLResponse, name="checkout")
+def pagina_checkout(request: Request, db: Session = Depends(get_db)):    
+    context = get_base_context(request, db)
+    if not context.get("user"):
+        return RedirectResponse(url="/login", status_code=303)
+    
+    carrinho = carrinhos.get(context["user"].id_cliente, [])
+    total = sum(item["preco"] * item["quantidade"] for item in carrinho)
+
+    context.update({"carrinho": carrinho, "total": total})
+    return templates.TemplateResponse("pages/checkout/checkout.html", context)
 
 # Rota para atualizar senha do perfil
 @router.post("/perfil/atualizar-senha", name="atualizar_senha")
@@ -377,45 +528,266 @@ async def remover_do_carrinho(
     return {"mensagem": "Produto removido do carrinho"}
 
 # Rota para finalizar compra
+# @router.post("/checkout")
+# def checkout(request:Request, db:Session = Depends(get_db)):
+#     token = request.cookies.get("token")
+#     payload = verificar_token(token)
+#     if not payload:
+#         return RedirectResponse(url="/login", status_code=303)
+    
+#     email = payload.get("sub")
+#     cliente = db.query(Clientes).filter_by(email=email).first()
+#     carrinho = carrinhos.get(cliente.id_cliente, [])
+
+    
+#     if not carrinho:
+#         return {"mensagem": "Carrinho vazio"}
+    
+#     total = sum(item["preco"] * item["quantidade"] for item in carrinho)
+#     # Correção: Usar os nomes de campo corretos do modelo Pedidos (id_cliente, valor_total)
+#     # e adicionar valores padrão para os campos obrigatórios (data_pedido, status)
+#     from datetime import datetime
+#     pedido = Pedidos(id_cliente=cliente.id_cliente,
+#                     valor_total=total,
+#                     data_pedido=datetime.now().strftime("%Y-%m-%d"),
+#                     status="Processando",
+#                           )
+#     db.add(pedido)
+#     db.commit()
+#     db.refresh(pedido)
+
+#     for item in carrinho:
+#         novo_item = ItemPedido(
+#             pedido_id=pedido.id_pedido, # Correção: A chave primária de Pedidos é id_pedido
+#             produto_id=item["id"],
+#             quantidade=item["quantidade"],
+#             preco_unitario=item["preco"]
+#         )
+#         db.add(novo_item)
+#     db.commit()
+#     carrinhos[cliente.id_cliente] = []
+#     return RedirectResponse(url="/perfil", status_code=303) # Correção: Redirecionar para a página de perfil
+
+#rota checkout
 @router.post("/checkout")
-def checkout(request:Request, db:Session = Depends(get_db)):
+async def checkout(request: Request, db: Session = Depends(get_db)):
     token = request.cookies.get("token")
     payload = verificar_token(token)
+
     if not payload:
         return RedirectResponse(url="/login", status_code=303)
-    
+
     email = payload.get("sub")
     cliente = db.query(Clientes).filter_by(email=email).first()
+
     carrinho = carrinhos.get(cliente.id_cliente, [])
-    
     if not carrinho:
-        return {"mensagem": "Carrinho vazio"}
-    
-    total = sum(item["preco"] * item["quantidade"] for item in carrinho)
-    # Correção: Usar os nomes de campo corretos do modelo Pedidos (id_cliente, valor_total)
-    # e adicionar valores padrão para os campos obrigatórios (data_pedido, status)
+        return templates.TemplateResponse("pages/checkout/checkout.html", {
+            "request": request,
+            "cliente": cliente,
+            "carrinho": carrinho,
+            "total": 0,
+            "erro": "Carrinho vazio"
+        })
+
+    # Tenta obter endereço enviado pelo formulário (ex: usuário preencheu no checkout)
+    form = await request.form()
+    form_logradouro = form.get("logradouro")
+    form_numero = form.get("numero")
+    form_bairro = form.get("bairro")
+    form_cidade = form.get("cidade")
+    form_uf = form.get("uf")
+    form_cep = form.get("cep")
+
+    endereco_obj = db.query(Endereco).filter_by(id_cliente=cliente.id_cliente).first()
+
+    # Decide qual endereço usar: formulário > tabela Endereco > campo cliente.endereco
+    if form_logradouro:
+        endereco_str = f"{form_logradouro}, {form_numero or ''} - {form_bairro or ''} - {form_cidade or ''} - {form_uf or ''}"
+        cep_used = form_cep or ""
+        # Se usuário optou por salvar, persiste/atualiza endereço no banco
+        if form.get('salvar_endereco'):
+            if endereco_obj:
+                endereco_obj.logradouro = form_logradouro
+                endereco_obj.numero = form_numero
+                endereco_obj.bairro = form_bairro
+                endereco_obj.cidade = form_cidade
+                endereco_obj.estado = form_uf
+                endereco_obj.cep = form_cep
+                db.add(endereco_obj)
+            else:
+                novo_end = Endereco(
+                    id_cliente=cliente.id_cliente,
+                    logradouro=form_logradouro,
+                    numero=form_numero,
+                    complemento=None,
+                    bairro=form_bairro,
+                    cidade=form_cidade,
+                    estado=form_uf,
+                    pais='Brasil',
+                    cep=form_cep
+                )
+                db.add(novo_end)
+            db.commit()
+    elif endereco_obj:
+        endereco_str = f"{endereco_obj.logradouro}, {endereco_obj.numero or ''} - {endereco_obj.bairro or ''} - {endereco_obj.cidade or ''} - {endereco_obj.estado or ''}"
+        cep_used = endereco_obj.cep or ""
+    elif getattr(cliente, 'endereco', None):
+        endereco_str = cliente.endereco
+        cep_used = ""
+    else:
+        # Nenhum endereço disponível: retorna para a página de checkout com erro legível
+        total_produtos = sum(item["preco"] * item["quantidade"] for item in carrinho)
+        return templates.TemplateResponse("pages/checkout/checkout.html", {
+            "request": request,
+            "cliente": cliente,
+            "carrinho": carrinho,
+            "total": total_produtos,
+            "erro": "Nenhum endereço cadastrado. Cadastre um endereço ou preencha os dados no checkout antes de finalizar."
+        })
+
+    total_produtos = sum(item["preco"] * item["quantidade"] for item in carrinho)
+    valor_frete = 15.90
+    total_final = total_produtos + valor_frete
+
     from datetime import datetime
-    pedido = Pedidos(id_cliente=cliente.id_cliente, valor_total=total, data_pedido=datetime.now().strftime("%Y-%m-%d"), status="Processando")
+
+    # Só cria o pedido se o formulário veio da etapa de pagamento
+    # Verifica se veio o campo 'payment' (PIX, cartão, etc)
+    payment_method = form.get('payment')
+    if not payment_method:
+        # Se não veio, volta para o checkout na etapa correta
+        return templates.TemplateResponse("pages/checkout/checkout.html", {
+            "request": request,
+            "cliente": cliente,
+            "carrinho": carrinho,
+            "total": total_produtos,
+            "erro": "Finalize o pagamento para confirmar o pedido."
+        })
+
+    # Criar o pedido
+    pedido = Pedidos(
+        id_cliente=cliente.id_cliente,
+        endereco_entrega=endereco_str,
+        cep_entrega=cep_used,
+        valor_frete=valor_frete,
+        data_pedido=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        status="Processando",
+        valor_total=total_final
+    )
+
     db.add(pedido)
     db.commit()
     db.refresh(pedido)
 
+    # Criar itens desse pedido
     for item in carrinho:
         novo_item = ItemPedido(
-            pedido_id=pedido.id_pedido, # Correção: A chave primária de Pedidos é id_pedido
+            pedido_id=pedido.id_pedido,
             produto_id=item["id"],
             quantidade=item["quantidade"],
             preco_unitario=item["preco"]
         )
         db.add(novo_item)
+
     db.commit()
+
     carrinhos[cliente.id_cliente] = []
-    return RedirectResponse(url="/perfil", status_code=303) # Correção: Redirecionar para a página de perfil
+
+    # Redireciona para página de confirmação com id do pedido
+    return RedirectResponse(url=f"/pedidos/confirmacao?id={pedido.id_pedido}", status_code=303)
+
+
+# Rota de confirmação de pedido
+@router.get("/pedidos/confirmacao", response_class=HTMLResponse)
+def pedido_confirmacao(request: Request, id: int = None, db: Session = Depends(get_db)):
+    if not id:
+        return templates.TemplateResponse("pages/pedidos/confirmacao.html", {"request": request, "pedido": None})
+
+    pedido = db.query(Pedidos).filter(Pedidos.id_pedido == id).first()
+    return templates.TemplateResponse("pages/pedidos/confirmacao.html", {"request": request, "pedido": pedido})
+
 
 # rota para acompanhe
 @router.get("/acompanhe", response_class=HTMLResponse, name="acompanhe")
-async def acompanhe(request:Request):
-    return templates.TemplateResponse("pages/acompanhe/acompanhe.html", {"request":request})
+async def acompanhe(request: Request, db: Session = Depends(get_db)):
+    context = get_base_context(request, db)
+    return templates.TemplateResponse("pages/acompanhe/acompanhe.html", context)
+
+
+CEP_LOJA = "03008020"  # CEP 
+
+@router.get("/api/endereco")#FEITO PELO PIETRO - 13/11/2025
+def calcular_endereco(
+    request: Request,
+    cep_destino: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    # Autenticação obrigatória
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Usuário não autenticado")
+
+    # Validação do CEP
+    if not cep_destino.isdigit() or len(cep_destino) != 8:
+        raise HTTPException(status_code=400, detail="CEP inválido")
+
+    # Consulta no ViaCEP
+    via_cep_url = f"https://viacep.com.br/ws/{cep_destino}/json/"
+    resposta = requests.get(via_cep_url)
+
+    if resposta.status_code != 200:
+        raise HTTPException(status_code=400, detail="Erro ao consultar o CEP")
+
+    dados = resposta.json()
+    if "erro" in dados:
+        raise HTTPException(status_code=400, detail="CEP não encontrado")
+
+    return dados  # devolve o JSON do ViaCEP diretamente
+
+#rota que calcula o frete FEITO PELO PIETRO - 13/11/2025
+@router.get("/api/frete")
+def calcular_frete(
+    request: Request,
+    cep_destino: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Usuário não autenticado")
+
+    if not cep_destino.isdigit() or len(cep_destino) != 8:
+        raise HTTPException(status_code=400, detail="CEP inválido")
+
+    # Consulta correta ao ViaCEP
+    via_cep_url = f"https://viacep.com.br/ws/{cep_destino}/json/"
+    resposta = requests.get(via_cep_url)  # <--- CORRETO
+
+    if resposta.status_code != 200:
+        raise HTTPException(status_code=400, detail="Erro ao consultar o CEP")
+
+    dados = resposta.json()
+    if "erro" in dados:
+        raise HTTPException(status_code=400, detail="CEP não encontrado")
+
+    valor_frete = 15.00
+    prazo_estimado = 5
+
+    return {
+        "endereco": f"{dados.get('logradouro')} - {dados.get('bairro')} - {dados.get('localidade')} - {dados.get('uf')}",
+        "cep": cep_destino,
+        "valor_frete": valor_frete,
+        "prazo_estimado_dias": prazo_estimado,
+        "status": "Simulação concluída"
+    }
+
+#rota para calcular o frete
+@router.get("/frete", response_class=HTMLResponse)
+def pagina_frete(request: Request):
+    return templates.TemplateResponse("teste_frete.html", {"request": request})
+
 
 # Duplicate/older route definitions removed to avoid conflicts.
 # The routes above provide the canonical implementations for perfil, carrinho and related endpoints.
@@ -447,7 +819,7 @@ def pagina_admin(request:Request, db:Session=Depends(get_db)):
     })
 
 #Rota criar produto
-@router.post("/admin/produto")
+@router.post("/admin/produto")#TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
 def criar_produto(request: Request,
     nome: str = Form(...),
     descricao: str = Form(None),
@@ -476,7 +848,7 @@ def criar_produto(request: Request,
     nome_imagem2 = salvar_upload_file(imagem2)
     nome_imagem3 = salvar_upload_file(imagem3)
     
-    novo_produto = Produtos(
+    novo_produto = Produtos( #TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
         nome=nome,
         descricao=descricao,
         preco=preco,
@@ -507,7 +879,7 @@ def editar_produto(id: int, request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("editar.html", {"request": request, "produto": produto})
 
 
-@router.post("/admin/produto/atualizar/{id}")
+@router.post("/admin/produto/atualizar/{id}")#TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
 def atualizar_produto(id: int,
     nome: str = Form(...),
     descricao: str = Form(None),

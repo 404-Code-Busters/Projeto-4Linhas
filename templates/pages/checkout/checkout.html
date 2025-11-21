@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Checkout - 4linhas</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/checkout.css') }}" />
+  </head>
+  <body>
+    {% include 'partials/header.html' %}
+
+    <main class="checkout-page">
+      <div class="checkout-container">
+        <section class="checkout-main">
+          <div class="checkout-steps">
+            <nav class="steps-nav">
+              <span class="step completed">Carrinho</span>
+              <span class="step completed">Endereço</span>
+              <span class="step active">Pagamento</span>
+              <span class="step">Confirmação</span>
+            </nav>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title"><span class="icon">&#128179;</span> Checkout</h2>
+
+            <!-- Alteração Gemini: Removido action e method para controlar o envio via JS -->
+            <form id="checkout-form" class="checkout-form">
+              <!-- STEP 0: CARRINHO -->
+              <div class="step-panel" id="step-cart">
+                <h3>Revisão do Carrinho</h3>
+                <div class="cart-review">
+                  {% if carrinho and carrinho|length > 0 %}
+                    <ul class="cart-items">
+                      {% for item in carrinho %}
+                        <li class="cart-item">
+                          <!-- Correção Gemini: Usando url_for para o caminho da imagem e adicionando um fallback -->
+                          <img 
+                            src="{{ url_for('static', path=item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" 
+                            alt="{{ item.nome }}" width="64" height="64">
+                          <div class="cart-item-info">
+                            <div class="name">{{ item.nome }}</div>
+                            <div class="qty">Qtd: {{ item.quantidade }}</div>
+                          </div>
+                          <div class="price">R$ {{ '%.2f'|format(item.preco) }}</div>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p>Seu carrinho está vazio.</p>
+                  {% endif %}
+                </div>
+                <div class="actions">
+                  <button type="button" class="btn-primary" data-action="next">CONTINUAR</button>
+                </div>
+              </div>
+
+              <!-- STEP 1: ENDEREÇO -->
+              <div class="step-panel" id="step-address" style="display:none;">
+                <h3>Endereço de entrega</h3>
+                {% if erro %}
+                  <div class="notice error">{{ erro }}</div>
+                {% endif %}
+
+                <!-- Alteração Gemini: Sistema de seleção e cadastro de endereço -->
+                {% if user and user.enderecos %}
+                <div class="address-selection">
+                  <h4>Selecione um endereço salvo</h4>
+                  <div id="saved-addresses-list">
+                    {% for endereco in user.enderecos %}
+                    <div class="saved-address-card" 
+                         data-cep="{{ endereco.cep }}"
+                         data-rua="{{ endereco.rua }}"
+                         data-numero="{{ endereco.numero }}"
+                         data-bairro="{{ endereco.bairro }}"
+                         data-cidade="{{ endereco.cidade }}"
+                         data-estado="{{ endereco.estado }}">
+                      <p><strong>{{ endereco.rua }}, {{ endereco.numero }}</strong></p>
+                      <p>{{ endereco.bairro }}, {{ endereco.cidade }} - {{ endereco.estado }}</p>
+                      <p>CEP: {{ endereco.cep }}</p>
+                      <button type="button" class="btn-use-address">Usar este endereço</button>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  <button type="button" id="show-address-form-btn" class="btn-link">Ou cadastre um novo endereço</button>
+                </div>
+                {% endif %}
+
+                <div id="address-form-container" class="addr-card" {% if user and user.enderecos %}style="display: none;"{% endif %}>
+                  {% if not (user and user.enderecos) %}
+                    <h4>Cadastre seu endereço de entrega</h4>
+                  {% endif %}
+                  <div class="addr-form-group">
+                    <label for="cep">CEP</label>
+                    <input type="text" id="cep" name="cep" class="addr-input" placeholder="00000-000" required>
+                  </div>
+                  <div class="addr-form-group">
+                    <label for="rua">Rua</label>
+                    <input type="text" id="rua" name="logradouro" class="addr-input" placeholder="Nome da sua rua" required>
+                  </div>
+                  <div class="addr-form-group">
+                    <label for="numero">Número</label>
+                    <input type="text" id="numero" name="numero" class="addr-input" placeholder="Ex: 123" required>
+                  </div>
+                  <div class="addr-form-group">
+                    <label for="bairro">Bairro</label>
+                    <input type="text" id="bairro" name="bairro" class="addr-input" placeholder="Seu bairro" required>
+                  </div>
+                  <div class="addr-form-group">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" name="cidade" class="addr-input" placeholder="Sua cidade" required>
+                  </div>
+                  <div class="addr-form-group">
+                    <label for="estado">Estado</label>
+                    <input type="text" id="estado" name="uf" class="addr-input" placeholder="UF" required>
+                  </div>
+                  <input type="checkbox" id="salvar_endereco" name="salvar_endereco" value="1" checked>
+                  <label for="salvar_endereco">Salvar este endereço para futuras compras</label>
+                </div>
+
+                <div class="actions">
+                  <button type="button" class="btn-outline" data-action="prev">VOLTAR</button>
+                  <button type="button" class="btn-primary" data-action="next">CONTINUAR</button>
+                </div>
+              </div>
+
+              <!-- STEP 2: PAGAMENTO -->
+              <div class="step-panel" id="step-payment" style="display:none;">
+                <h3>Forma de Pagamento</h3>
+                <label class="payment-option selected">
+                  <input type="radio" name="payment" value="pix" checked />
+                  <div>
+                    <strong>PIX</strong>
+                    <div class="muted">Até 22% de desconto com aprovação imediata</div>
+                  </div>
+                </label>
+
+                <label class="payment-option">
+                  <input type="radio" name="payment" value="card" />
+                  <div>
+                    <strong>Cartão de Crédito</strong>
+                    <div class="muted">Parcelamos em até 10x sem juros</div>
+                  </div>
+                </label>
+
+                <label class="payment-option">
+                  <input type="radio" name="payment" value="nupay" />
+                  <div>
+                    <strong>NUPAY</strong>
+                  </div>
+                </label>
+
+                <div class="actions">
+                  <button type="button" class="btn-outline" data-action="prev">VOLTAR</button>
+                  <!-- Alteração Gemini: Adicionado ID para controlar o submit via JS -->
+                  <button type="button" id="submit-checkout-btn" class="btn-primary">FINALIZAR COMPRA</button>
+                </div>
+              </div>
+
+              <!-- STEP 3: CONFIRMAÇÃO (será apresentado após POST) -->
+              <div class="step-panel" id="step-confirm" style="display:none;">
+                <h3>Confirmando pedido</h3>
+                <p>Processando pagamento e finalizando seu pedido...</p>
+              </div>
+
+            </form>
+          </div>
+        </section>
+
+        <aside class="checkout-sidebar">
+          <div class="summary-card">
+            <h3>Resumo</h3>
+
+            <dl class="summary-list">
+              <div class="line"><dt>Valor dos Produtos:</dt><dd>R$ {{ '%.2f'|format(total or 0) }}</dd></div>
+              <div class="line"><dt>Descontos:</dt><dd class="neg">- R$ 0,00</dd></div>
+              <div class="line"><dt>Frete:</dt><dd>R$ 15,90</dd></div>
+            </dl>
+
+            <div class="total-box">
+              <div class="label">Valor à vista no PIX:</div>
+              <div class="price">R$ {{ '%.2f'|format((total or 0) + 15.90) }}</div>
+              <div class="muted small">(Economize: R$ 0,00)</div>
+            </div>
+
+            <div class="sidebar-actions">
+              <button class="btn-primary" data-action="next">CONTINUAR</button>
+              <button class="btn-outline" data-action="prev">VOLTAR</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+    <!-- Alteração Gemini: Script para o sistema de endereços -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const showFormBtn = document.getElementById('show-address-form-btn');
+        const addressFormContainer = document.getElementById('address-form-container');
+        const savedAddresses = document.querySelectorAll('.saved-address-card');
+  
+        // Mostra o formulário de novo endereço ao clicar no botão
+        if (showFormBtn) {
+          showFormBtn.addEventListener('click', function() {
+            addressFormContainer.style.display = 'block';
+            this.style.display = 'none';
+          });
+        }
+  
+        // Preenche o formulário ao clicar em "Usar este endereço"
+        savedAddresses.forEach(card => {
+          card.querySelector('.btn-use-address').addEventListener('click', function() {
+            document.getElementById('cep').value = card.dataset.cep;
+            document.getElementById('rua').value = card.dataset.rua;
+            document.getElementById('numero').value = card.dataset.numero;
+            document.getElementById('bairro').value = card.dataset.bairro;
+            document.getElementById('cidade').value = card.dataset.cidade;
+            document.getElementById('estado').value = card.dataset.estado;
+  
+            // Destaca o card selecionado
+            savedAddresses.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+  
+            // Opcional: Esconde o formulário se ele estiver visível
+            if (addressFormContainer.style.display === 'block') {
+              addressFormContainer.style.display = 'none';
+              if(showFormBtn) showFormBtn.style.display = 'inline';
+            }
+          });
+        });
+      });
+    </script>
+
+    <!-- Alteração Gemini: Script para controlar a submissão do formulário -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const submitBtn = document.getElementById('submit-checkout-btn');
+        const checkoutForm = document.getElementById('checkout-form');
+
+        if (submitBtn && checkoutForm) {
+          submitBtn.addEventListener('click', function() {
+            checkoutForm.setAttribute('action', '/checkout');
+            checkoutForm.setAttribute('method', 'post');
+            checkoutForm.submit();
+          });
+        }
+      });
+    </script>
+
+    <script src="{{ url_for('static', path='js/pages/checkout.js') }}"></script>
+  </body>
+</html>

@@ -1,73 +1,147 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perfil - 4linhas</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil - 4linhas</title>
 
-  <!-- CSS base (reset, variáveis, estilos globais) -->
-  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
-  <!-- Header component styles -->
-  <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
-  <!-- CSS especifico da página -->
-  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/carrinho.css') }}">
-  <!-- CSS perfil/abas -->
-  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/perfil.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/perfil-novo.css') }}">
-  <!-- CSS inline extraído -->
-  <!-- (migrado para components/header.css) -->
-  
-  <script src="{{ url_for('static', path='js/cart.js') }}"></script>
+    <!-- CSS base (reset, variáveis, estilos globais) -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/base.css') }}"
+    />
+    <!-- Header component styles -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/components/header.css') }}"
+    />
+    <!-- CSS perfil/abas -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/pages/perfil.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/pages/perfil-novo.css') }}"
+    />
+    <!-- CSS inline extraído -->
+    <!-- (migrado para components/header.css) -->
 
-  <!-- Fonte Google Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-</head>
-<body>
+    <script src="{{ url_for('static', path='js/cart.js') }}"></script>
 
-  <!-- =============== HEADER (partial) =============== -->
-  {% include 'partials/header.html' %}
+    <!-- Fonte Google Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    
+    <!-- Leaflet (OpenStreetMap) - Gratuito -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Geocoder (reverse geocoding gratuito) -->
+    <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.3/dist/leaflet-geoman.umd.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.3/dist/leaflet-geoman.css" />
+  </head>
+  <body>
+    <!-- =============== HEADER (partial) =============== -->
+    {% include 'partials/header.html' %}
 
-  <!-- MAIN CONTENT: PERFIL DE USUÁRIO -->
-  <main class="profile-page">
-    <section class="profile-hero">
-      <h1>Minha Conta</h1>
-      <p>Visão geral da sua conta e pedidos.</p>
-    </section>
+    <!-- MAIN CONTENT: PERFIL DE USUÁRIO -->
+    <main class="profile-page">
+      <section class="profile-hero">
+        <h1>Minha Conta</h1>
+        <p>Visão geral da sua conta e pedidos.</p>
+      </section>
 
-    <div class="profile-container">
-      <!-- Sidebar de Navegação -->
-      <aside class="profile-sidebar">
-        <div class="profile-user-box">
-          <div class="profile-pic-placeholder">
-            <span>{{ cliente.nome[0] if cliente and cliente.nome else 'U' }}</span>
+      <div class="profile-container">
+        <!-- Sidebar de Navegação -->
+        <aside class="profile-sidebar">
+          <div class="profile-user-box">
+            <div class="profile-pic-placeholder">
+              <span>{{ cliente.nome[0] if cliente and cliente.nome else 'U' }}</span> 
+            </div>
+            <h3 class="profile-user-name">
+              {{ cliente.nome if cliente else 'Usuário' }}
+            </h3>
+            <p class="profile-user-email">
+              {{ cliente.email if cliente else 'email@exemplo.com' }}
+            </p>
           </div>
-          <h3 class="profile-user-name">{{ cliente.nome if cliente else 'Usuário' }}</h3>
-          <p class="profile-user-email">{{ cliente.email if cliente else 'email@exemplo.com' }}</p>
-        </div>
-        <nav class="profile-nav" role="tablist" aria-label="Seções da conta">
-          <ul>
-            <li><a href="#carrinho" class="profile-nav-link" data-tab="cart" role="tab" aria-selected="false">Meu Carrinho</a></li>
-            <li><a href="#pedidos" class="profile-nav-link active" data-tab="orders" role="tab" aria-selected="true">Meus Pedidos</a></li>
-            <li><a href="#dados" class="profile-nav-link" data-tab="account" role="tab" aria-selected="false">Meus Dados</a></li>
-            <li><a href="#enderecos" class="profile-nav-link" data-tab="addresses" role="tab" aria-selected="false">Endereços</a></li>
-            <li><a href="#favoritos" class="profile-nav-link" data-tab="favorites" role="tab" aria-selected="false">Favoritos</a></li>
-            <li><a href="{{ url_for('logout') }}" class="profile-nav-link logout">Sair</a></li>
-          </ul>
-        </nav>
-      </aside>
+          <nav class="profile-nav" role="tablist" aria-label="Seções da conta">
+            <ul>
+              <li>
+                <a
+                  href="#carrinho"
+                  class="profile-nav-link"
+                  data-tab="cart"
+                  role="tab"
+                  aria-selected="false"
+                  >Meu Carrinho</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#pedidos"
+                  class="profile-nav-link active"
+                  data-tab="orders"
+                  role="tab"
+                  aria-selected="true"
+                  >Meus Pedidos</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#dados"
+                  class="profile-nav-link"
+                  data-tab="account"
+                  role="tab"
+                  aria-selected="false"
+                  >Meus Dados</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#enderecos"
+                  class="profile-nav-link"
+                  data-tab="addresses"
+                  role="tab"
+                  aria-selected="false"
+                  >Endereços</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#favoritos"
+                  class="profile-nav-link"
+                  data-tab="favorites"
+                  role="tab"
+                  aria-selected="false"
+                  >Favoritos</a
+                >
+              </li>
+              <li>
+                <a
+                  href="{{ url_for('logout') }}"
+                  class="profile-nav-link logout"
+                  >Sair</a
+                >
+              </li>
+            </ul>
+          </nav>
+        </aside>
 
-      <!-- Conteúdo Principal -->
-      <div class="profile-content">
-        <!-- Seção: Meu Carrinho / Checkout -->
-        <section id="tab-cart" class="tab-content" role="tabpanel" hidden>
-          <div class="content-header">
-            <h2>Meu Carrinho</h2>
-            <p>Revise seus itens e finalize a compra.</p>
-          </div>
-          <div class="content-body">
-            {% if carrinho and carrinho|length > 0 %}
+        <!-- Conteúdo Principal -->
+        <div class="profile-content">
+          <!-- Seção: Meu Carrinho / Checkout -->
+          <section id="tab-cart" class="tab-content" role="tabpanel" hidden>
+            <div class="content-header">
+              <h2>Meu Carrinho</h2>
+              <p>Revise seus itens e finalize a compra.</p>
+            </div>
+            <div class="content-body">
+              {% if carrinho and carrinho|length > 0 %}
               <div class="cart-page-content">
                 <div class="cart-items-list">
                   <table class="cart-table">
@@ -84,20 +158,43 @@
                       {% for item in carrinho %}
                       <tr>
                         <td>
-                          <img src="{{ url_for('static', path=item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="{{ item.nome }}" class="item-image-large">
+                          <img
+                            src="{{ url_for('static', path=item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}"
+                            alt="{{ item.nome }}"
+                            class="item-image-large"
+                          />
                         </td>
                         <td>{{ item.nome }}</td>
                         <td>R$ {{ "%.2f"|format(item.preco) }}</td>
                         <td>
-                          <form action="{{ url_for('atualizar_quantidade', produto_id=item.id) }}" method="post" class="qty-form">
-                            <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1" class="qty-input">
-                            <button type="submit" class="btn-update-qty">Atualizar</button>
+                          <form
+                            action="{{ url_for('atualizar_quantidade', produto_id=item.id) }}"
+                            method="post"
+                            class="qty-form"
+                          >
+                            <input
+                              type="number"
+                              name="quantidade"
+                              value="{{ item.quantidade }}"
+                              min="1"
+                              class="qty-input"
+                            />
+                            <button type="submit" class="btn-update-qty">
+                              Atualizar
+                            </button>
                           </form>
                         </td>
-                        <td>R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</td>
                         <td>
-                          <form action="{{ url_for('remover_do_carrinho', produto_id=item.id) }}" method="post">
-                            <button type="submit" class="btn-remove-item">&times;</button>
+                          R$ {{ "%.2f"|format(item.preco * item.quantidade) }}
+                        </td>
+                        <td>
+                          <form
+                            action="{{ url_for('remover_do_carrinho', produto_id=item.id) }}"
+                            method="post"
+                          >
+                            <button type="submit" class="btn-remove-item">
+                              &times;
+                            </button>
                           </form>
                         </td>
                       </tr>
@@ -115,122 +212,220 @@
                     <span>Total</span>
                     <span>R$ {{ "%.2f"|format(total) }}</span>
                   </div>
-                  <form action="{{ url_for('checkout') }}" method="post" style="margin-top: 1rem;">
-                    <button type="submit" class="btn-primary checkout-full-btn">Finalizar Compra</button>
+                  <form
+                    action="{{ url_for('checkout') }}"
+                    method="post"
+                    style="margin-top: 1rem"
+                  >
+                    <button type="submit" class="btn-primary checkout-full-btn">
+                      Finalizar Compra
+                    </button>
                   </form>
                 </div>
               </div>
-            {% else %}
+              {% else %}
               <div class="empty-state">
                 <p>Seu carrinho está vazio.</p>
-                <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver produtos</a>
+                <a href="{{ url_for('catalogo') }}" class="btn-primary"
+                  >Ver produtos</a
+                >
               </div>
-            {% endif %}
-          </div>
-        </section>
+              {% endif %}
+            </div>
+          </section>
 
-        <!-- Seção: Meus Pedidos -->
-        <section id="tab-orders" class="tab-content active" role="tabpanel">
-          <div class="content-header">
-            <h2>Meus Pedidos</h2>
-            <p>Acompanhe o histórico e o status dos seus pedidos.</p>
-          </div>
-          <div class="content-body">
-            {% if pedidos and pedidos|length > 0 %}
+          <!-- Seção: Meus Pedidos -->
+          <section id="tab-orders" class="tab-content active" role="tabpanel">
+            <div class="content-header">
+              <h2>Meus Pedidos</h2>
+              <p>Acompanhe o histórico e o status dos seus pedidos.</p>
+            </div>
+            <div class="content-body">
+              {% if pedidos and pedidos|length > 0 %}
               <div class="orders-list">
                 {% for pedido in pedidos %}
-                  <div class="order-card">
-                    <div class="order-card-header">
-                      <h3>Pedido #{{ pedido.id_pedido }}</h3>
-                      <span class="order-status">{{ pedido.status }}</span>
-                    </div>
-                    <div class="order-card-body">
-                      <p><strong>Data:</strong> {{ pedido.data_pedido }}</p>
-                      <p><strong>Total:</strong> R$ {{ "%.2f"|format(pedido.valor_total if pedido.valor_total is defined else 0) }}</p>
-                    </div>
-                    {% if pedido.itens %}
-                      <details class="order-card-details">
-                        <summary>Ver Itens ({{ pedido.itens|length }})</summary>
-                        <ul class="order-items-list">
-                          {% for item in pedido.itens %}
-                            <li class="order-item">
-                              {% if item.produto and item.produto.imagem_caminho %}
-                                <img src="{{ url_for('static', path=item.produto.imagem_caminho) }}" alt="{{ item.produto.nome }}" class="item-image">
-                              {% else %}
-                                <img src="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="Imagem não disponível" class="item-image">
-                              {% endif %}
-                              <div class="item-details">
-                                <span class="item-name">{{ item.produto.nome if item.produto else 'Produto não encontrado' }}</span>
-                                <span class="item-qty-price">{{ item.quantidade }} x R$ {{ "%.2f"|format(item.preco_unitario if item.preco_unitario is defined else 0) }}</span>
-                              </div>
-                              <span class="item-total">R$ {{ "%.2f"|format(item.quantidade * (item.preco_unitario if item.preco_unitario is defined else 0)) }}</span>
-                            </li>
-                          {% endfor %}
-                        </ul>
-                      </details>
-                    {% endif %}
+                <div class="order-card">
+                  <div class="order-card-header">
+                    <h3>Pedido #{{ pedido.id_pedido }}</h3>
+                    <span class="order-status">{{ pedido.status }}</span>
                   </div>
+                  <div class="order-card-body">
+                    <p><strong>Data:</strong> {{ pedido.data_pedido }}</p>
+                    <p>
+                      <strong>Total:</strong> R$ {{
+                      "%.2f"|format(pedido.valor_total if pedido.valor_total is
+                      defined else 0) }}
+                    </p>
+                  </div>
+                  {% if pedido.itens %}
+                  <details class="order-card-details">
+                    <summary>Ver Itens ({{ pedido.itens|length }})</summary>
+                    <ul class="order-items-list">
+                      {% for item in pedido.itens %}
+                      <li class="order-item">
+                        {% if item.produto and item.produto.imagem_caminho %}
+                        <img
+                          src="{{ url_for('static', path=item.produto.imagem_caminho) }}"
+                          alt="{{ item.produto.nome }}"
+                          class="item-image"
+                        />
+                        {% else %}
+                        <img
+                          src="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}"
+                          alt="Imagem não disponível"
+                          class="item-image"
+                        />
+                        {% endif %}
+                        <div class="item-details">
+                          <span class="item-name"
+                            >{{ item.produto.nome if item.produto else 'Produto
+                            não encontrado' }}</span
+                          >
+                          <span class="item-qty-price"
+                            >{{ item.quantidade }} x R$ {{
+                            "%.2f"|format(item.preco_unitario if
+                            item.preco_unitario is defined else 0) }}</span
+                          >
+                        </div>
+                        <span class="item-total"
+                          >R$ {{ "%.2f"|format(item.quantidade *
+                          (item.preco_unitario if item.preco_unitario is defined
+                          else 0)) }}</span
+                        >
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </details>
+                  {% endif %}
+                </div>
                 {% endfor %}
               </div>
-            {% else %}
+              {% else %}
               <div class="empty-state">
                 <p>Nenhum pedido encontrado.</p>
-                <a href="{{ url_for('catalogo') }}" class="btn-primary">Começar a comprar</a>
+                <a href="{{ url_for('catalogo') }}" class="btn-primary"
+                  >Começar a comprar</a
+                >
               </div>
-            {% endif %}
-          </div>
-        </section>
-
-        <!-- Seção: Meus Dados -->
-        <section id="tab-account" class="tab-content" role="tabpanel" hidden>
-          <div class="content-header">
-            <h2>Meus Dados</h2>
-            <p>Gerencie suas informações pessoais e de segurança.</p>
-          </div>
-          <div class="content-body">
-            <div class="data-card">
-              <h4>Informações Pessoais</h4>
-              <p><strong>Nome:</strong> {{ cliente.nome if cliente else 'Usuário' }}</p>
-              <p><strong>Email:</strong> {{ cliente.email if cliente else 'email@exemplo.com' }}</p>
+              {% endif %}
             </div>
-            <div class="data-card">
-              <h4>Alterar Senha</h4>
-              <form action="{{ url_for('atualizar_senha') }}" method="post" class="password-update-form">
-                <div class="form-group">
-                  <label for="nova_senha">Nova Senha</label>
-                  <input type="password" id="nova_senha" name="nova_senha" placeholder="••••••••" required>
+          </section>
+
+          <!-- Seção: Meus Dados -->
+          <section id="tab-account" class="tab-content" role="tabpanel" hidden>
+            <div class="content-header">
+              <h2>Meus Dados</h2>
+              <p>Gerencie suas informações pessoais e de segurança.</p>
+            </div>
+            <div class="content-body">
+              <div class="data-card">
+                <h4>Informações Pessoais</h4>
+                <p>
+                  <strong>Nome:</strong> {{ cliente.nome if cliente else
+                  'Usuário' }}
+                </p>
+                <p>
+                  <strong>Email:</strong> {{ cliente.email if cliente else
+                  'email@exemplo.com' }}
+                </p>
+                <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
+                <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+                <p><strong>Endereço:</strong> {{ cliente.endereco }}</p>
+              </div>
+              <div class="data-card">
+                <h4>Alterar Senha</h4>
+                <form
+                  action="{{ url_for('atualizar_senha') }}"
+                  method="post"
+                  class="password-update-form"
+                >
+                  <div class="form-group">
+                    <label for="nova_senha">Nova Senha</label>
+                    <input
+                      type="password"
+                      id="nova_senha"
+                      name="nova_senha"
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+                  <button type="submit" class="btn-primary">
+                    Atualizar Senha
+                  </button>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- Seção: Endereços -->
+          <section
+            id="tab-addresses"
+            class="tab-content"
+            role="tabpanel"
+            hidden
+          >
+            <div class="addr-header">
+              <h2>Meus Endereços</h2>
+              <p>Gerencie seus endereços de entrega e faturamento.</p>
+            </div>
+
+            <!-- CARD DE MÚLTIPLOS ENDEREÇOS -->
+            <div class="endereco-card">
+              <!-- Lista dinâmica -->
+              <div id="enderecos-lista"></div>
+
+              <!-- Botão para abrir modal -->
+              <button class="btn-add-endereco" onclick="abrirModalEndereco()">
+                + Novo endereço
+              </button>
+            </div>
+
+            <!-- MODAL DE NOVO ENDEREÇO  -->
+            <div id="modal-endereco" class="modal-endereco">
+              <div class="modal-content-endereco">
+                <!-- LADO ESQUERDO -->
+                <div class="modal-left">
+                  <h3>Adicionar Novo Endereço</h3>
+
+                  <label for="modal-cep">CEP</label>
+                  <input type="text" id="modal-cep" maxlength="8" placeholder="Digite seu CEP" />
+
+                  <label for="modal-logradouro">Endereço</label>
+                  <input type="text" id="modal-logradouro" readonly />
+
+                  <label for="modal-bairro">Bairro</label>
+                  <input type="text" id="modal-bairro" readonly />
+
+                  <label for="modal-cidade">Cidade</label>
+                  <input type="text" id="modal-cidade" readonly />
+
+                  <label for="modal-uf">Estado</label>
+                  <input type="text" id="modal-uf" readonly />
+
+                  <label for="modal-numero">Número</label>
+                  <input type="text" id="modal-numero" placeholder="Digite o número" />
+
+                  <div class="modal-botoes">
+                    <button class="btn-salvar" onclick="salvarEndereco()">
+                      Salvar
+                    </button>
+                    <button
+                      class="btn-cancelar"
+                      onclick="fecharModalEndereco()"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
                 </div>
-                <button type="submit" class="btn-primary">Atualizar Senha</button>
-              </form>
-            </div>
-          </div>
-        </section>
 
-        <!-- Seção: Endereços -->
-        <section id="tab-addresses" class="tab-content" role="tabpanel" hidden>
-          <div class="content-header">
-            <h2>Meus Endereços</h2>
-            <p>Gerencie seus endereços de entrega e faturamento.</p>
-          </div>
-          <div class="content-body">
-            <div class="empty-state">
-              <p>Nenhum endereço cadastrado.</p>
-              <button class="btn-primary">Adicionar Novo Endereço</button>
-            </div>
-            <!-- Exemplo de como um endereço seria exibido -->
-            <!--
-            <div class="address-card">
-              <h4>Casa</h4>
-              <p>Rua das Flores, 123, Bairro Jardim</p>
-              <p>São Paulo, SP - 01234-567</p>
-              <div class="address-actions">
-                <button class="btn-secondary">Editar</button>
-                <button class="btn-danger">Excluir</button>
+                <!-- LADO DIREITO (MAPA) -->
+                <div class="modal-right">
+                  <div id="map-container" style="width: 100%; height: 100%; border-radius: 0 22px 22px 0;"></div>
+                </div>
               </div>
             </div>
-            -->
-          </div>
-        </section>
+          </section>          <!-- JS da funcionalidade com Maps -->
+          <script src="/static/js/pages/address_modal_maps.js"></script>
 
         <!-- Seção: Favoritos -->
         <section id="tab-favorites" class="tab-content" role="tabpanel" hidden>
@@ -264,68 +459,7 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <!-- Bloco de Newsletter - Primeiro -->
-    <div class="newsletter">
-      <h3>Assine nossa newsletter</h3>
-      <p>Receba novidades, promoções e lançamentos em primeira mão.</p>
-      <form class="newsletter-form" action="/newsletter" method="post">
-        <input type="email" name="email" placeholder="Seu e-mail" required>
-        <button type="submit">Inscrever-se</button>
-      </form>
-    </div>
-
-    <div class="footer-content">
-      <div class="footer-col">
-        <a href="/" class="footer-logo">
-          <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
-        </a>
-        <p>Produtos de alta qualidade, estilo e conforto. Inspirados nas melhores marcas do mundo.</p>
-      </div>
-      <div class="footer-col">
-        <h3>Institucional</h3>
-        <ul>
-          <li><a href="/sobre">Sobre nós</a></li>
-          <li><a href="/politica-de-privacidade">Política de Privacidade</a></li>
-          <li><a href="/termos">Termos de Uso</a></li>
-          <li><a href="/contato">Contato</a></li>
-          <li><a href="/carreiras">Carreiras</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h3>Ajuda</h3>
-        <ul>
-          <li><a href="/faq">FAQ</a></li>
-          <li><a href="/acompanhe-pedido">Acompanhe seu pedido</a></li>
-          <li><a href="/suporte">Suporte</a></li>
-          <li><a href="/trocas">Trocas e Devoluções</a></li>
-          <li><a href="/entrega">Entrega</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h3>Nos siga</h3>
-        <div class="footer-social">
-          <a href="#"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
-          <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>
-          <!-- Twitter removed per request -->
-        </div>
-      </div>
-      <div class="footer-col">
-        <h3>Produtos</h3>
-        <ul>
-          <li><a href="/homem">Homem</a></li>
-          <li><a href="/mulher">Mulher</a></li>
-          <li><a href="/artigos">Artigos</a></li>
-          <li><a href="/destaques">Destaques</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>&copy; 2025 4linhas. Todos os direitos reservados. | CNPJ: 12.345.678/0001-90</p>
-    </div>
-  </footer>
+  {% include 'partials/footer.html' %}
 
   <!-- Script para alternância de abas da página de perfil -->
   <script>
@@ -369,6 +503,36 @@
       activateTab(initialTab);
     });
   </script>
-
 </body>
 </html>
+
+          <!--TESTE DA SECTION ENDEREÇO-->
+          <script>
+            document.addEventListener("DOMContentLoaded", () => {
+              const cepInput = document.getElementById("cep");
+
+              cepInput.addEventListener("blur", async () => {
+                const cep = cepInput.value.replace(/\D/g, "");
+                if (cep.length !== 8) return;
+
+                try {
+                  const response = await fetch(`/api/frete?cep_destino=${cep}`);
+                  if (!response.ok) throw new Error("Erro ao consultar o CEP");
+
+                  const data = await response.json();
+
+                  // Preenche os campos automaticamente
+                  const enderecoParts = data.endereco.split(" - ");
+                  document.getElementById("logradouro").value =
+                    enderecoParts[0] || "";
+                  document.getElementById("bairro").value =
+                    enderecoParts[1] || "";
+                  document.getElementById("cidade").value =
+                    enderecoParts[2] || "";
+                  document.getElementById("uf").value = enderecoParts[3] || "";
+                } catch (error) {
+                  console.error("Erro ao buscar CEP:", error);
+                }
+              });
+            });
+          </script>
