@@ -1,0 +1,783 @@
+@import url('../colors.css');
+
+/* ===== BASE GERAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  color: #0D1B2A;
+  background-color: #fff;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== PRODUCTS PAGE ===== */
+.products-page {
+  padding: 4rem 2rem;
+  background-color: #f9f9f9;
+}
+
+.products-hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.products-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0D1B2A;
+  margin-bottom: 1rem;
+}
+
+.products-hero p {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* FILTERS SECTION */
+.filters-section {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+.filter-sidebar {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+  transition: all 0.3s ease;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.filter-sidebar h3 {
+  margin: 0;
+  font-weight: 700;
+  color: #0D1B2A;
+}
+
+.close-filters {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #0D1B2A;
+}
+
+.close-filters:hover {
+  color: #FF6B35;
+}
+
+.filter-group {
+  margin-bottom: 1.5rem;
+}
+
+.filter-group h4 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #0D1B2A;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+}
+
+.color-swatches {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+.swatch.active {
+  border: 2px solid #FF6B35;
+}
+
+.swatch[data-color="black"] { background: black; }
+.swatch[data-color="white"] { background: white; }
+.swatch[data-color="red"] { background: red; }
+.swatch[data-color="blue"] { background: blue; }
+
+.products-content {
+  transition: all 0.3s ease;
+}
+
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.search-bar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-bar input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 250px;
+}
+
+.search-bar button {
+  padding: 0.5rem 1rem;
+  background: #FF6B35;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.search-bar button:hover {
+  background: #e05b2d;
+}
+
+.sort-view {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.sort-view select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.view-btn {
+  background: none;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.view-btn.active {
+  background: #FF6B35;
+  color: #fff;
+}
+
+.products-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.products-grid h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0D1B2A;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.product-card {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: none; /* Hidden by default for filtering */
+}
+
+.product-card.show {
+  display: block;
+}
+
+.product-card.list {
+  display: flex;
+  gap: 1rem;
+}
+
+.product-card.list img {
+  width: 150px;
+  height: 150px;
+}
+
+.product-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 1rem;
+  text-align: center;
+}
+
+.product-info h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0D1B2A;
+  margin-bottom: 0.5rem;
+}
+
+.rating {
+  color: #FFD700;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-info p {
+  font-size: 1.1rem;
+  color: #FF6B35;
+  margin-bottom: 1rem;
+}
+
+.colors, .sizes {
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.color-option {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+}
+
+.size-btn {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.size-btn:hover {
+  background: #FF6B35;
+  color: #fff;
+}
+
+.add-to-cart {
+  background-color: #FF6B35;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-to-cart:hover {
+  background-color: #e05b2d;
+}
+
+/* ===== ESTILOS DOS CARDS ANTIGOS (OUTFIT) ADICIONADOS ===== */
+.outfit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0; /* Removido padding lateral para alinhar com a página */
+}
+
+.outfit-card {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.outfit-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.product-link {
+    display: block;
+    padding: 1rem;
+    flex: 1;
+}
+
+.product-card-img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+}
+
+.outfit-overlay {
+    padding: 1.5rem;
+    background: #fff;
+    border-top: 1px solid #eee;
+}
+
+.outfit-overlay h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.product-price {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #FF6B35;
+    margin-bottom: 0.5rem;
+}
+
+.product-size {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.ver-produto {
+  display: inline-block;
+  background-color: #007bff;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
+.ver-produto:hover {
+  background-color: #0056b3;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+/* ===== INSPIRE SECTION ===== */
+.inspire-section {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.inspire-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.inspire-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0D1B2A;
+  margin-bottom: 0.5rem;
+}
+
+.inspire-header p {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.outfit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.outfit-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  /* Slightly larger card for visual preference */
+  height: 340px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.outfit-card:hover {
+  transform: scale(1.02);
+}
+
+.outfit-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- Força a imagem ocupar todo o card e regras responsivas --- */
+
+@media (max-width: 992px) {
+  .products-page .outfit-card { height: auto !important; }
+}
+@media (max-width: 640px) {
+  .products-page .outfit-card { height: auto !important; }
+}
+
+/* Force consistent card height specifically on products page to override other page styles */
+.products-page .outfit-card {
+  height: auto !important;
+}
+.products-page .outfit-card img, .products-page .product-card-img {
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* Ensure the cart count badge sits on the top-right of the icon inside header on products page */
+.products-page .user-actions a, .products-page .user-actions button { position: relative; display: inline-flex; align-items: center; }
+.products-page .user-actions #cart-count,
+.products-page .user-actions .cart-count {
+  position: absolute !important;
+  top: -6px !important;
+  right: -6px !important;
+  transform: none !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background-color: #FF6B35;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border: 2px solid #fff;
+}
+
+/* More specific selectors to override conflicting rules from other page CSS (e.g. home.css)
+   Ensure product images are cropped (not stretched) and centered inside fixed-height cards */
+.products-page .outfit-card img,
+.products-page .product-card-img {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
+  max-width: none !important;
+}
+
+.outfit-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff; /* branco conforme solicitado */
+  color: #0D1B2A;   /* texto escuro legível */
+  padding: 1.25rem 1.25rem;
+  transform: translateY(100%);
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  pointer-events: none; /* evita interceptar cliques fora dos controles interativos */
+  z-index: 2;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 -6px 18px rgba(13,27,42,0.06);
+}
+
+/* Ao passar o mouse, revela a overlay */
+.outfit-card:hover .outfit-overlay,
+.outfit-overlay.open {
+  transform: translateY(0);
+  pointer-events: auto; /* torna elementos interativos clicáveis (botões, links) */
+}
+
+/* Ensure overlay interactive elements (add-to-cart) are clickable */
+.outfit-overlay .add-to-cart-btn,
+.outfit-overlay .outfit-btn,
+.outfit-overlay a {
+  pointer-events: auto;
+  color: inherit;
+}
+
+/* Small tweak to product title color inside overlay */
+.outfit-overlay h3 { 
+  color: #0D1B2A; 
+  font-size: 1.3rem;
+  font-weight: 600; 
+  margin-bottom: 0.5rem; 
+}
+.outfit-overlay .product-desc { color: #3a3f44; margin-bottom: 0.5rem; }
+
+.outfit-btn {
+  background-color: #FF6B35;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+  pointer-events: auto; /* make the button clickable despite overlay */
+}
+
+.outfit-btn:hover {
+  background-color: #e05b2d;
+}
+
+/* Ensure overlay interactive elements (add-to-cart) are clickable */
+.outfit-overlay .add-to-cart-btn,
+.outfit-overlay .outfit-btn,
+.outfit-overlay a {
+  pointer-events: auto;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+.filter-toggle {
+  display: none;
+  background: #FF6B35;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 1rem auto;
+  transition: background 0.3s;
+}
+
+.filter-toggle:hover {
+  background: #e05b2d;
+}
+
+@media (max-width: 768px) {
+  .filter-toggle {
+    display: block;
+  }
+  .filters-section {
+    grid-template-columns: 1fr;
+  }
+  .filter-sidebar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    padding: 2rem;
+    box-shadow: none;
+  }
+  .filter-sidebar.show {
+    display: block;
+  }
+  .products-content {
+    width: 100%;
+  }
+  .products-hero h1 {
+    font-size: 2rem;
+  }
+  .products-hero p {
+    font-size: 1rem;
+  }
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  .main-nav {
+    flex-direction: column;
+    padding: 0.5rem 1rem;
+    align-items: flex-start;
+  }
+  .menu-links {
+    display: none;
+  }
+  .hamburger {
+    display: flex;
+  }
+  .nav-right {
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+  }
+  .user-top-links {
+    font-size: 0.65rem;
+  }
+  .nav-bottom {
+    gap: 1rem;
+  }
+  .search-form {
+    display: none;
+  }
+
+  .inspire-section {
+    padding: 1rem;
+    margin: 2rem 1rem;
+  }
+
+  .inspire-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .outfit-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .outfit-card {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .products-hero h1 {
+    font-size: 1.5rem;
+  }
+  .products-hero p {
+    font-size: 0.9rem;
+  }
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+  .newsletter-form {
+    flex-direction: column;
+  }
+  .newsletter-form input[type="email"],
+  .newsletter-form button {
+    width: 100%;
+  }
+  .nav-right {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .user-top-links {
+    gap: 0.5rem;
+  }
+  .nav-bottom {
+    justify-content: center;
+  }
+
+  .inspire-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .outfit-card {
+    height: 200px;
+  }
+}
+
+/* Cart modal styles */
+.cart-modal { position: fixed; inset: 0; display: block; z-index: 2000; pointer-events: none; opacity: 0; transition: opacity 220ms ease; }
+.cart-modal.open { opacity: 1; pointer-events: auto; }
+.cart-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0); transition: background 220ms ease; }
+.cart-modal.open .cart-modal-backdrop { background: rgba(0,0,0,0.5); }
+.cart-modal-panel { position: absolute; right: 1rem; top: 5rem; width: 360px; max-height: 70vh; overflow: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 1rem; transform: translateY(-8px) scale(0.98); transition: transform 220ms ease, opacity 220ms ease; opacity: 0; }
+.cart-modal.open .cart-modal-panel { transform: translateY(0) scale(1); opacity: 1; }
+.cart-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #f0f0f0; padding-bottom: 0.5rem; }
+.cart-modal-title { font-size: 1.1rem; margin: 0; padding: 0.25rem 0; }
+.cart-modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #333; padding: 0.25rem; border-radius: 6px; }
+.cart-modal-close:hover { background: rgba(0,0,0,0.05); }
+.cart-items { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
+.cart-item-row { display: flex; gap: 0.75rem; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
+.cart-item-img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-weight: 600; }
+.cart-item-price { color: #FF6B35; font-weight: 700; }
+.cart-item-remove { background: none; border: none; color: #e05b2d; cursor: pointer; }
+.cart-actions { margin-top: 1rem; display:flex; justify-content: flex-end; }
+.cart-checkout { background: #FF6B35; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+
+/* Additional rules migrated from produtos.html inline styles to ensure consistent product card appearance */
+.product-link {
+  display: block;
+  padding: 1rem;
+  flex: 1;
+}
+
+.product-card-img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+}
+
+.product-desc {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-size {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  padding: 1rem;
+  background-color: #FF6B35;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-to-cart-btn:hover { background-color: #e85a2c; }
+.add-to-cart-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+  .outfit-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); padding: 1rem; }
+  .outfit-card { min-height: 350px; }
+}
+
+@media (max-width: 768px) {
+    .outfit-card { min-height: 350px; }
+}

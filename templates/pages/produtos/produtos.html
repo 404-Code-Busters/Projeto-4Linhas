@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo - 4linhas</title>
+
+  <!-- CSS base (reset, variáveis, estilos globais) -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+  <!-- Header component styles -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
+  <!-- CSS especifico da página -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/produtos.css') }}">
+
+  <!-- Fonte Google Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  
+  <script src="{{ url_for('static', path='js/cart.js') }}" defer></script>
+
+  <style>
+    /* Alteração feita pelo Gemini: Estilos da versão antiga dos cards foram movidos para produtos.css */
+    /* Mantivemos aqui apenas os estilos essenciais para o formulário de filtros e a estrutura da página. */
+    .catalogo-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .filtros-catalogo {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border: 1px solid #eee;
+    }
+    #form-filtros {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      align-items: end;
+    }
+    .filtro-grupo {
+      display: flex;
+      flex-direction: column;
+    }
+    .filtro-grupo label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    .filtro-grupo input,
+    .filtro-grupo select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .filtro-acoes {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-filtrar, .btn-limpar {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      text-align: center;
+      font-size: 14px;
+    }
+    .btn-filtrar {
+      background-color: var(--cor-laranja, #FF6B35);
+      color: white;
+    }
+    .btn-limpar {
+      background-color: #6c757d;
+      color: white;
+    }
+    /* Estilos para a grade de produtos e cards foram movidos para produtos.css */
+    /*
+    /* Alteração feita pelo Gemini: Estilos para os filtros e para a grade de produtos. */
+    /* Estes estilos garantem que o formulário de filtros e os cards de produtos sejam exibidos corretamente. */
+    .catalogo-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .filtros-catalogo {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border: 1px solid #eee;
+    }
+    #form-filtros {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      align-items: end;
+    }
+    .filtro-grupo {
+      display: flex;
+      flex-direction: column;
+    }
+    .filtro-grupo label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    .filtro-grupo input,
+    .filtro-grupo select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .filtro-acoes {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-filtrar, .btn-limpar {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      text-align: center;
+      font-size: 14px;
+    }
+    .btn-filtrar {
+      background-color: var(--cor-laranja, #FF6B35);
+      color: white;
+    }
+    .btn-limpar {
+      background-color: #6c757d;
+      color: white;
+    }
+    .produtos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+    .product-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      overflow: hidden;
+      text-align: center;
+      transition: box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .product-card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+    .product-card-info {
+      padding: 1rem;
+    }
+    .product-card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+    .product-card-price {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--cor-laranja, #FF6B35);
+      margin-bottom: 1rem;
+    }
+    .add-to-cart-btn {
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    */
+  </style>
+</head>
+<body>
+
+  {% include 'partials/header.html' %}
+
+  <main class="catalogo-page">
+    <h1>Nosso Catálogo</h1>
+    <p>Encontre os melhores produtos para o seu estilo.</p>
+
+    <!-- Alteração feita pelo Gemini: Formulário de filtros para a página de catálogo. -->
+    <!-- Este formulário permite que os usuários busquem e filtrem produtos por nome, tamanho, cor e preço máximo. -->
+    <!-- Os valores dos campos são preenchidos dinamicamente com base nos parâmetros da URL para manter o estado dos filtros. -->
+    <section class="filtros-catalogo">
+      <form id="form-filtros" action="{{ url_for('catalogo') }}" method="GET">
+        <div class="filtro-grupo">
+          <label for="q">Buscar por nome</label>
+          <input type="search" id="q" name="q" placeholder="Ex: Camisa Polo" value="{{ request.query_params.get('q', '') }}">
+        </div>
+        <div class="filtro-grupo">
+          <label for="tamanho">Tamanho</label>
+          <select id="tamanho" name="tamanho">
+            <option value="">Todos</option>
+            <option value="PP" {% if request.query_params.get('tamanho') == 'PP' %}selected{% endif %}>PP</option>
+            <option value="P" {% if request.query_params.get('tamanho') == 'P' %}selected{% endif %}>P</option>
+            <option value="M" {% if request.query_params.get('tamanho') == 'M' %}selected{% endif %}>M</option>
+            <option value="G" {% if request.query_params.get('tamanho') == 'G' %}selected{% endif %}>G</option>
+            <option value="GG" {% if request.query_params.get('tamanho') == 'GG' %}selected{% endif %}>GG</option>
+            <option value="XG" {% if request.query_params.get('tamanho') == 'XG' %}selected{% endif %}>XG</option>
+          </select>
+        </div>
+        <div class="filtro-grupo">
+          <label for="cor">Cor</label>
+          <input type="text" id="cor" name="cor" placeholder="Ex: Azul" value="{{ request.query_params.get('cor', '') }}">
+        </div>
+        <div class="filtro-grupo">
+          <label for="preco_max">Preço até R$ <span id="preco-valor">{{ request.query_params.get('preco_max', '1000') }}</span></label>
+          <input type="range" id="preco_max" name="preco_max" min="0" max="1000" step="10" value="{{ request.query_params.get('preco_max', '1000') }}">
+        </div>
+        <div class="filtro-acoes">
+            <button type="submit" class="btn-filtrar">Filtrar</button>
+            <a href="{{ url_for('catalogo') }}" class="btn-limpar">Limpar</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- Alteração feita pelo Gemini: Seção de produtos atualizada para usar o layout de card antigo (outfit-card). -->
+    <!-- O loop agora percorre os 'produtos' filtrados pelo backend e os renderiza com o visual que você preferia. -->
+    <!-- Se nenhum produto for encontrado, exibe uma mensagem. -->
+    <section class="inspire-section">
+      <div class="outfit-grid">
+      {% if produtos %}
+        {% for produto in produtos %}
+          <div class="outfit-card" data-price="{{ "%.2f"|format(produto.preco) }}">
+            <a href="{{ url_for('detalhe_produto', id_produto=produto.id_produto) }}" class="product-link">
+              <img class="product-card-img" 
+                   src="{{ url_for('static', path=produto.imagem_caminho) if produto.imagem_caminho else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" 
+                   alt="{{ produto.nome }}">
+            </a>
+            <div class="outfit-overlay">
+              <h3>{{ produto.nome }}</h3>
+              <p class="product-desc">{{ produto.descricao }}</p>
+              <p class="product-price">R$ {{ "%.2f"|format(produto.preco) }}</p>
+              <p class="product-size">Tamanho: {{ produto.tamanho }}</p>
+              <button class="add-to-cart-btn" data-product-id="{{ produto.id_produto }}"
+                      {% if produto.estoque <= 0 %}disabled{% endif %}>
+                {% if produto.estoque > 0 %}Adicionar ao Carrinho{% else %}Fora de Estoque{% endif %}
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>Nenhum produto encontrado com os filtros selecionados.</p>
+      {% endif %}
+      </div>
+    </section>
+  </main>
+  
+    {% include 'partials/footer.html' %}
+
+  <!-- Alteração feita pelo Gemini: Script para filtros dinâmicos na página de catálogo. -->
+  <!-- Este script faz com que o formulário de filtros seja submetido automaticamente quando um valor é alterado, -->
+  <!-- e também atualiza o valor exibido do slider de preço. -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('form-filtros');
+      const precoSlider = document.getElementById('preco_max');
+      const precoValor = document.getElementById('preco-valor');
+
+      // Atualiza o valor do preço exibido enquanto o usuário move o slider
+      if (precoSlider && precoValor) {
+        precoSlider.addEventListener('input', function() {
+          precoValor.textContent = this.value;
+        });
+      }
+
+      // Submete o formulário automaticamente quando um filtro é alterado
+      form.addEventListener('change', function(event) {
+        // Evita submissão dupla se o botão for clicado
+        if (event.target.tagName !== 'BUTTON') {
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

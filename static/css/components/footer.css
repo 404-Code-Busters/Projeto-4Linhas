@@ -1,0 +1,155 @@
+/* ===== FOOTER ===== */
+.site-footer {
+  background-color: #0D1B2A;
+  color: #fff;
+  margin-top: 4rem;
+  padding: 2rem 0; /* Aumentado o padding para tornar maior */
+}
+
+/* ===== NEWSLETTER ===== */
+/* Corrigido pelo Gemini com o código fornecido pelo usuário */
+.newsletter {
+  background-color: rgba(255, 255, 255, 0.05);
+  text-align: center;
+  padding: 3rem 2rem; /* Aumentado o padding para tornar maior */
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.newsletter h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.newsletter p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.newsletter-form {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.newsletter-form input[type="email"] {
+  flex: 1 1 250px;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.newsletter-form button {
+  padding: 0.6rem 1.2rem;
+  background-color: #FF6B35;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.newsletter-form button:hover {
+  background-color: #e05b2d;
+}
+
+/* Footer columns */
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 4rem 2rem; /* Aumentado o padding */
+  max-width: 1400px; /* Aumentado a largura máxima */
+  margin: 0 auto;
+}
+
+.footer-col {
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+.footer-logo img {
+  width: 120px;
+  margin-bottom: 1rem;
+}
+
+.footer-col h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-col ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-col ul li a {
+  color: #fff;
+  transition: color 0.3s;
+}
+
+.footer-col ul li a:hover {
+  color: #FF6B35;
+}
+
+.footer-social a img {
+  width: 24px;
+  margin-right: 0.5rem;
+  transition: opacity 0.3s;
+}
+
+.footer-social a img:hover {
+  opacity: 0.7;
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+/* ===== RESPONSIVIDADE FOOTER ===== */
+/* Adicionado pelo Gemini para melhorar a clareza em telas menores */
+
+@media (max-width: 768px) {
+  .footer-content {
+    /* Em tablets, as colunas terão um pouco mais de espaço */
+    padding: 3rem 1.5rem;
+    gap: 2.5rem;
+  }
+
+  .footer-col {
+    /* Garante que no máximo 2 colunas fiquem lado a lado */
+    flex-basis: calc(50% - 2rem);
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-content {
+    /* Em celulares, as colunas ficam empilhadas */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1rem;
+    gap: 2rem;
+  }
+
+  .newsletter-form {
+    flex-direction: column;
+  }
+}

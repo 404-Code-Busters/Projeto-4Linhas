@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pedido Confirmado - 4linhas</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
+  <style>
+    .confirm-card{max-width:800px;margin:3rem auto;padding:2rem;background:#fff;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.05)}
+    .confirm-success{font-size:1.4rem;color:#1aab5a}
+  </style>
+</head>
+<body>
+  {% include 'partials/header.html' %}
+
+  <main>
+    <div class="confirm-card">
+      {% if pedido %}
+        <div class="confirm-success">Pedido <strong>#{{ pedido.id_pedido }}</strong> confirmado!</div>
+        <p>Obrigado pela sua compra. Enviaremos atualizações por e-mail sobre o status do pedido.</p>
+        <dl>
+          <dt>Valor total:</dt><dd>R$ {{ '%.2f'|format(pedido.valor_total) }}</dd>
+          <dt>Endereço de entrega:</dt><dd>{{ pedido.endereco_entrega }} - CEP: {{ pedido.cep_entrega }}</dd>
+          <dt>Data:</dt><dd>{{ pedido.data_pedido }}</dd>
+        </dl>
+        <a href="/perfil" class="btn-primary">Ir para meu perfil</a>
+      {% else %}
+        <h2>Nenhum pedido encontrado</h2>
+        <p>Se você acabou de finalizar, tente novamente em alguns segundos.</p>
+        <a href="/" class="btn-outline">Voltar à loja</a>
+      {% endif %}
+    </div>
+  </main>
+
+  {% include 'partials/footer.html' %}
+</body>
+</html>

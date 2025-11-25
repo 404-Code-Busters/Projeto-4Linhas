@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4Linhas - Painel Administrativo</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/modal.css') }}">
+  <link rel="icon" href="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}">
+</head>
+<body>
+  <header class="admin-header">
+    <div class="wrap">
+      <h1>Painel Administrativo</h1>
+      <button class="hamburger-menu" aria-label="Abrir menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="admin-nav">
+        <a href="#pedidos">Pedidos</a>
+        <a href="#usuarios">Usuários</a>
+        <a href="/">Voltar ao Site</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-main wrap">
+
+    <!-- Seção de Boas-vindas -->
+    <section id="inicio" class="card destaque">
+      <h2>Bem-vindo ao Painel Administrativo 👋</h2>
+      <p>Gerencie os produtos, pedidos e usuários de forma prática e centralizada.</p>
+      <div class="tiles">
+        <div class="tile">
+          <span>Produtos Cadastrados</span>
+          <strong id="produtosCount">{{ produtos|length }}</strong>
+        </div>
+        <div class="tile">
+          <span>Total de Pedidos</span>
+          <strong>{{ pedidos|length }}</strong>
+        </div>
+        <div class="tile">
+          <span>Usuários Cadastrados</span>
+          <strong>{{ clientes|length }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Produtos -->
+    <section id="produtos" class="card">
+      <h2>📦 Gerenciar Produtos</h2>
+      
+      <!-- Formulário para Novo Produto -->
+      <section id="cadastrar-produto" class="admin-section">
+        <h2>Cadastrar Novo Produto</h2>
+        <form action="{{ url_for('criar_produto') }}" method="post" enctype="multipart/form-data" class="product-form">
+          
+          <div class="form-grid">
+            <!-- Coluna 1: Informações Básicas -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="nome">Nome do Produto</label>
+                <input type="text" id="nome" name="nome" placeholder="Ex: Camisa Esportiva" required>
+              </div>
+              <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" rows="4" placeholder="Detalhes sobre o material, corte, etc."></textarea>
+              </div>
+            </div>
+      
+            <!-- Coluna 2: Preço, Estoque e Atributos -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="preco">Preço (R$)</label>
+                <input type="number" id="preco" name="preco" step="0.01" placeholder="Ex: 149.90" required>
+              </div>
+              <div class="form-group">
+                <label for="estoque">Estoque</label>
+                <input type="number" id="estoque" name="estoque" placeholder="Ex: 50" required>
+              </div>
+              <div class="form-group">
+                <label for="tamanho">Tamanho</label>
+                <input type="text" id="tamanho" name="tamanho" placeholder="Ex: P, M, G" required>
+              </div>
+              <div class="form-group">
+                <label for="cor">Cor</label>
+                <input type="text" id="cor" name="cor" placeholder="Ex: Azul Marinho" required>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Seção de Upload de Imagens -->
+          <div class="form-group">
+            <label>Imagens do Produto</label>
+            <div class="image-upload-container">
+              <!-- Imagem Principal -->
+              <div class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem">
+                  <span class="preview-text">Principal</span>
+                </div>
+                <label for="imagem" class="btn-upload">Adicionar</label>
+                <input type="file" id="imagem" name="imagem" accept="image/*" data-preview-target="preview-imagem">
+              </div>
+              <!-- Imagem 1 -->
+              <div class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem1">
+                  <span class="preview-text">Img. 2</span>
+                </div>
+                <label for="imagem1" class="btn-upload">Adicionar</label>
+                <input type="file" id="imagem1" name="imagem1" accept="image/*" data-preview-target="preview-imagem1">
+              </div>
+              <!-- Imagem 2 -->
+              <div class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem2">
+                  <span class="preview-text">Img. 3</span>
+                </div>
+                <label for="imagem2" class="btn-upload">Adicionar</label>
+                <input type="file" id="imagem2" name="imagem2" accept="image/*" data-preview-target="preview-imagem2">
+              </div>
+              <!-- Imagem 3 -->
+              <div class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem3">
+                  <span class="preview-text">Img. 4</span>
+                </div>
+                <label for="imagem3" class="btn-upload">Adicionar</label>
+                <input type="file" id="imagem3" name="imagem3" accept="image/*" data-preview-target="preview-imagem3">
+              </div>
+            </div>
+          </div>
+      
+          <div class="btn-container">
+            <button type="submit" class="btn-primary">Salvar Produto</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Tabela de Produtos -->
+      <div class="table-section">
+        <h3>Lista de Produtos</h3>
+        <input type="text" class="busca" id="buscaProdutos" placeholder="Buscar produtos...">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Preço</th>
+              <th>Estoque</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if produtos %}
+              {% for p in produtos %}
+              <tr>
+                <td>{{ p.id_produto }}</td>
+                <td>{{ p.nome }}</td>
+                <td>R$ {{ "%.2f"|format(p.preco) }}</td>
+                <td>{{ p.estoque if p.estoque is not none else '-' }}</td>
+                <td>
+                  <form action="/admin/produto/deletar/{{ p.id_produto }}" method="POST" style="display:inline;" onsubmit="return confirmarExclusao('{{ p.id_produto }}')">
+                    <button type="submit" class="btn small danger">Excluir</button>
+                  </form>
+                  <button type="button" class="btn small editar-produto-btn"
+                    data-id="{{ p.id_produto }}"
+                    data-nome="{{ p.nome|e }}"
+                    data-descricao="{{ p.descricao|e }}"
+                    data-preco="{{ p.preco }}"
+                    data-tamanho="{{ p.tamanho }}"
+                    data-categoria="{{ p.categoria if p.categoria else '' }}" {# Adicionado data-categoria #}
+                    data-cor="{{ p.cor }}"
+                    data-estoque="{{ p.estoque if p.estoque is not none else '' }}"
+                    data-imagem="{{ p.imagem_caminho if p.imagem_caminho else '' }}"
+                    data-imagem1="{{ p.imagem_caminho1 if p.imagem_caminho1 else '' }}"
+                    data-imagem2="{{ p.imagem_caminho2 if p.imagem_caminho2 else '' }}"
+                    data-imagem3="{{ p.imagem_caminho3 if p.imagem_caminho3 else '' }}"
+                  >Editar</button>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+    </section>
+
+    <!-- Seção de Pedidos -->
+    <section id="pedidos" class="card">
+      <h2>📋 Gerenciar Pedidos</h2>
+      {% if pedidos %}
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>ID Pedido</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+      </table>
+      {% else %}
+      <p>Nenhum pedido encontrado.</p>
+      {% endif %}
+    </section>
+    <!-- Seção de Gráficos -->
+    <section id="graficos" class="card graficos">
+      <h2>📊 Resumo de Vendas</h2>
+      <img src="#" alt="Gráfico ilustrativo">
+    </section>
+
+  </main>
+
+  <!-- Alteração feita pelo Gemini: Estilos do modal foram aprimorados para uma melhor experiência visual. -->
+  <style>
+    /* Alteração feita pelo Gemini: Estilos para alinhar os botões de upload de imagem lado a lado. */
+    .file-buttons-row {
+      display: flex;
+      flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas pequenas */
+      gap: 1rem; /* Espaçamento entre os grupos de botões */
+      align-items: flex-start;
+    }
+    .file-button-group {
+      flex: 1; /* Faz com que cada grupo tente ocupar o mesmo espaço */
+      min-width: 150px; /* Largura mínima antes de quebrar a linha */
+      display: flex;
+      flex-direction: row; /* Alteração feita pelo Gemini: Alinha o botão e a pré-visualização lado a lado */
+      align-items: center; /* Centraliza verticalmente o botão e a pré-visualização */
+      gap: 0.5rem; /* Espaçamento entre o botão e a pré-visualização */
+      padding: 0.5rem; /* Adiciona um pouco de padding para melhor visual */
+      border: 1px solid #eee; /* Borda para cada grupo */
+      border-radius: 6px;
+      background-color: #fcfcfc;
+    }
+    .file-button-group .image-btn {
+      padding: 8px 12px; /* Padding menor para o botão */
+      font-size: 0.9rem; /* Fonte menor */
+      white-space: nowrap; /* Evita que o texto do botão quebre */
+      flex-shrink: 0; /* Impede que o botão encolha */
+    }
+    .file-button-group .file-preview {
+      width: 60px; /* Tamanho fixo para a pré-visualização */
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #ccc;
+      border-radius: 4px;
+      overflow: hidden;
+      flex-shrink: 0; /* Impede que a pré-visualização encolha */
+      background-color: #fff;
+    }
+    .file-button-group .file-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Garante que a imagem preencha o espaço */
+    }
+    .file-button-group .file-preview .file-name {
+      font-size: 0.75rem; /* Fonte menor para o texto "Nenhuma" */
+      color: #888;
+      text-align: center;
+    }
+
+    /* Estilos do Modal de Edição */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 2rem;
+    }
+    .modal {
+      background: #fff;
+      padding: 2rem; /* Ajustado o espaçamento interno para menor */
+      border-radius: 12px;
+      width: 100%;
+      max-width: 900px; /* Ajustado o tamanho máximo para menor */
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem; /* Ajustado o espaçamento */
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 1rem;
+    }
+    .modal header h2 {
+      margin: 0;
+      font-size: 1.5rem; /* Título ajustado para menor */
+      color: #333;
+    }
+    .modal header button#modalClose {
+      background: #f0f0f0;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #555;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .modal header button#modalClose:hover {
+      background-color: #e0e0e0;
+      color: #111;
+    }
+    .modal .fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem; /* Aumentado o espaçamento entre os campos */
+    }
+    .modal .fields .full {
+      grid-column: 1 / -1;
+    }
+    .modal .fields label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem; /* Espaçamento entre label e input */
+      color: #444;
+    }
+    .modal .fields input[type="text"],
+    .modal .fields input[type="number"],
+    .modal .fields textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .modal .fields input:focus,
+    .modal .fields textarea:focus {
+      outline: none;
+      border-color: var(--cor-laranja, #FF6B35);
+      box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+    }
+    .modal .image-previews {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      background-color: #f9f9f9;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+    .modal .image-previews .preview-item {
+      position: relative;
+    }
+    .modal .image-previews img,
+    .modal .image-previews .no-image {
+      width: 140px; /* Imagens de preview maiores */
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .modal .image-previews .no-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      color: #999;
+      border-style: dashed;
+    }
+    .modal .image-previews .remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: white;
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+    .modal .image-previews .remove-btn:hover {
+      transform: scale(1.1);
+      background-color: #fdecec;
+      color: #c53030;
+    }
+    .modal .file-inputs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .modal .actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e5e5e5;
+    }
+    .modal .actions .btn {
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .modal .actions .btn-primary {
+      background-color: var(--cor-laranja, #FF6B35);
+      color: white;
+    }
+    .modal .actions .btn-primary:hover {
+      background-color: #e05b2d;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
+    }
+    .modal .actions .btn-secondary {
+      background-color: #e2e8f0;
+      color: #4a5568;
+    }
+    .modal .actions .btn-secondary:hover {
+      background-color: #cbd5e0;
+    }
+    @media (max-width: 768px) {
+      .modal .fields, .modal .file-inputs {
+        grid-template-columns: 1fr;
+      }
+      .modal {
+        padding: 1.5rem;
+      }
+      .modal .image-previews {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+
+  <!-- Edit product modal (hidden) -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header>
+        <h2 id="modalTitle">Editar Produto</h2>
+        <button id="modalClose" type="button" aria-label="Fechar">&times;</button>
+      </header>
+      <form id="editProductForm" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="post">
+        <input type="hidden" name="remove_imagem" id="remove_imagem" value="0">
+        <input type="hidden" name="remove_imagem1" id="remove_imagem1" value="0">
+        <input type="hidden" name="remove_imagem2" id="remove_imagem2" value="0">
+        <input type="hidden" name="remove_imagem3" id="remove_imagem3" value="0">
+        <input type="hidden" name="id_produto" id="modal_id"> {# Campo oculto para o ID do produto #}
+        <div class="fields">
+          <div>
+            <label>Nome</label>
+            <input type="text" name="nome" id="modal_nome" required>
+          </div>
+          <div>
+            <label>Preço</label>
+            <input type="number" step="0.01" name="preco" id="modal_preco" required>
+          </div>
+          <div>
+            <label>Tamanho</label>
+            <input type="text" name="tamanho" id="modal_tamanho" required>
+          </div>
+          <div>
+            <label>Estoque</label>
+            <input type="number" name="estoque" id="modal_estoque" required>
+          </div>
+          <div class="full">
+            <label>Descrição</label>
+            <textarea name="descricao" id="modal_descricao" rows="3"></textarea>
+          </div>
+          <div>
+            <label>Categoria</label> {# Campo de categoria adicionado #}
+            <input type="text" name="categoria" id="modal_categoria" placeholder="Ex: Camisa, Calça">
+          </div>
+          <div> {# Campo de cor adicionado #}
+            <label>Cor</label>
+            <input type="text" name="cor" id="modal_cor">
+          </div>
+          <div class="full">
+            <label>Imagens (substituir até 4)</label>
+            <div class="image-previews" id="modal_image_previews">
+              <!-- previews inserted by JS -->
+            </div>
+          </div>
+          <div class="full file-inputs">
+            <div>
+              <label>Imagem 1</label>
+              <input type="file" name="imagem" id="modal_imagem" accept="image/*">
+            </div>
+            <div>
+              <label>Imagem 2</label>
+              <input type="file" name="imagem1" id="modal_imagem1" accept="image/*">
+            </div>
+            <div>
+              <label>Imagem 3</label>
+              <input type="file" name="imagem2" id="modal_imagem2" accept="image/*">
+            </div>
+            <div>
+              <label>Imagem 4</label>
+              <input type="file" name="imagem3" id="modal_imagem3" accept="image/*">
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-secondary" id="modalCancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const modalOverlay = document.getElementById('modalOverlay');
+      const modalCloseBtn = document.getElementById('modalClose');
+      const editProductForm = document.getElementById('editProductForm');
+      const editButtons = document.querySelectorAll('.editar-produto-btn');
+
+      // Campos do formulário no modal
+      const modalId = document.getElementById('modal_id');
+      const modalNome = document.getElementById('modal_nome');
+      const modalDescricao = document.getElementById('modal_descricao');
+      const modalPreco = document.getElementById('modal_preco');
+      const modalTamanho = document.getElementById('modal_tamanho');
+      const modalCor = document.getElementById('modal_cor');
+      const modalEstoque = document.getElementById('modal_estoque');
+      const modalCategoria = document.getElementById('modal_categoria');
+
+      // Pré-visualizações e inputs de imagem
+      const modalImagePreviews = document.getElementById('modal_image_previews');
+      const modalImagemInput = document.getElementById('modal_imagem');
+      const modalImagem1Input = document.getElementById('modal_imagem1');
+      const modalImagem2Input = document.getElementById('modal_imagem2');
+      const modalImagem3Input = document.getElementById('modal_imagem3');
+
+      // Inputs ocultos para remoção de imagem
+      const removeImagem = document.getElementById('remove_imagem');
+      const removeImagem1 = document.getElementById('remove_imagem1');
+      const removeImagem2 = document.getElementById('remove_imagem2');
+      const removeImagem3 = document.getElementById('remove_imagem3');
+
+      function openModal() {
+        modalOverlay.style.display = 'flex';
+        modalOverlay.classList.add('open');
+      }
+
+      function closeModal() {
+        modalOverlay.style.display = 'none';
+        modalOverlay.classList.remove('open');
+        // Resetar formulário e pré-visualizações de imagem
+        editProductForm.reset();
+        modalImagePreviews.innerHTML = '';
+        removeImagem.value = '0';
+        removeImagem1.value = '0';
+        removeImagem2.value = '0';
+        removeImagem3.value = '0';
+        // Limpar inputs de arquivo
+        modalImagemInput.value = '';
+        modalImagem1Input.value = '';
+        modalImagem2Input.value = '';
+        modalImagem3Input.value = '';
+      }
+
+      modalCloseBtn.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+          closeModal();
+        }
+      });
+
+      editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const productId = this.dataset.id;
+          const nome = this.dataset.nome;
+          const descricao = this.dataset.descricao;
+          const preco = this.dataset.preco;
+          const tamanho = this.dataset.tamanho;
+          const cor = this.dataset.cor;
+          const estoque = this.dataset.estoque;
+          const categoria = this.dataset.categoria;
+
+          // Definir a ação do formulário
+          editProductForm.action = `/admin/produto/atualizar/${productId}`;
+
+          // Preencher os campos do formulário
+          modalId.value = productId;
+          modalNome.value = nome;
+          modalDescricao.value = descricao;
+          modalPreco.value = preco;
+          modalTamanho.value = tamanho;
+          modalCor.value = cor;
+          modalEstoque.value = estoque;
+          modalCategoria.value = categoria;
+
+          // Lidar com as pré-visualizações de imagem
+          const images = [
+            this.dataset.imagem,
+            this.dataset.imagem1,
+            this.dataset.imagem2,
+            this.dataset.imagem3
+          ];
+          const imageInputs = [modalImagemInput, modalImagem1Input, modalImagem2Input, modalImagem3Input];
+          const removeImageFlags = [removeImagem, removeImagem1, removeImagem2, removeImagem3];
+
+          modalImagePreviews.innerHTML = ''; // Limpar pré-visualizações anteriores
+
+          images.forEach((imgPath, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            if (imgPath) {
+              const img = document.createElement('img');
+              img.src = `/static/${imgPath}`; // Assumindo que as imagens estão em static/
+              img.alt = `Imagem ${index + 1}`;
+              previewItem.appendChild(img);
+
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.className = 'remove-btn';
+              removeBtn.textContent = '✕';
+              removeBtn.addEventListener('click', () => {
+                imageInputs[index].value = ''; // Limpar input de arquivo
+                removeImageFlags[index].value = '1'; // Marcar para remoção
+                previewItem.remove(); // Remover pré-visualização
+              });
+              previewItem.appendChild(removeBtn);
+            } else {
+              const noImage = document.createElement('div');
+              noImage.className = 'no-image';
+              noImage.textContent = 'Sem imagem';
+              previewItem.appendChild(noImage);
+            }
+            modalImagePreviews.appendChild(previewItem);
+          });
+
+          openModal();
+        });
+      });
+
+      // Lidar com as mudanças nos inputs de arquivo do formulário de novo produto (para pré-visualizações)
+      const imageInputs = document.querySelectorAll('input[type="file"][data-preview-target]');
+      
+      imageInputs.forEach(input => {
+        input.addEventListener('change', function() {
+          const targetId = this.dataset.previewTarget;
+          const previewContainer = document.getElementById(targetId);
+          
+          if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+              previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview da imagem">`;
+            }
+            
+            reader.readAsDataURL(this.files[0]);
+          }
+        });
+      });
+
+      // Confirmação para o botão de exclusão
+      window.confirmarExclusao = function(productId) {
+        return confirm(`Tem certeza que deseja excluir o produto ID ${productId}?`);
+      };
+    });
+  </script>
+
+
+  </div>
+</body>
+</html>

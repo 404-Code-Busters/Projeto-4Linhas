@@ -1,0 +1,7 @@
+- [x] Remover o link CSS do header.css do head em produto.html
+- [x] Substituir o bloco <header>...</header> por {% include 'partials/header.html' %} em produto.html
+- [x] Testar a página para confirmar funcionamento (servidor iniciado, página acessível em localhost:5000/produto/1)
+- [x] Substituir o bloco <header>...</header> por {% include 'partials/header.html' %} em home.html
+- [x] Testar a página home para confirmar funcionamento
+- [x] Centralizar os links do menu principal no header.css
+- [ ] Testar centralização em diferentes tamanhos de tela

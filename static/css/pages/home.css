@@ -1,0 +1,567 @@
+@import url('../colors.css');
+
+/* ===== BASE GERAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.hero-divider {
+  width: 100%;
+  height: 5.5rem;
+  background-color: #0D1B2A; /* Blue line color */
+  margin: 0rem 0;
+  border-radius: 0px;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  color: #0D1B2A;
+  background-color: #fff;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== HERO CARROSSEL ===== */
+.hero-swiper {
+  width: 100%;
+  height: 80vh;
+  position: relative;
+}
+
+.hero-slide {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+}
+
+.hero-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-content {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  text-align: left;
+  color: #fff;
+  z-index: 2;
+}
+
+.hero-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.hero-button {
+  display: inline-block;
+  background-color: #FF6B35;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.hero-button:hover {
+  background-color: #e05b2d;
+}
+
+/* Swiper controls */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  margin-top: -15px;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 14px;
+}
+
+.swiper-pagination-bullet {
+  background: #fff;
+  opacity: 0.8;
+}
+
+.swiper-pagination-bullet-active {
+  background: #FF6B35;
+}
+
+/* ===== ABOUT ===== */
+.about {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 4rem 2rem;
+  background-color: #f9f9f9;
+}
+
+.about-text {
+  flex: 1 1 400px;
+  max-width: 600px;
+}
+
+.about-text h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #0D1B2A;
+}
+
+.about-text p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.about-button {
+  display: inline-block;
+  background-color: #FF6B35;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.about-button:hover {
+  background-color: #e05b2d;
+}
+
+.about-image {
+  flex: 1 1 400px;
+  max-width: 600px;
+}
+
+.about-image img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* ===== CATEGORY CHOOSER ===== */s 
+.category-chooser {
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #fff;
+}
+
+.category-chooser h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0D1B2A;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #0D1B2A;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.category-card img {
+  width: 90%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.category-card span {
+  display: block;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 1rem;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ===== OUTFIT INSPIRATION ===== */
+.outfit-inspiration {
+  padding: 4rem 2rem;
+  text-align: center;
+  background-color: #fff;
+}
+
+.outfit-inspiration h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0D1B2A;
+  margin-bottom: 2rem;
+}
+
+.outfit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.outfit-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #0D1B2A;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 500px;
+}
+
+.outfit-card img {
+  width: 90%;
+  height: 900px;
+  object-fit: cover;
+}
+
+.outfit-card span {
+  display: block;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 1rem;
+}
+
+.outfit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ===== COMPETITIVIDADE ===== */
+.competitividade {
+  padding: 4rem 2rem;
+  text-align: center;
+  background-color: #0D1B2A;
+}
+
+.competitividade h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffff;
+  margin-bottom: 2rem;
+}
+
+.competitividade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Dois cards lado a lado */
+  gap: 2rem;
+  max-width: 100%; /* Divide a tela completa */
+  margin: 0 auto;
+  height: max-content;
+}
+
+.competitividade-card {
+  position: relative;
+  background-color: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  height: 750px;
+}
+
+.competitividade-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.card-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.75rem;
+}
+
+.card-content p {
+  font-size: 1.1rem;
+  color: white;
+  line-height: 1.5;
+}
+
+.competitividade-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .category-chooser h2 {
+    font-size: 1.5rem;
+  }
+  .category-card img {
+    height: 160px;
+  }
+  .outfit-inspiration h2 {
+    font-size: 1.5rem;
+  }
+  .outfit-grid {
+    gap: 1rem;
+  }
+  .outfit-card {
+    width: 100%;
+    max-width: 200px;
+  }
+  .outfit-card img {
+    height: 250px;
+  }
+  .competitividade h2 {
+    font-size: 1.5rem;
+  }
+  .competitividade-grid {
+    grid-template-columns: 1fr; /* Uma coluna no mobile */
+  }
+  .competitividade-card {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-card img {
+    height: 140px;
+  }
+  .category-card span {
+    font-size: 1rem;
+  }
+}
+
+
+
+
+/* ===== FAQ ===== */
+.faq {
+  padding: 4rem 2rem;
+  background-color: #f9f9f9;
+}
+
+.faq-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.faq h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0D1B2A;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.faq-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faq-item {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.faq-item summary {
+  padding: 1.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #0D1B2A;
+  cursor: pointer;
+  background-color: #fff;
+  transition: background-color 0.3s;
+  list-style: none;
+  position: relative;
+}
+
+.faq-item summary::after {
+  content: '▼';
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item[open] summary::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.faq-item summary:hover {
+  background-color: #f9f9f9;
+}
+
+.faq-item[open] summary {
+  background-color: #FF6B35;
+  color: #fff;
+}
+
+.faq-item p {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+  opacity: 0;
+  padding: 0 1.5rem 0;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.faq-item[open] p {
+  max-height: 200px;
+  opacity: 1;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 1024px) {
+  .nav-bottom {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-swiper,
+  .hero-slide {
+    height: 50vh;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .about {
+    flex-direction: column;
+    padding: 2rem 1rem;
+  }
+
+  .about-text,
+  .about-image {
+    max-width: 100%;
+  }
+
+  .nav-bottom {
+    gap: 1rem;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .outfit-grid {
+    max-width: 100%;
+  }
+
+  .competitividade-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .competitividade-card {
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-swiper,
+  .hero-slide {
+    height: 40vh;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-content p {
+    font-size: 0.9rem;
+  }
+
+  .hero-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  .nav-bottom {
+    justify-content: center;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-card img {
+    height: 200px;
+  }
+
+  .outfit-card img {
+    height: 300px;
+  }
+
+  .competitividade-card img {
+    height: 50%;
+  }
+}
+
+
+

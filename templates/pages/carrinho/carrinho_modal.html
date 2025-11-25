@@ -1,0 +1,27 @@
+<![CDATA[<div id="cart-content">
+    {% if not carrinho or carrinho|length == 0 %}
+        <p>Seu carrinho está vazio.</p>
+    {% else %}
+        {% for item in carrinho %}
+        <div class="cart-item-row">
+            {% if item.imagem %}
+            <img src="{{ url_for('static', path=item.imagem) }}" alt="{{ item.nome }}" class="cart-item-img">
+            {% endif %}
+            <div class="cart-item-info">
+                <div class="cart-item-name">{{ item.nome }}</div>
+                <div class="cart-item-price">R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</div>
+                <div class="cart-item-qty">
+                    Qtd: 
+                    <button class="qty-decr" data-produto-id="{{ item.id }}">-</button>
+                    <span class="qty-value">{{ item.quantidade }}</span>
+                    <button class="qty-incr" data-produto-id="{{ item.id }}">+</button>
+                </div>
+            </div>
+            <button class="cart-item-remove" data-produto-id="{{ item.id }}">Remover</button>
+        </div>
+        {% endfor %}
+        <div class="cart-total">
+            Total: R$ {{ "%.2f"|format(total) }}
+        </div>
+    {% endif %}
+</div>]]>
