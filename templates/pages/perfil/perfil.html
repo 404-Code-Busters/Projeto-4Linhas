@@ -265,7 +265,7 @@
                       <li class="order-item">
                         {% if item.produto and item.produto.imagem_caminho %}
                         <img
-                          src="{{ url_for('static', path=item.produto.imagem_caminho) }}"
+                          src="{{ url_for('static', path='/upload/img/' + item.produto.imagem_caminho) }}"
                           alt="{{ item.produto.nome }}"
                           class="item-image"
                         />
