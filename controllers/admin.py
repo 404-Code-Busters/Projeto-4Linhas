@@ -14,12 +14,12 @@ router = APIRouter() # rotas
 templates = Jinja2Templates(directory="templates") # front-end
 
 # Configuração dos arquivos estáticos
-router.mount("/static", StaticFiles(directory="static"), name="static")
+router.mount("/static/upload/img", StaticFiles(directory="static/upload/img"), name="static")
 
 # carrinho simples em memória
 carrinhos = {}
 
-UPLOAD_DIR = './static/'
+UPLOAD_DIR = '../static/upload/img'
 # caminho para o os
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 

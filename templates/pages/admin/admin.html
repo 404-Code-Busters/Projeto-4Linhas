@@ -100,7 +100,7 @@
                   <span class="preview-text">Principal</span>
                 </div>
                 <label for="imagem" class="btn-upload">Adicionar</label>
-                <input type="file" id="imagem" name="imagem" accept="image/*" data-preview-target="preview-imagem">
+                <input type="file" id="imagem" name="imagem" accept="static/upload/img/*" data-preview-target="preview-imagem">
               </div>
               <!-- Imagem 1 -->
               <div class="image-upload-slot">
@@ -108,7 +108,7 @@
                   <span class="preview-text">Img. 2</span>
                 </div>
                 <label for="imagem1" class="btn-upload">Adicionar</label>
-                <input type="file" id="imagem1" name="imagem1" accept="image/*" data-preview-target="preview-imagem1">
+                <input type="file" id="imagem1" name="imagem1" accept="static/upload/img/*" data-preview-target="preview-imagem1">
               </div>
               <!-- Imagem 2 -->
               <div class="image-upload-slot">
@@ -116,7 +116,7 @@
                   <span class="preview-text">Img. 3</span>
                 </div>
                 <label for="imagem2" class="btn-upload">Adicionar</label>
-                <input type="file" id="imagem2" name="imagem2" accept="image/*" data-preview-target="preview-imagem2">
+                <input type="file" id="imagem2" name="imagem2" accept="static/upload/img/*" data-preview-target="preview-imagem2">
               </div>
               <!-- Imagem 3 -->
               <div class="image-upload-slot">
@@ -124,7 +124,7 @@
                   <span class="preview-text">Img. 4</span>
                 </div>
                 <label for="imagem3" class="btn-upload">Adicionar</label>
-                <input type="file" id="imagem3" name="imagem3" accept="image/*" data-preview-target="preview-imagem3">
+                <input type="file" id="imagem3" name="imagem3" accept="static/upload/img/*" data-preview-target="preview-imagem3">
               </div>
             </div>
           </div>
@@ -624,7 +624,7 @@
             previewItem.className = 'preview-item';
             if (imgPath) {
               const img = document.createElement('img');
-              img.src = `/static/${imgPath}`; // Assumindo que as imagens estão em static/
+              img.src = `/static/upload/img/${imgPath}`; // Assumindo que as imagens estão em static/
               img.alt = `Imagem ${index + 1}`;
               previewItem.appendChild(img);
 

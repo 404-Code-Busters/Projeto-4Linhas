@@ -19,7 +19,7 @@ router.mount("/static", StaticFiles(directory="static"), name="static")
 # carrinho simples em memória
 carrinhos = {}
 
-UPLOAD_DIR = './static/'
+UPLOAD_DIR = '../static/upload/img'
 # caminho para o os
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
