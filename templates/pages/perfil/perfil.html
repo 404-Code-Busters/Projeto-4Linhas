@@ -159,7 +159,7 @@
                       <tr>
                         <td>
                           <img
-                            src="{{ url_for('static', path=item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}"
+                            src="{{ url_for('static', path='/upload/img/' + item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}"
                             alt="{{ item.nome }}"
                             class="item-image-large"
                           />

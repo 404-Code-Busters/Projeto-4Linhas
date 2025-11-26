@@ -60,7 +60,7 @@ function renderCartModal(data) {
             row.className = 'cart-item-row';
             const itemTotal = (Number(item.preco) || 0) * (Number(item.quantidade) || 0);
             row.innerHTML = `
-                <img src="/static/${item.imagem || 'assets/logo/4linhas-bg-red.svg'}" alt="${item.nome || ''}" class="cart-item-img">
+                <img src="/static/upload/img/${item.imagem || 'assets/logo/4linhas-bg-red.svg'}" alt="${item.nome || ''}" class="cart-item-img">
                 <div class="cart-item-info">
                     <div class="cart-item-name">${item.nome || ''}</div>
                     <div class="cart-item-price">R$ ${itemTotal.toFixed(2).replace('.', ',')}</div>
