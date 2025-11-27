@@ -569,9 +569,34 @@
 .cart-summary-box {
   background-color: #f9f9f9;
   border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 1.5rem;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
+
+.cart-summary-box h4 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.cart-summary-box .summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.cart-summary-box .summary-row.total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
 .checkout-full-btn {
   width: 100%;
   padding: 1rem;
@@ -703,4 +728,35 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+}
+
+/* Estilos para os botões de quantidade */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    text-align: center;
+    margin: 0 5px;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Espaçamento para o resumo do pedido */
+.order-summary {
+    margin-top: 20px; /* Adiciona espaço acima do resumo do pedido */
 }

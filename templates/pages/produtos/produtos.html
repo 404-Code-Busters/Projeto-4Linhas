@@ -244,7 +244,7 @@
           <div class="outfit-card" data-price="{{ "%.2f"|format(produto.preco) }}">
             <a href="{{ url_for('detalhe_produto', id_produto=produto.id_produto) }}" class="product-link">
               <img class="product-card-img" 
-                   src="{{ url_for('static', path=produto.imagem_caminho) if produto.imagem_caminho else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" 
+                   src="{{ url_for('static', path='upload/img/' + produto.imagem_caminho) if produto.imagem_caminho else url_for('../static/upload/img', path='assets/logo/4linhas-bg-red.svg') }}" 
                    alt="{{ produto.nome }}">
             </a>
             <div class="outfit-overlay">

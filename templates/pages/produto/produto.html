@@ -34,7 +34,7 @@
     <div class="product-gallery">
       {# Define a imagem principal. Usa a primeira imagem disponível. #}
       {% set main_image_path = produto.imagem_caminho or produto.imagem_caminho1 or produto.imagem_caminho2 or produto.imagem_caminho3 or 'assets/logo/4linhas-bg-red.svg' %}
-      <img src="{{ url_for('static', path=main_image_path) }}" alt="{{ produto.nome }}" class="product-image-main" id="main-product-image">
+      <img src="{{ url_for('static', path='/upload/img/' + main_image_path) }}" alt="{{ produto.nome }}" class="product-image-main" id="main-product-image">
 
       {# Gera a lista de todas as imagens disponíveis para as miniaturas #}
       {% set image_paths = [
@@ -47,10 +47,10 @@
       <div class="product-thumbnails">
       {% for img_path in image_paths %}
         {% if img_path %}
-          <img src="{{ url_for('static', path=img_path) }}" 
+          <img src="{{ url_for('static', path='/upload/img/' + img_path) }}" 
                alt="Miniatura de {{ produto.nome }}" 
                class="thumbnail {% if loop.first %}active{% endif %}"
-               data-full-image="{{ url_for('static', path=img_path) }}">
+               data-full-image="{{ url_for('static', path='/upload/img/' + img_path) }}">
         {% endif %}
       {% endfor %}
       </div>

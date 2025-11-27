@@ -5,7 +5,7 @@
         {% for item in carrinho %}
         <div class="cart-item-row">
             {% if item.imagem %}
-            <img src="{{ url_for('static', path=item.imagem) }}" alt="{{ item.nome }}" class="cart-item-img">
+            <img src="{{ url_for('static', path='/upload/img/' + item.imagem) }}" alt="{{ item.nome }}" class="cart-item-img">
             {% endif %}
             <div class="cart-item-info">
                 <div class="cart-item-name">{{ item.nome }}</div>

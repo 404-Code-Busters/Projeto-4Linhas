@@ -10,7 +10,7 @@
       rel="stylesheet"
       href="{{ url_for('static', path='css/base.css') }}"
     />
-    <!-- Header component styles -->
+    <!-- Estilos do componente do cabeçalho -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', path='css/components/header.css') }}"
@@ -84,10 +84,10 @@
               <li>
                 <a
                   href="#pedidos"
-                  class="profile-nav-link active"
+                  class="profile-nav-link"
                   data-tab="orders"
                   role="tab"
-                  aria-selected="true"
+                  aria-selected="false"
                   >Meus Pedidos</a
                 >
               </li>
@@ -140,7 +140,7 @@
               <h2>Meu Carrinho</h2>
               <p>Revise seus itens e finalize a compra.</p>
             </div>
-            <div class="content-body">
+            <div class="content-body" id="profile-cart-content">
               {% if carrinho and carrinho|length > 0 %}
               <div class="cart-page-content">
                 <div class="cart-items-list">
@@ -156,10 +156,10 @@
                     </thead>
                     <tbody>
                       {% for item in carrinho %}
-                      <tr>
+                      <tr data-product-id="{{ item.id }}">
                         <td>
                           <img
-                            src="{{ url_for('static', path=item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}"
+                            src="{{ url_for('static', path='/upload/img/' + item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}"
                             alt="{{ item.nome }}"
                             class="item-image-large"
                           />
@@ -167,35 +167,18 @@
                         <td>{{ item.nome }}</td>
                         <td>R$ {{ "%.2f"|format(item.preco) }}</td>
                         <td>
-                          <form
-                            action="{{ url_for('atualizar_quantidade', produto_id=item.id) }}"
-                            method="post"
-                            class="qty-form"
-                          >
-                            <input
-                              type="number"
-                              name="quantidade"
-                              value="{{ item.quantidade }}"
-                              min="1"
-                              class="qty-input"
-                            />
-                            <button type="submit" class="btn-update-qty">
-                              Atualizar
-                            </button>
-                          </form>
+                          <div class="quantity-selector">
+                            <input type="hidden" class="quantity-input" value="{{ item.quantidade }}">
+                            <button type="button" class="quantity-btn minus-btn" data-change="-1">-</button>
+                            <span class="quantity-text">{{ item.quantidade }}</span>
+                            <button type="button" class="quantity-btn plus-btn" data-change="1">+</button>
+                          </div>
                         </td>
-                        <td>
+                        <td class="item-total">
                           R$ {{ "%.2f"|format(item.preco * item.quantidade) }}
                         </td>
                         <td>
-                          <form
-                            action="{{ url_for('remover_do_carrinho', produto_id=item.id) }}"
-                            method="post"
-                          >
-                            <button type="submit" class="btn-remove-item">
-                              &times;
-                            </button>
-                          </form>
+                          <button type="button" class="btn-remove-item">&times;</button>
                         </td>
                       </tr>
                       {% endfor %}
@@ -206,11 +189,11 @@
                   <h4>Resumo do Pedido</h4>
                   <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>R$ {{ "%.2f"|format(total) }}</span>
+                    <span class="summary-subtotal">R$ {{ "%.2f"|format(total) }}</span>
                   </div>
                   <div class="summary-row total">
                     <span>Total</span>
-                    <span>R$ {{ "%.2f"|format(total) }}</span>
+                    <span class="summary-total">R$ {{ "%.2f"|format(total) }}</span>
                   </div>
                   <form
                     action="{{ url_for('checkout') }}"
@@ -235,7 +218,7 @@
           </section>
 
           <!-- Seção: Meus Pedidos -->
-          <section id="tab-orders" class="tab-content active" role="tabpanel">
+          <section id="tab-orders" class="tab-content" role="tabpanel" hidden>
             <div class="content-header">
               <h2>Meus Pedidos</h2>
               <p>Acompanhe o histórico e o status dos seus pedidos.</p>
@@ -265,7 +248,7 @@
                       <li class="order-item">
                         {% if item.produto and item.produto.imagem_caminho %}
                         <img
-                          src="{{ url_for('static', path=item.produto.imagem_caminho) }}"
+                          src="{{ url_for('static', path='/upload/img/' + item.produto.imagem_caminho) }}"
                           alt="{{ item.produto.nome }}"
                           class="item-image"
                         />
@@ -461,21 +444,35 @@
 
   {% include 'partials/footer.html' %}
 
-  <!-- Script para alternância de abas da página de perfil -->
+  <!-- Script para alternância de abas e carrinho dinâmico -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // --- LÓGICA DE ABAS (Preservada) ---
       const navLinks = document.querySelectorAll('.profile-nav-link[data-tab]');
       const tabContents = document.querySelectorAll('.tab-content');
 
       function activateTab(tabName) {
-        // Atualiza os links de navegação
+        if (!tabName) {
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                link.setAttribute('aria-selected', 'false');
+            });
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                content.setAttribute('hidden', '');
+            });
+            history.pushState("", document.title, window.location.pathname + window.location.search);
+            return;
+        }
+
+        let tabFound = false;
         navLinks.forEach(link => {
           const isActive = link.getAttribute('data-tab') === tabName;
           link.classList.toggle('active', isActive);
           link.setAttribute('aria-selected', isActive);
+          if (isActive) tabFound = true;
         });
 
-        // Mostra/esconde o conteúdo da aba
         tabContents.forEach(content => {
           const isContentActive = content.id === `tab-${tabName}`;
           content.classList.toggle('active', isContentActive);
@@ -486,8 +483,11 @@
           }
         });
 
-        // Atualiza a URL hash
-        window.location.hash = tabName;
+        if (tabFound) {
+            window.location.hash = tabName;
+        } else {
+            history.pushState("", document.title, window.location.pathname + window.location.search);
+        }
       }
 
       navLinks.forEach(link => {
@@ -497,10 +497,143 @@
           activateTab(tabName);
         });
       });
+      
+      const initialTab = window.location.hash.substring(1);
+      if (initialTab) {
+        activateTab(initialTab);
+      } else {
+        activateTab('');
+      }
+      window.addEventListener('hashchange', () => {
+          const tabNameFromHash = window.location.hash.substring(1);
+          activateTab(tabNameFromHash);
+      });
 
-      // Ativa a aba com base na URL hash na carga da página ou usa o padrão
-      const initialTab = window.location.hash.substring(1) || 'orders';
-      activateTab(initialTab);
+      // --- LÓGICA DO CARRINHO DINÂMICO ---
+      const cartContentEl = document.getElementById('profile-cart-content');
+      if (cartContentEl) {
+        cartContentEl.addEventListener('click', async (event) => {
+          const target = event.target;
+          const productRow = target.closest('tr[data-product-id]');
+          if (!productRow) return;
+
+          const productId = productRow.dataset.productId;
+          
+          if (target.matches('.btn-remove-item')) {
+            await updateCartAPI(`/carrinho/remover/${productId}`, 'POST');
+          }
+
+          if (target.matches('.quantity-btn')) {
+            const change = parseInt(target.dataset.change, 10);
+            const quantityInput = productRow.querySelector('.quantity-input');
+            const currentQuantity = parseInt(quantityInput.value, 10);
+            const newQuantity = currentQuantity + change;
+
+            if (newQuantity > 0) {
+              const formData = new FormData();
+              formData.append('quantidade', newQuantity);
+              await updateCartAPI(`/carrinho/atualizar/${productId}`, 'POST', formData);
+            } else {
+              await updateCartAPI(`/carrinho/remover/${productId}`, 'POST');
+            }
+          }
+        });
+      }
+
+      async function updateCartAPI(url, method, body = null) {
+        if(cartContentEl) cartContentEl.classList.add('loading');
+        try {
+          const response = await fetch(url, { method, body, credentials: 'same-origin' });
+
+          if (!response.ok) {
+            // Se a resposta não for OK (ex: 401, 500), tenta ler a mensagem de erro do backend
+            let errorMessage = 'Erro desconhecido ao atualizar carrinho.';
+            try {
+              const errorData = await response.json();
+              errorMessage = errorData.message || errorMessage;
+            } catch (jsonError) {
+              // Se não conseguir ler o JSON de erro, usa a mensagem padrão
+              console.error('Não foi possível ler a mensagem de erro JSON:', jsonError);
+            }
+            throw new Error(errorMessage);
+          }
+
+          const result = await response.json();
+
+          if (result.success) {
+            renderProfileCart(result.cart);
+            if (window.atualizarContadorCarrinho) {
+              window.atualizarContadorCarrinho();
+            }
+          } else {
+            throw new Error(result.message || 'Erro ao atualizar carrinho');
+          }
+        } catch (error) {
+          console.error('Erro na operação do carrinho:', error);
+        } finally {
+            if(cartContentEl) cartContentEl.classList.remove('loading');
+        }
+      }
+
+      function renderProfileCart(cartData) {
+        if (!cartContentEl) return;
+
+        if (!cartData || !cartData.itens || cartData.itens.length === 0) {
+          cartContentEl.innerHTML = `
+            <div class="empty-state">
+              <p>Seu carrinho está vazio.</p>
+              <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver produtos</a>
+            </div>`;
+          return;
+        }
+
+        const itemsHtml = cartData.itens.map(item => `
+          <tr data-product-id="${item.id}">
+            <td><img src="/static/upload/img/${item.imagem || 'default.jpg'}" alt="${item.nome}" class="item-image-large"/></td>
+            <td>${item.nome}</td>
+            <td>R$ ${parseFloat(item.preco).toFixed(2)}</td>
+            <td>
+              <div class="quantity-selector">
+                <input type="hidden" class="quantity-input" value="${item.quantidade}">
+                <button type="button" class="quantity-btn minus-btn" data-change="-1">-</button>
+                <span class="quantity-text">${item.quantidade}</span>
+                <button type="button" class="quantity-btn plus-btn" data-change="1">+</button>
+              </div>
+            </td>
+            <td class="item-total">R$ ${(item.preco * item.quantidade).toFixed(2)}</td>
+            <td><button type="button" class="btn-remove-item">&times;</button></td>
+          </tr>
+        `).join('');
+
+        const total = cartData.total;
+        cartContentEl.innerHTML = `
+          <div class="cart-page-content">
+            <div class="cart-items-list">
+              <table class="cart-table">
+                <thead>
+                  <tr>
+                    <th colspan="2">Produto</th><th>Preço</th><th>Quantidade</th><th>Total</th><th></th>
+                  </tr>
+                </thead>
+                <tbody>${itemsHtml}</tbody>
+              </table>
+            </div>
+            <div class="cart-summary-box">
+              <h4>Resumo do Pedido</h4>
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <span class="summary-subtotal">R$ ${total.toFixed(2)}</span>
+              </div>
+              <div class="summary-row total">
+                <span>Total</span>
+                <span class="summary-total">R$ ${total.toFixed(2)}</span>
+              </div>
+              <form action="{{ url_for('checkout') }}" method="post" style="margin-top: 1rem">
+                <button type="submit" class="btn-primary checkout-full-btn">Finalizar Compra</button>
+              </form>
+            </div>
+          </div>`;
+      }
     });
   </script>
 </body>
