@@ -38,7 +38,7 @@
                         <li class="cart-item">
                           <!-- Correção Gemini: Usando url_for para o caminho da imagem e adicionando um fallback -->
                           <img 
-                            src="{{ url_for('static', path=item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" 
+                            src="{{ url_for('static', path='/upload/img/' + item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" 
                             alt="{{ item.nome }}" width="64" height="64">
                           <div class="cart-item-info">
                             <div class="name">{{ item.nome }}</div>
@@ -98,19 +98,19 @@
                   </div>
                   <div class="addr-form-group">
                     <label for="rua">Rua</label>
-                    <input type="text" id="rua" name="logradouro" class="addr-input" placeholder="Nome da sua rua" required>
+                    <input type="text" id="rua" name="logradouro" class="addr-input" placeholder="Ex.: Rua Correia de Andrade " required>
                   </div>
                   <div class="addr-form-group">
                     <label for="numero">Número</label>
-                    <input type="text" id="numero" name="numero" class="addr-input" placeholder="Ex: 123" required>
+                    <input type="text" id="numero" name="numero" class="addr-input" placeholder="Ex.: 232"type required>
                   </div>
                   <div class="addr-form-group">
                     <label for="bairro">Bairro</label>
-                    <input type="text" id="bairro" name="bairro" class="addr-input" placeholder="Seu bairro" required>
+                    <input type="text" id="bairro" name="bairro" class="addr-input" placeholder="Ex.: Brás" required>
                   </div>
                   <div class="addr-form-group">
                     <label for="cidade">Cidade</label>
-                    <input type="text" id="cidade" name="cidade" class="addr-input" placeholder="Sua cidade" required>
+                    <input type="text" id="cidade" name="cidade" class="addr-input" placeholder="São Paulo" required>
                   </div>
                   <div class="addr-form-group">
                     <label for="estado">Estado</label>
