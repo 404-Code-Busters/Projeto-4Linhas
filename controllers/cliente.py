@@ -1,5 +1,6 @@
 import requests
-from fastapi import APIRouter, Request, Form, UploadFile, File, Depends, HTTPException, Query
+import asyncio
+from fastapi import APIRouter, Request, Form, UploadFile, File, Depends, HTTPException, Query, BackgroundTasks
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -9,6 +10,7 @@ from database import get_db, SessionLocal
 from models.models import *
 from models.models import Clientes, Produtos, Pedidos
 from auth import *
+from controllers.enviar_email import send_welcome_email
 
 router = APIRouter() # rotas
 templates = Jinja2Templates(directory="templates") # front-end
@@ -150,16 +152,78 @@ def salvar_endereco(
 ##############################################################
 
 # Rota para processar cadastro #TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
+# @router.post("/register")
+# def cadastrar_cliente(
+#     request:Request,
+#     nome:str = Form(...), 
+#     cpf:str = Form(...),
+#     email:str = Form(...),
+#     senha:str = Form(...),
+#     telefone:str = Form(...), 
+#     # endereco:str = Form(...),
+#     db:Session = Depends(get_db)
+# ):
+    
+#     erro = None
+#     if len(cpf) != 11:
+#         erro = "CPF deve conter 11 dígitos."
+#     elif len(telefone) != 11:
+#         erro = "Telefone deve conter 11 dígitos."
+#     if erro:
+#         return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
+#             "request": request,
+#             "erro": erro,
+#             "nome": nome,
+#             "cpf": cpf,
+#             "email": email,
+#             "telefone": telefone
+#         })
+    
+#     cliente = db.query(Clientes).filter(Clientes.email == email).first()
+#     if cliente:
+#         return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
+#             "request": request,
+#             "erro": "E-mail já cadastrado!",
+#             "nome": nome,
+#             "cpf": cpf,
+#             "email": email,
+#             "telefone": telefone
+#         })
+#     cliente = db.query(Clientes).filter(Clientes.cpf == cpf).first()
+#     if cliente:
+#         return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
+#             "request": request,
+#             "erro": "CPF já cadastrado!",
+#             "nome": nome,
+#             "cpf": cpf,
+#             "email": email,
+#             "telefone": telefone
+#         })
+    
+#     senha_hash = gerar_senha(senha) #TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
+#     novo_cliente = Clientes(
+#         nome=nome, 
+#         cpf=cpf,
+#         email=email, 
+#         senha=senha_hash,
+#         telefone=telefone,
+#         # endereco=endereco
+#          )
+#     db.add(novo_cliente)
+#     db.commit()
+#     db.refresh(novo_cliente)
+#     return RedirectResponse(url="/login", status_code=303)
+
 @router.post("/register")
 def cadastrar_cliente(
-    request:Request,
-    nome:str = Form(...), 
-    cpf:str = Form(...),
-    email:str = Form(...),
-    senha:str = Form(...),
-    telefone:str = Form(...), 
-    # endereco:str = Form(...),
-    db:Session = Depends(get_db)
+    request: Request,
+    background_tasks: BackgroundTasks,
+    nome: str = Form(...),
+    cpf: str = Form(...),
+    email: str = Form(...),
+    senha: str = Form(...),
+    telefone: str = Form(...),
+    db: Session = Depends(get_db)
 ):
     
     erro = None
@@ -167,6 +231,7 @@ def cadastrar_cliente(
         erro = "CPF deve conter 11 dígitos."
     elif len(telefone) != 11:
         erro = "Telefone deve conter 11 dígitos."
+
     if erro:
         return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
             "request": request,
@@ -176,7 +241,8 @@ def cadastrar_cliente(
             "email": email,
             "telefone": telefone
         })
-    
+
+    # Verifica e-mail existente
     cliente = db.query(Clientes).filter(Clientes.email == email).first()
     if cliente:
         return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
@@ -187,6 +253,8 @@ def cadastrar_cliente(
             "email": email,
             "telefone": telefone
         })
+    
+    # Verifica CPF existente
     cliente = db.query(Clientes).filter(Clientes.cpf == cpf).first()
     if cliente:
         return templates.TemplateResponse("pages/cadastre-se/cadastre-se.html", {
@@ -197,19 +265,26 @@ def cadastrar_cliente(
             "email": email,
             "telefone": telefone
         })
-    
-    senha_hash = gerar_senha(senha) #TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
+
+    senha_hash = gerar_senha(senha)
+
     novo_cliente = Clientes(
-        nome=nome, 
+        nome=nome,
         cpf=cpf,
-        email=email, 
+        email=email,
         senha=senha_hash,
-        telefone=telefone,
-        # endereco=endereco
-         )
+        telefone=telefone
+    )
+
     db.add(novo_cliente)
     db.commit()
     db.refresh(novo_cliente)
+
+    # ---------------------------
+    # Envio de e-mail 
+    # ---------------------------
+    background_tasks.add_task(send_welcome_email, email)
+
     return RedirectResponse(url="/login", status_code=303)
 
 # Rota para perfil do usuário

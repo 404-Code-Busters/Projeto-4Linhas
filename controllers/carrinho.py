@@ -1,5 +1,5 @@
 import requests
-from fastapi import APIRouter, Request, Form, UploadFile, File, Depends, HTTPException, Query
+from fastapi import APIRouter, Request, Form, UploadFile, File, Depends, HTTPException, Query, BackgroundTasks
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -9,6 +9,7 @@ from database import get_db, SessionLocal
 from models.models import *
 from models.models import Clientes, Produtos, Pedidos , ItemPedido
 from auth import *
+from controllers.enviar_email import send_order_email
 
 router = APIRouter() # rotas
 templates = Jinja2Templates(directory="templates") # front-end
@@ -262,7 +263,7 @@ async def remover_do_carrinho(
 
 #rota checkout
 @router.post("/checkout")
-async def checkout(request: Request, db: Session = Depends(get_db)):
+async def checkout(request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     token = request.cookies.get("token")
     payload = verificar_token(token)
 
@@ -279,7 +280,7 @@ async def checkout(request: Request, db: Session = Depends(get_db)):
             "cliente": cliente,
             "carrinho": carrinho,
             "total": 0,
-            "erro": "Carrinho vazio"
+            "erro": "Carrinho vazio",
         })
 
     # Tenta obter endereço enviado pelo formulário (ex: usuário preencheu no checkout)
@@ -382,9 +383,38 @@ async def checkout(request: Request, db: Session = Depends(get_db)):
         )
         db.add(novo_item)
 
+    # Preparar itens para enviar no email
+    itens_email = [
+        {
+            "nome": item["nome"],
+            "quantidade": item["quantidade"],
+            "preco": item["preco"]
+        }
+        for item in carrinho
+]
+
+    # Enviar email em segundo plano
+    background_tasks.add_task(send_order_email, cliente.email, pedido, itens_email)
+
     db.commit()
 
     carrinhos[cliente.id_cliente] = []
+
+    # -----------------------------------------------
+    # ---- ENVIAR EMAIL DE CONFIRMAÇÃO DE COMPRA ----
+    # -----------------------------------------------
+
+    itens_email = [
+        {
+            "nome": item["nome"],
+            "quantidade": item["quantidade"],
+            "preco": item["preco"]
+        }
+        for item in carrinho
+    ]
+
+    background_tasks.add_task(send_order_email, cliente.email, pedido, itens_email)
+
 
     # Redireciona para página de confirmação com id do pedido
     return RedirectResponse(url=f"/pedidos/confirmacao?id={pedido.id_pedido}", status_code=303)
