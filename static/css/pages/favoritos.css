@@ -1,0 +1,114 @@
+/* CONTAINER PRINCIPAL */
+.favoritos-container {
+    width: 100%;
+    max-width: 1250px;
+    margin: 120px auto 40px;
+    padding: 0 20px;
+    font-family: "Inter", sans-serif;
+}
+
+.favoritos-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* MENSAGEM DE LISTA VAZIA */
+.favoritos-vazio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 40px;
+    opacity: 0.6;
+}
+
+.favoritos-vazio img {
+    width: 50px;
+}
+
+.favoritos-vazio p {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* GRID DOS PRODUTOS */
+.favoritos-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+/* CARD DE PRODUTO */
+.favorito-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    transition: 0.25s;
+    position: relative;
+}
+
+.favorito-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.10);
+}
+
+/* HEART NO CARD */
+.card-heart {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    cursor: pointer;
+}
+
+.card-heart img {
+    width: 22px;
+    transition: 0.2s;
+}
+
+.card-heart img:hover {
+    transform: scale(1.15);
+}
+
+/* IMAGEM */
+.card-img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+/* NOME E PREÇO */
+.card-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.card-price {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 14px;
+}
+
+/* BOTÃO */
+.btn-carrinho {
+    width: 100%;
+    padding: 10px;
+    background: #1a73e8;
+    border: none;
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.btn-carrinho:hover {
+    background: #1359b8;
+}

@@ -14,8 +14,8 @@
       <div class="promo-arrow">▼</div>
     </div>
 
-    {# Alteração Gemini: Lógica condicional para o dropdown #}
-    {% if user %}
+    {# Lógica condicional para o dropdown #}
+    {% if user %} 
       <!-- Dropdown para USUÁRIO LOGADO -->
       <div class="user-dropdown">
         <div class="user-info">
@@ -27,7 +27,10 @@
         </div>
         <ul class="user-menu">
           <li><a href="{{ url_for('perfil') }}">Minha Conta</a></li>
+          <li><a href="{{ url_for('perfil') }}#carrinho">Meu Carrinho</a></li>
           <li><a href="{{ url_for('perfil') }}#pedidos">Meus Pedidos</a></li>
+          <li><a href="{{ url_for('perfil') }}#dados">Meus Dados</a></li>
+          <li><a href="{{ url_for('perfil') }}#favoritos">Meus Favoritos</a></li>
           <li><a href="{{ url_for('logout') }}" class="logout-link">Sair</a></li>
         </ul>
       </div>
@@ -46,7 +49,7 @@
             <div class="benefits-secondary">
             <h3>CADASTRE-SE</h3>
             <p>Crie sua conta e aproveite benefícios exclusivos.</p>
-            <a href="{{ url_for('login') }}#cadastro" class="btn-register">Criar Conta</a>
+            <a href="{{ url_for('cadastro') }}" class="btn-register">Criar Conta</a>
           </div>
         </div>
       </div>
@@ -95,7 +98,7 @@
           <button class="search-button" aria-label="Buscar">
             <img src="{{ url_for('static', path='assets/icons/magnifying-glass.png') }}" alt="Buscar" class="search-icon">
           </button>
-          {# Alteração Gemini: Link do perfil condicional #}
+          {# Link do perfil condicional #}
           {% if user %}
             <a href="{{ url_for('perfil') }}" class="profile-link" aria-label="Meu Perfil">
               <img src="{{ url_for('static', path='assets/icons/user.png') }}" alt="Perfil" class="nav-icons profile-icon">
@@ -110,7 +113,8 @@
           </a>
           <button id="cart-button" class="cart-button" aria-label="Abrir carrinho">
             <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt= "Carrinho" class="nav-icons">
-            <span id="cart-count" class="cart-count">0</span>
+            <span id="cart-count" class="cart-count"></span> <!-- havia um 0 = <span id="cart-count" class="cart-count">0</span>
+             removida para teste, condicional relativo a contador de produtos em arrinho icon/modal--> 
           </button>
         </div>
     </div>

@@ -70,7 +70,7 @@ if (searchButton) {
   searchButton.addEventListener('click', (e) => {
     // If a dedicated search modal exists, use it (legacy behavior)
     if (searchModal && closeModal) {
-      searchModal.classList.add('open');
+      searchModal.classList.add('is-open');
       return;
     }
     // Otherwise, try to focus an in-page search input (#search-input)
@@ -93,18 +93,18 @@ if (searchButton) {
   // If modal exists, wire close behavior too
   if (searchModal && closeModal) {
     closeModal.addEventListener('click', () => {
-      searchModal.classList.remove('open');
+      searchModal.classList.remove('is-open');
     });
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
       if (e.target === searchModal) {
-        searchModal.classList.remove('open');
+        searchModal.classList.remove('is-open');
       }
     });
     // Close modal on Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && searchModal.classList.contains('open')) {
-        searchModal.classList.remove('open');
+      if (e.key === 'Escape' && searchModal.classList.contains('is-open')) {
+        searchModal.classList.remove('is-open');
       }
     });
   }
@@ -170,3 +170,6 @@ if (searchButton) {
 		}
 	});
 })();
+
+
+// TRADUZR PARA O COMPREENSÃO IMEDIATA E PARA ALTERAÇÕES FUTURAS!!!
