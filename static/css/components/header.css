@@ -705,71 +705,126 @@ body.menu-open .mobile-menu {
   }
 }
 
-/* ===== MODAL DE BUSCA ===== */
-/* Adicionado pelo Gemini para corrigir a visibilidade do modal */
+/* ==========================================================================
+   Modal de Busca
+   ========================================================================== */
 
+/* O container do modal (fundo escuro) */
 .search-modal {
-  display: none; /* Oculto por padrão */
-  position: fixed;
-  z-index: 1001; /* Garante que fique acima do header */
+  display: none; /* Escondido por padrão */
+  position: fixed; /* Fica fixo na tela */
+  z-index: 1000; /* Garante que fique sobre todos os outros elementos */
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.6); /* Fundo escurecido */
-  backdrop-filter: blur(4px); /* Efeito de desfoque no fundo */
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 10vh; /* Distância do topo */
+  overflow: auto; /* Permite scroll se o conteúdo for maior que a tela */
+  background-color: rgba(0, 0, 0, 0.6); /* Fundo preto semi-transparente */
+  -webkit-backdrop-filter: blur(5px); /* Efeito de desfoque para navegadores Webkit */
+  backdrop-filter: blur(5px); /* Efeito de desfoque moderno */
   opacity: 0; /* Começa invisível para a transição */
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease-in-out;
 }
 
-/* Regra que torna o modal visível quando o JS adiciona a classe .open */
-.search-modal.open {
-  display: flex;
-  opacity: 1; /* Torna visível com transição */
+/* Classe para exibir o modal (será adicionada via JavaScript) */
+.search-modal.is-open {
+  display: block;
+  opacity: 1;
 }
 
+/* O conteúdo do modal (a caixa branca) */
 .search-modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  transform: translateY(-20px); /* Posição inicial para animação */
-  transition: transform 0.3s ease-out;
+  background-color: #fefefe;
+  margin: 15% auto; /* Centraliza verticalmente e dá espaço no topo/baixo */
+  padding: 2rem 2.5rem;
+  border: 1px solid #ddd;
+  width: 90%; /* Responsivo para telas menores */
+  max-width: 600px; /* Largura máxima em telas grandes */
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  position: relative;
+  transform: translateY(-50px); /* Efeito de "surgir" de cima */
+  transition: transform 0.3s ease-in-out;
 }
 
-.search-modal.open .search-modal-content {
-  transform: translateY(0); /* Posição final na animação */
+.search-modal.is-open .search-modal-content {
+    transform: translateY(0);
 }
 
-.close-modal {
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  line-height: 1;
-  cursor: pointer;
-  color: #888;
-  transition: color 0.2s, transform 0.2s;
-}
 
-.close-modal:hover {
-  color: #333;
-  transform: rotate(90deg);
-}
-
-.search-modal-input:focus {
-  outline: none;
-  border-color: var(--cor-laranja, #FF6B35);
-  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
-}
-
+/* Cabeçalho do modal */
 .search-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1.5rem;
 }
+
+.search-modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Botão de fechar (X) */
+.close-modal {
+  color: #aaa;
+  font-size: 2rem;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Formulário de busca dentro do modal */
+.search-modal-form {
+  display: flex;
+  gap: 0.5rem; /* Espaço entre o input e o botão */
+}
+
+/* Campo de input para a busca */
+.search-modal-input {
+  flex-grow: 1; /* Ocupa o máximo de espaço possível */
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-modal-input:focus {
+  outline: none;
+  border-color: #007bff; /* Cor de destaque ao focar */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Botão de busca (reutilizando a classe .invite-button que você já tinha) */
+.search-modal-form button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #FF6B35; /* Cor primária, ajuste se necessário */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  flex-shrink: 0; /* Impede que o botão encolha */
+}
+
+.search-modal-form button:hover {
+  background-color: #0D1B2A; /* Cor mais escura no hover */
+  transform: translateY(-2px); /* Leve elevação no hover */
+}
+

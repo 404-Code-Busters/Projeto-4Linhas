@@ -383,6 +383,7 @@ img {
 
 
 
+/* mais bonitinho, só nn sei como está  */
 /* ===== FAQ ===== */
 .faq {
   padding: 4rem 2rem;
@@ -390,31 +391,39 @@ img {
 }
 
 .faq-container {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .faq h2 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #0D1B2A;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   text-align: center;
 }
 
+/* Containers */
 .faq-items {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
+/* Card do FAQ */
 .faq-item {
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e3e3e3;
+  transition: box-shadow 0.25s ease;
 }
 
+.faq-item:hover {
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Pergunta */
 .faq-item summary {
   padding: 1.5rem;
   font-weight: 600;
@@ -422,51 +431,58 @@ img {
   color: #0D1B2A;
   cursor: pointer;
   background-color: #fff;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, color 0.3s;
   list-style: none;
   position: relative;
-}
-
-.faq-item summary::after {
-  content: '▼';
-  position: absolute;
-  right: 1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: transform 0.3s ease;
-  font-size: 0.8rem;
 }
 
 .faq-item summary::-webkit-details-marker {
   display: none;
 }
 
+/* Ícone moderno */
+.faq-item summary::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #0D1B2A;
+  border-bottom: 2px solid #0D1B2A;
+  transform: translateY(-50%) rotate(45deg);
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+/* Ícone abre */
 .faq-item[open] summary::after {
-  transform: translateY(-50%) rotate(180deg);
+  transform: translateY(-50%) rotate(-135deg);
+  border-color: #fff;
 }
 
-.faq-item summary:hover {
-  background-color: #f9f9f9;
-}
-
+/* Quando aberto */
 .faq-item[open] summary {
   background-color: #FF6B35;
   color: #fff;
 }
 
+/* Resposta */
 .faq-item p {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
   opacity: 0;
   padding: 0 1.5rem 0;
   color: #333;
   line-height: 1.6;
   margin: 0;
+  transition:
+    max-height 0.35s ease,
+    opacity 0.35s ease,
+    padding 0.35s ease;
 }
 
 .faq-item[open] p {
-  max-height: 200px;
+  max-height: 300px;
   opacity: 1;
   padding: 0 1.5rem 1.5rem;
 }
