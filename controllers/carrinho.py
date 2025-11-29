@@ -431,10 +431,7 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
             "preco": item["preco"]
         }
         for item in carrinho
-]
-
-    # Enviar email em segundo plano
-    background_tasks.add_task(send_order_email, cliente.email, pedido, itens_email)
+        ]
 
     db.commit()
 
