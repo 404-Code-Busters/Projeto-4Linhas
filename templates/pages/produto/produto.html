@@ -62,7 +62,7 @@
         <span class="stars">★★★★★</span>
         <span>(12 avaliações)</span>
       </div>
-      <div class="product-price">R$ {{ "%.2f"|format(produto.preco) }}</div>
+      <div class="product-price">R$ {{ "%.2f"|format(produto.preco)|replace('.', ',') }}</div>
       <p class="product-description">{{ produto.descricao }}</p>
 
       <div class="product-options">

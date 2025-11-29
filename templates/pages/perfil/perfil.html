@@ -156,29 +156,34 @@
                     </thead>
                     <tbody>
                       {% for item in carrinho %}
-                      <tr data-product-id="{{ item.id }}">
-                        <td>
+                      <tr data-product-id="{{ item.id }}" style="border-bottom: 1px solid #f0f0f0; vertical-align: middle;">
+                        <td style="padding: 1rem 0.5rem;">
                           <img
                             src="{{ url_for('static', path='/upload/img/' + item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}"
                             alt="{{ item.nome }}"
                             class="item-image-large"
+                            style="width: 96px; height: 96px; object-fit: cover; border-radius: 8px;"
                           />
                         </td>
-                        <td>{{ item.nome }}</td>
-                        <td>R$ {{ "%.2f"|format(item.preco) }}</td>
-                        <td>
-                          <div class="quantity-selector">
+                        <td style="padding: 1rem 0.5rem; font-weight: 700; color: #203647;">{{ item.nome }}</td>
+                        <td style="padding: 1rem 0.5rem; font-weight: 600; color: #0d1b2a;">R$ {{ "%.2f"|format(item.preco)|replace('.', ',') }}</td>
+                        <td style="padding: 1rem 0.5rem;">
+                          <div class="quantity-selector" style="display: flex; gap: 0.5rem; align-items: center;">
                             <input type="hidden" class="quantity-input" value="{{ item.quantidade }}">
-                            <button type="button" class="quantity-btn minus-btn" data-change="-1">-</button>
-                            <span class="quantity-text">{{ item.quantidade }}</span>
-                            <button type="button" class="quantity-btn plus-btn" data-change="1">+</button>
+                            <button type="button" class="quantity-btn minus-btn" data-change="-1" style="padding: 0.4rem 0.6rem; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: white;">
+                              <img src="{{ url_for('static', path='assets/icons/simbolo-de-menos.png') }}" alt="-" style="width: 16px; height: 16px;">
+                            </button>
+                            <span class="quantity-text" style="min-width: 2rem; text-align: center; font-weight: 600;">{{ item.quantidade }}</span>
+                            <button type="button" class="quantity-btn plus-btn" data-change="1" style="padding: 0.4rem 0.6rem; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: white;">
+                              <img src="{{ url_for('static', path='assets/icons/botao-de-simbolo-de-mais.png') }}" alt="+" style="width: 16px; height: 16px;">
+                            </button>
                           </div>
                         </td>
-                        <td class="item-total">
-                          R$ {{ "%.2f"|format(item.preco * item.quantidade) }}
+                        <td class="item-total" style="padding: 1rem 0.5rem; font-weight: 700; color: #0d1b2a;">
+                          R$ {{ "%.2f"|format(item.preco * item.quantidade)|replace('.', ',') }}
                         </td>
-                        <td>
-                          <button type="button" class="btn-remove-item">&times;</button>
+                        <td style="padding: 1rem 0.5rem;">
+                          <button type="button" class="btn-remove-item" style="background: #fee2e2; border: none; border-radius: 4px; padding: 0.5rem; cursor: pointer; color: #991b1b; font-weight: 700;">&times;</button>
                         </td>
                       </tr>
                       {% endfor %}
@@ -189,17 +194,20 @@
                   <h4>Resumo do Pedido</h4>
                   <div class="summary-row">
                     <span>Subtotal</span>
-                    <span class="summary-subtotal">R$ {{ "%.2f"|format(total) }}</span>
+                    <span class="summary-subtotal">R$ {{ "%.2f"|format(total)|replace('.', ',') }}</span>
                   </div>
                   <div class="summary-row total">
                     <span>Total</span>
-                    <span class="summary-total">R$ {{ "%.2f"|format(total) }}</span>
+                    <span class="summary-total">R$ {{ "%.2f"|format(total)|replace('.', ',') }}</span>
                   </div>
                   <form
                     action="{{ url_for('checkout') }}"
                     method="post"
+                    class="profile-checkout-form"
+                    data-source="profile"
                     style="margin-top: 1rem"
                   >
+                    <input type="hidden" name="from_profile" value="true">
                     <button type="submit" class="btn-primary checkout-full-btn">
                       Finalizar Compra
                     </button>
@@ -235,9 +243,7 @@
                   <div class="order-card-body">
                     <p><strong>Data:</strong> {{ pedido.data_pedido }}</p>
                     <p>
-                      <strong>Total:</strong> R$ {{
-                      "%.2f"|format(pedido.valor_total if pedido.valor_total is
-                      defined else 0) }}
+                      <strong>Total:</strong> R$ {{ "%.2f"|format(pedido.valor_total if pedido.valor_total is defined else 0)|replace('.', ',') }}
                     </p>
                   </div>
                   {% if pedido.itens %}
@@ -265,15 +271,11 @@
                             não encontrado' }}</span
                           >
                           <span class="item-qty-price"
-                            >{{ item.quantidade }} x R$ {{
-                            "%.2f"|format(item.preco_unitario if
-                            item.preco_unitario is defined else 0) }}</span
+                            >{{ item.quantidade }} x R$ {{ "%.2f"|format(item.preco_unitario if item.preco_unitario is defined else 0)|replace('.', ',') }}</span
                           >
                         </div>
                         <span class="item-total"
-                          >R$ {{ "%.2f"|format(item.quantidade *
-                          (item.preco_unitario if item.preco_unitario is defined
-                          else 0)) }}</span
+                          >R$ {{ "%.2f"|format(item.quantidade * (item.preco_unitario if item.preco_unitario is defined else 0))|replace('.', ',') }}</span
                         >
                       </li>
                       {% endfor %}
@@ -453,16 +455,18 @@
 
       function activateTab(tabName) {
         if (!tabName) {
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                link.setAttribute('aria-selected', 'false');
-            });
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-                content.setAttribute('hidden', '');
-            });
-            history.pushState("", document.title, window.location.pathname + window.location.search);
-            return;
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            link.setAttribute('aria-selected', 'false');
+          });
+          tabContents.forEach(content => {
+            content.classList.remove('active');
+            content.setAttribute('hidden', '');
+          });
+          // Do not modify the URL here. Preserve any incoming hash set by links
+          // (e.g. /perfil#cart). Clearing the hash on load caused redirects to
+          // specific sections to be removed. Keep the URL intact and simply return.
+          return;
         }
 
         let tabFound = false;
@@ -484,9 +488,11 @@
         });
 
         if (tabFound) {
-            window.location.hash = tabName;
+          window.location.hash = tabName;
         } else {
-            history.pushState("", document.title, window.location.pathname + window.location.search);
+          // If no matching tab was found, do not clear the URL hash.
+          // This preserves any intentional anchor in the URL and avoids
+          // unexpectedly removing navigation state.
         }
       }
 
@@ -591,7 +597,7 @@
           <tr data-product-id="${item.id}">
             <td><img src="/static/upload/img/${item.imagem || 'default.jpg'}" alt="${item.nome}" class="item-image-large"/></td>
             <td>${item.nome}</td>
-            <td>R$ ${parseFloat(item.preco).toFixed(2)}</td>
+            <td>R$ ${parseFloat(item.preco).toFixed(2).replace('.', ',')}</td>
             <td>
               <div class="quantity-selector">
                 <input type="hidden" class="quantity-input" value="${item.quantidade}">
@@ -600,7 +606,7 @@
                 <button type="button" class="quantity-btn plus-btn" data-change="1">+</button>
               </div>
             </td>
-            <td class="item-total">R$ ${(item.preco * item.quantidade).toFixed(2)}</td>
+            <td class="item-total">R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}</td>
             <td><button type="button" class="btn-remove-item">&times;</button></td>
           </tr>
         `).join('');
@@ -622,13 +628,14 @@
               <h4>Resumo do Pedido</h4>
               <div class="summary-row">
                 <span>Subtotal</span>
-                <span class="summary-subtotal">R$ ${total.toFixed(2)}</span>
+                <span class="summary-subtotal">R$ ${total.toFixed(2).replace('.', ',')}</span>
               </div>
               <div class="summary-row total">
                 <span>Total</span>
-                <span class="summary-total">R$ ${total.toFixed(2)}</span>
+                <span class="summary-total">R$ ${total.toFixed(2).replace('.', ',')}</span>
               </div>
-              <form action="{{ url_for('checkout') }}" method="post" style="margin-top: 1rem">
+              <form action="{{ url_for('checkout') }}" method="post" class="profile-checkout-form" data-source="profile" style="margin-top: 1rem">
+                <input type="hidden" name="from_profile" value="true">
                 <button type="submit" class="btn-primary checkout-full-btn">Finalizar Compra</button>
               </form>
             </div>

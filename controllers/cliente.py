@@ -46,6 +46,60 @@ def get_base_context(request: Request, db: Session):
     return {"request": request, "user": user}
 
 
+# Rota para listar endereços do usuário autenticado (JSON)
+@router.get("/api/enderecos")
+def listar_enderecos(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload:
+        return JSONResponse({"success": False, "message": "Usuário não autenticado"}, status_code=401)
+
+    email = payload.get("sub")
+    cliente = db.query(Clientes).filter_by(email=email).first()
+    if not cliente:
+        return JSONResponse({"success": False, "message": "Cliente não encontrado"}, status_code=404)
+
+    enderecos = db.query(Endereco).filter_by(id_cliente=cliente.id_cliente).all()
+    print(f"[DEBUG] listar_enderecos: encontrado {len(enderecos)} enderecos para cliente {cliente.id_cliente}")
+    result = []
+    for e in enderecos:
+        result.append({
+            "id_endereco": e.id_endereco,
+            "logradouro": e.logradouro,
+            "numero": e.numero,
+            "complemento": e.complemento,
+            "bairro": e.bairro,
+            "cidade": e.cidade,
+            "estado": e.estado,
+            "pais": e.pais,
+            "cep": e.cep
+        })
+
+    return JSONResponse({"success": True, "enderecos": result})
+    
+
+
+@router.post("/api/enderecos/remover")
+def remover_endereco(request: Request, id_endereco: int = Form(...), db: Session = Depends(get_db)):
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload:
+        return JSONResponse({"success": False, "message": "Usuário não autenticado"}, status_code=401)
+
+    email = payload.get("sub")
+    cliente = db.query(Clientes).filter_by(email=email).first()
+    if not cliente:
+        return JSONResponse({"success": False, "message": "Cliente não encontrado"}, status_code=404)
+
+    endereco_obj = db.query(Endereco).filter_by(id_endereco=id_endereco, id_cliente=cliente.id_cliente).first()
+    if not endereco_obj:
+        return JSONResponse({"success": False, "message": "Endereço não encontrado"}, status_code=404)
+
+    db.delete(endereco_obj)
+    db.commit()
+    return JSONResponse({"success": True, "message": "Endereço removido"})
+
+
 
 # Alteração feita pelo : A rota '/produtos/busca' foi removida.
 # Sua funcionalidade foi unificada na rota '/catalogo' para simplificar o código e centralizar a lógica.
@@ -107,6 +161,26 @@ def pagina_endereco(request: Request, db: Session = Depends(get_db)):
     })
 
 
+# OBSERVAÇÃO / HISTÓRICO (importante):
+# Problema descoberto: o modal de endereço no front-end não estava
+# disparando um POST persistente para o backend — havia duas causas
+# principais durante o desenvolvimento:
+#  1) O endpoint originalmente exigia um campo `pais` que não existe
+#     no formulário do modal; isso causava validações/erros e dificultou
+#     o diagnóstico. Ajustamos a assinatura para `pais: str = Form("Brasil")`
+#     (valor padrão) para que o endpoint aceite o que o modal envia.
+#  2) Havia uma duplicação/noverride do `window.salvarEndereco` no JS
+#     (uma versão síncrona em memória sobrescrevia a versão assíncrona
+#     que faz o `fetch`). Isso fez parecer que "nada acontecia" ao
+#     clicar em salvar. Removemos a versão não-AJAX no frontend para garantir
+#     que o POST seja enviado.
+# Mudanças aplicadas aqui no backend:
+#  - `/salvar_endereco` agora retorna respostas JSON (sucesso/erro)
+#  - aceita `id_endereco` para update/create
+#  - `pais` tem valor padrão "Brasil" para corresponder ao modal
+#  - prints de debug foram adicionados temporariamente para inspecionar
+#    os dados recebidos e o número de endereços retornados (remover depois)
+# TODO: remover prints de debug quando o fluxo estiver estável.
 #FALTA TESTAR E APLICAR
 @router.post("/salvar_endereco")
 def salvar_endereco(
@@ -117,15 +191,16 @@ def salvar_endereco(
     bairro: str = Form(...),
     cidade: str = Form(...),
     uf: str = Form(...),
-    pais: str = Form(...),
+    pais: str = Form("Brasil"),
     cep: str = Form(...),
+    id_endereco: int = Form(None),
     db: Session = Depends(get_db)
 ):
     # Verifica token de autenticação
     token = request.cookies.get("token")
     payload = verificar_token(token)
     if not payload:
-        return RedirectResponse(url="/login", status_code=303)
+        return JSONResponse({"success": False, "message": "Usuário não autenticado"}, status_code=401)
 
     email = payload.get("sub")
     cliente = db.query(Clientes).filter_by(email=email).first()
@@ -135,20 +210,69 @@ def salvar_endereco(
 
     # Cria um novo endereço vinculado ao cliente
     #DADOS PEGOS DO BANCO E ATUALIZADOS - DIA 13/11/2025
-    novo_endereco = Endereco(
-        id_cliente=cliente.id_cliente,
-        logradouro=logradouro,
-        numero=numero,
-        complemento=complemento,
-        bairro=bairro,
-        cidade=cidade,
-        estado=uf,
-        pais=pais,
-        cep=cep
-    )
+    try:
+        # If id_endereco provided, update existing record
+        if id_endereco:
+            endereco_obj = db.query(Endereco).filter_by(id_endereco=id_endereco, id_cliente=cliente.id_cliente).first()
+            if not endereco_obj:
+                return JSONResponse({"success": False, "message": "Endereço não encontrado"}, status_code=404)
+            endereco_obj.logradouro = logradouro
+            endereco_obj.numero = numero
+            endereco_obj.complemento = complemento
+            endereco_obj.bairro = bairro
+            endereco_obj.cidade = cidade
+            endereco_obj.estado = uf
+            endereco_obj.pais = pais
+            endereco_obj.cep = cep
+            db.add(endereco_obj)
+            db.commit()
+            db.refresh(endereco_obj)
+            return JSONResponse({"success": True, "endereco": {
+                "id_endereco": endereco_obj.id_endereco,
+                "logradouro": endereco_obj.logradouro,
+                "numero": endereco_obj.numero,
+                "complemento": endereco_obj.complemento,
+                "bairro": endereco_obj.bairro,
+                "cidade": endereco_obj.cidade,
+                "estado": endereco_obj.estado,
+                "pais": endereco_obj.pais,
+                "cep": endereco_obj.cep
+            }})
+        # debug: print received fields
+        print(f"[DEBUG] salvar_endereco: recebido logradouro={logradouro!r}, numero={numero!r}, complemento={complemento!r}, bairro={bairro!r}, cidade={cidade!r}, uf={uf!r}, pais={pais!r}, cep={cep!r}, id_endereco={id_endereco!r}")
 
-    db.add(novo_endereco)
-    db.commit()
+        novo_endereco = Endereco(
+            id_cliente=cliente.id_cliente,
+            logradouro=logradouro,
+            numero=numero,
+            complemento=complemento,
+            bairro=bairro,
+            cidade=cidade,
+            estado=uf,
+            pais=pais,
+            cep=cep
+        )
+
+        db.add(novo_endereco)
+        db.commit()
+        db.refresh(novo_endereco)
+        return JSONResponse({"success": True, "endereco": {
+            "id_endereco": novo_endereco.id_endereco,
+            "logradouro": novo_endereco.logradouro,
+            "numero": novo_endereco.numero,
+            "complemento": novo_endereco.complemento,
+            "bairro": novo_endereco.bairro,
+            "cidade": novo_endereco.cidade,
+            "estado": novo_endereco.estado,
+            "pais": novo_endereco.pais,
+            "cep": novo_endereco.cep
+        }})
+    except Exception as e:
+        # log the exception to server console
+        import traceback
+        print('Erro ao salvar endereço:', str(e))
+        print(traceback.format_exc())
+        return JSONResponse({"success": False, "message": "Erro interno ao salvar endereço"}, status_code=500)
 ##############################################################
 
 # Rota para processar cadastro #TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025

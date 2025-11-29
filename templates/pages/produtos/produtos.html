@@ -250,7 +250,7 @@
             <div class="outfit-overlay">
               <h3>{{ produto.nome }}</h3>
               <p class="product-desc">{{ produto.descricao }}</p>
-              <p class="product-price">R$ {{ "%.2f"|format(produto.preco) }}</p>
+              <p class="product-price">R$ {{ "%.2f"|format(produto.preco)|replace('.', ',') }}</p>
               <p class="product-size">Tamanho: {{ produto.tamanho }}</p>
               <button class="add-to-cart-btn" data-product-id="{{ produto.id_produto }}"
                       {% if produto.estoque <= 0 %}disabled{% endif %}>

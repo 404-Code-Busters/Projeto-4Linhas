@@ -328,6 +328,76 @@
   font-size: 1.5rem;
   color: #999;
   cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-remove-item:hover {
+  color: #c53030;
+}
+
+/* === Cart Table Improvements === */
+
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cart-table thead {
+  background-color: #f9f9f9;
+  font-weight: 600;
+  color: #203647;
+  text-align: left;
+}
+
+.cart-table thead th {
+  padding: 1rem;
+  border-bottom: 2px solid #eee;
+  font-size: 0.95rem;
+}
+
+.cart-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.cart-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.quantity-selector {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 0.25rem;
+  width: fit-content;
+}
+
+.quantity-btn {
+  background: white;
+  border: 1px solid #ddd;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.quantity-btn:hover {
+  background-color: #f0f0f0;
+  border-color: #999;
+}
+
+.quantity-text {
+  min-width: 30px;
+  text-align: center;
+  font-weight: 600;
+  color: #333;
 }
 
 .cart-summary-box {
@@ -335,6 +405,36 @@
   border: 1px solid #eee;
   border-radius: 12px;
   padding: 1.5rem;
+}
+
+/* Improve appearance of quantity buttons and icons */
+.quantity-selector .quantity-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.quantity-selector .quantity-btn img {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.quantity-selector .quantity-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255,107,53,0.08);
+}
+
+.quantity-text {
+  min-width: 28px;
+  text-align: center;
 }
 
 .checkout-full-btn {
@@ -346,5 +446,22 @@
 @media (max-width: 960px) {
   .cart-page-content {
     grid-template-columns: 1fr;
+  }
+
+  .cart-table {
+    font-size: 0.9rem;
+  }
+
+  .cart-table img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .cart-table thead th {
+    padding: 0.75rem;
+  }
+
+  .cart-table tbody td {
+    padding: 0.75rem;
   }
 }

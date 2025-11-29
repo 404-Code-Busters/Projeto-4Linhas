@@ -23,26 +23,7 @@
   <!-- JS do Swiper -->
   <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
   <script src="{{ url_for('static', path='js/cart.js') }}"></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const cartBtn = document.getElementById('cart-button');
-      if (!cartBtn) return;
-      cartBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        // Prefer exposing openCartModal (alias to mostrarCarrinho)
-        try {
-          if (typeof openCartModal === 'function') return openCartModal();
-        } catch (err) { /* ignore */ }
-        try {
-          if (typeof mostrarCarrinho === 'function') return mostrarCarrinho();
-        } catch (err) { /* ignore */ }
-        // As a last resort, trigger click on any anchor that cart.js may have bound
-        const fake = document.querySelector('a[data-cart]');
-        if (fake) { fake.click(); }
-      });
-    });
-  </script>
+  
 
 </head>
 <body>
@@ -58,7 +39,7 @@
       <div class="hero-content">
         <h1>Equipamentos Esportivos de Alta Qualidade</h1>
         <p>Tudo que você precisa para seu treino e performance</p>
-        <a href="../produtos/produtos.html" class="hero-button">Compre Agora</a>
+        <a href="{{ url_for('catalogo') }}" class="hero-button">Compre Agora</a>
       </div>
     </div>
 
@@ -68,7 +49,7 @@
       <div class="hero-content">
         <h1>Moda Esportiva para Todos</h1>
         <p>Estilo, conforto e tecnologia em cada peça</p>
-        <a href="#" class="hero-button">Compre Agora</a>
+        <a href="{{ url_for('catalogo') }}" class="hero-button">Compre Agora</a>
       </div>
     </div>
 
@@ -78,7 +59,7 @@
       <div class="hero-content">
         <h1>Descontos Imperdíveis</h1>
         <p>Aproveite ofertas exclusivas em produtos selecionados</p>
-        <a href="#" class="hero-button">Compre Agora</a>
+        <a href="{{ url_for('catalogo') }}" class="hero-button">Compre Agora</a>
       </div>
     </div>
   </div>
@@ -203,5 +184,6 @@
   <!-- FOOTER -->
   {% include 'partials/footer.html' %}
 
+  <script src="{{ url_for('static', path='js/pages/home.js') }}"></script>
 </body>
 </html>

@@ -36,7 +36,7 @@ function getOrCreateCartModal() {
                 <div class="cart-items"></div>
                 <div class="cart-total" style="margin-top: 1rem; font-weight: 700; text-align: right;"></div>
                 <div class="cart-actions">
-                    <a href="/perfil#carrinho" class="cart-checkout">Finalizar compra</a>
+                    <a href="/perfil#cart" class="cart-checkout">Finalizar compra</a>
                 </div>
             </div>
         `;

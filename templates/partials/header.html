@@ -1,6 +1,4 @@
-<!-- Partial: site header (copiado de home) -->
-<!-- Component assets for header (CSS/JS) - included here so pages that use the partial
-  get the header behavior without importing full home.css/home.js. -->
+
 <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
 <script defer src="{{ url_for('static', path='js/components/header.js') }}"></script>
 <header>
@@ -27,10 +25,10 @@
         </div>
         <ul class="user-menu">
           <li><a href="{{ url_for('perfil') }}">Minha Conta</a></li>
-          <li><a href="{{ url_for('perfil') }}#carrinho">Meu Carrinho</a></li>
-          <li><a href="{{ url_for('perfil') }}#pedidos">Meus Pedidos</a></li>
-          <li><a href="{{ url_for('perfil') }}#dados">Meus Dados</a></li>
-          <li><a href="{{ url_for('perfil') }}#favoritos">Meus Favoritos</a></li>
+          <li><a href="{{ url_for('perfil') }}#cart">Meu Carrinho</a></li>
+          <li><a href="{{ url_for('perfil') }}#orders">Meus Pedidos</a></li>
+          <li><a href="{{ url_for('perfil') }}#account">Meus Dados</a></li>
+          <li><a href="{{ url_for('perfil') }}#favorites">Meus Favoritos</a></li>
           <li><a href="{{ url_for('logout') }}" class="logout-link">Sair</a></li>
         </ul>
       </div>
@@ -103,6 +101,12 @@
             <a href="{{ url_for('perfil') }}" class="profile-link" aria-label="Meu Perfil">
               <img src="{{ url_for('static', path='assets/icons/user.png') }}" alt="Perfil" class="nav-icons profile-icon">
             </a>
+            {# Ícone de admin se o usuário for admin #}
+            {% if user.is_admin %}
+              <a href="{{ url_for('admin') }}" class="admin-link" aria-label="Painel Admin" title="Painel de Administração">
+                <img src="{{ url_for('static', path='assets/icons/user.png') }}" alt="Admin" class="nav-icons admin-icon" style="filter: brightness(0.5) saturate(2) hue-rotate(0deg); background-color: rgba(255, 0, 0, 0.3); border-radius: 50%; padding: 4px;">
+              </a>
+            {% endif %}
           {% else %}
             <a href="{{ url_for('login') }}" class="profile-link" aria-label="Fazer Login">
               <img src="{{ url_for('static', path='assets/icons/user.png') }}" alt="Login" class="nav-icons profile-icon">

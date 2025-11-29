@@ -97,7 +97,7 @@ Equipe 4Linhas
 
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
-                <tr style="background-color: #f0f0f0;">
+                <tr style="background-color: #FF6B35;">
                     <th>Produto</th>
                     <th>Qtde</th>
                     <th>Preço</th>

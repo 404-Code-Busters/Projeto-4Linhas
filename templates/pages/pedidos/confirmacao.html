@@ -19,12 +19,36 @@
       {% if pedido %}
         <div class="confirm-success">Pedido <strong>#{{ pedido.id_pedido }}</strong> confirmado!</div>
         <p>Obrigado pela sua compra. Enviaremos atualizações por e-mail sobre o status do pedido.</p>
+
+        <!-- Items -->
+        <h4 style="margin-top:1rem;">Itens do pedido</h4>
+        {% if itens and itens|length > 0 %}
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:1rem;">
+            {% for it in itens %}
+              <div style="display:flex;align-items:center;gap:12px;border:1px solid #f2f2f2;padding:12px;border-radius:8px;">
+                {% if it.imagem %}
+                  <img src="{{ url_for('static', path='/upload/img/' + it.imagem) }}" alt="{{ it.nome }}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;">
+                {% else %}
+                  <img src="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="{{ it.nome }}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;">
+                {% endif %}
+                <div>
+                  <div style="font-weight:700;color:#203647">{{ it.nome }}</div>
+                  <div style="color:#666">Qtd: {{ it.quantidade }} — R$ {{ "%.2f"|format(it.preco_unitario)|replace('.', ',') }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
         <dl>
-          <dt>Valor total:</dt><dd>R$ {{ '%.2f'|format(pedido.valor_total) }}</dd>
+          <dt>Valor total:</dt><dd>R$ {{ '%.2f'|format(pedido.valor_total)|replace('.', ',') }}</dd>
           <dt>Endereço de entrega:</dt><dd>{{ pedido.endereco_entrega }} - CEP: {{ pedido.cep_entrega }}</dd>
           <dt>Data:</dt><dd>{{ pedido.data_pedido }}</dd>
         </dl>
-        <a href="/perfil" class="btn-primary">Ir para meu perfil</a>
+        <div style="margin-top:1rem;display:flex;gap:12px;align-items:center;">
+          <a href="/perfil#orders" class="btn-primary">Ver meus pedidos</a>
+          <a href="/" class="btn-outline">Continuar comprando</a>
+        </div>
       {% else %}
         <h2>Nenhum pedido encontrado</h2>
         <p>Se você acabou de finalizar, tente novamente em alguns segundos.</p>

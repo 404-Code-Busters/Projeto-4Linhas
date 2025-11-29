@@ -262,6 +262,31 @@ async def remover_do_carrinho(
     })
 
 #rota checkout
+@router.get("/checkout")
+async def checkout_get(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+
+    if not payload:
+        return RedirectResponse(url="/login", status_code=303)
+
+    email = payload.get("sub")
+    cliente = db.query(Clientes).filter_by(email=email).first()
+
+    carrinho = carrinhos.get(cliente.id_cliente, [])
+    total_produtos = sum(item["preco"] * item["quantidade"] for item in carrinho) if carrinho else 0
+
+    from_profile = request.query_params.get("from_profile") == "true"
+
+    return templates.TemplateResponse("pages/checkout/checkout.html", {
+        "request": request,
+        "cliente": cliente,
+        "carrinho": carrinho,
+        "total": total_produtos,
+        "erro": "",
+        "from_profile": from_profile,
+    })
+
 @router.post("/checkout")
 async def checkout(request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     token = request.cookies.get("token")
@@ -281,10 +306,13 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
             "carrinho": carrinho,
             "total": 0,
             "erro": "Carrinho vazio",
+            "from_profile": False,
         })
 
     # Tenta obter endereço enviado pelo formulário (ex: usuário preencheu no checkout)
     form = await request.form()
+    from_profile = form.get("from_profile") == "true"
+    
     form_logradouro = form.get("logradouro")
     form_numero = form.get("numero")
     form_bairro = form.get("bairro")
@@ -329,6 +357,11 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
         endereco_str = cliente.endereco
         cep_used = ""
     else:
+        # Se vem do perfil, permite que o usuário cadastre endereço no checkout (sem erro)
+        if from_profile:
+            # Redirect to GET /checkout to implement PRG and preserve from_profile flag
+            return RedirectResponse(url="/checkout?from_profile=true", status_code=303)
+        
         # Nenhum endereço disponível: retorna para a página de checkout com erro legível
         total_produtos = sum(item["preco"] * item["quantidade"] for item in carrinho)
         return templates.TemplateResponse("pages/checkout/checkout.html", {
@@ -336,7 +369,8 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
             "cliente": cliente,
             "carrinho": carrinho,
             "total": total_produtos,
-            "erro": "Nenhum endereço cadastrado. Cadastre um endereço ou preencha os dados no checkout antes de finalizar."
+            "erro": "Nenhum endereço cadastrado. Cadastre um endereço ou preencha os dados no checkout antes de finalizar.",
+            "from_profile": False,
         })
 
     total_produtos = sum(item["preco"] * item["quantidade"] for item in carrinho)
@@ -349,13 +383,19 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
     # Verifica se veio o campo 'payment' (PIX, cartão, etc)
     payment_method = form.get('payment')
     if not payment_method:
+        # Se vem do perfil, permite que o usuário escolha pagamento no checkout (sem erro)
+        if from_profile:
+            # Redirect to GET /checkout to implement PRG and preserve from_profile flag
+            return RedirectResponse(url="/checkout?from_profile=true", status_code=303)
+        
         # Se não veio, volta para o checkout na etapa correta
         return templates.TemplateResponse("pages/checkout/checkout.html", {
             "request": request,
             "cliente": cliente,
             "carrinho": carrinho,
             "total": total_produtos,
-            "erro": "Finalize o pagamento para confirmar o pedido."
+            "erro": "Finalize o pagamento para confirmar o pedido.",
+            "from_profile": False,
         })
 
     # Criar o pedido

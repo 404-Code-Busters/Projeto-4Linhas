@@ -150,6 +150,8 @@
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
+    // remove qualquer indicador de edição
+    if (modal) modal.removeAttribute('data-edit-id');
   };
 
   window.fecharModalEndereco = function () {
@@ -167,7 +169,7 @@
   }
 
   // salvar e renderizar
-  window.salvarEndereco = function (ev) {
+  window.salvarEndereco = async function (ev) {
     if (ev && ev.preventDefault) ev.preventDefault();
 
     const cep = document.getElementById("modal-cep")?.value?.trim() || "";
@@ -176,15 +178,60 @@
     const cidade = cidadeInput?.value?.trim() || "";
     const uf = ufInput?.value?.trim() || "";
     const numero = document.getElementById("modal-numero")?.value?.trim() || "";
+    const complemento = document.getElementById("modal-complemento") ? document.getElementById("modal-complemento").value.trim() : "";
 
     if (!cep || !logradouro || !bairro || !cidade || !uf || !numero) {
       alert("Preencha todos os campos do novo endereço.");
       return false;
     }
 
-    enderecos.push({ cep, logradouro, bairro, cidade, uf, numero });
-    atualizarListaEnderecos();
-    window.fecharModalEndereco();
+    // se está editando, pega o id
+    const editId = modal?.getAttribute('data-edit-id');
+
+    const formData = new FormData();
+    formData.append('cep', cep);
+    formData.append('logradouro', logradouro);
+    formData.append('numero', numero);
+    formData.append('complemento', complemento || '');
+    formData.append('bairro', bairro);
+    formData.append('cidade', cidade);
+    formData.append('uf', uf);
+    formData.append('pais', 'Brasil');
+    if (editId) formData.append('id_endereco', editId);
+
+    try {
+      const resp = await fetch('/salvar_endereco', {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      });
+
+      if (!resp.ok) throw new Error('Erro ao salvar endereço');
+      const data = await resp.json();
+
+      if (data && data.success && data.endereco) {
+        const saved = data.endereco;
+        // atualizar array local
+        if (editId) {
+          const idx = enderecos.findIndex(x => String(x.id_endereco) === String(editId));
+          if (idx >= 0) enderecos[idx] = saved;
+        } else {
+          enderecos.push(saved);
+        }
+        atualizarListaEnderecos();
+        window.fecharModalEndereco();
+        // feedback visual para o usuário
+        alert('Endereço salvo com sucesso.');
+        return false;
+      } else {
+        console.error('Resposta inesperada ao salvar endereço', data);
+        alert('Não foi possível salvar o endereço. Veja o console para detalhes.');
+      }
+    } catch (err) {
+      console.error('Erro ao salvar endereço:', err);
+      alert('Erro ao salvar endereço. Veja o console.');
+    }
+
     return false;
   };
 
@@ -204,12 +251,12 @@
         <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
           <div style="flex-grow:1">
             <strong>${escapeHtml(e.logradouro)}, ${escapeHtml(e.numero)}</strong><br>
-            ${escapeHtml(e.bairro)} — ${escapeHtml(e.cidade)} / ${escapeHtml(e.uf)}<br>
+            ${escapeHtml(e.bairro)} — ${escapeHtml(e.cidade)} / ${escapeHtml(e.estado || e.uf)}<br>
             <small style="color:#999">CEP: ${escapeHtml(e.cep)}</small>
           </div>
           <div style="display:flex;gap:8px;flex-shrink:0">
-            <button data-idx="${i}" class="addr-edit-btn" type="button">Editar</button>
-            <button data-idx="${i}" class="addr-remove-btn" type="button">Excluir</button>
+            <button data-id="${e.id_endereco || i}" class="addr-edit-btn" type="button">Editar</button>
+            <button data-id="${e.id_endereco || i}" class="addr-remove-btn" type="button">Excluir</button>
           </div>
         </div>
       `;
@@ -218,11 +265,30 @@
 
     // attach events to edit/remove
     listaEl.querySelectorAll(".addr-remove-btn").forEach(btn => {
-      btn.addEventListener("click", (ev) => {
-        const idx = Number(ev.currentTarget.getAttribute("data-idx"));
-        if (!Number.isNaN(idx)) {
-          enderecos.splice(idx, 1);
-          atualizarListaEnderecos();
+      btn.addEventListener("click", async (ev) => {
+        const id = ev.currentTarget.getAttribute("data-id");
+        if (!id) return;
+        if (!confirm('Remover este endereço?')) return;
+
+        const form = new FormData();
+        form.append('id_endereco', id);
+
+        try {
+          const resp = await fetch('/api/enderecos/remover', { method: 'POST', body: form, credentials: 'same-origin' });
+          if (!resp.ok) throw new Error('Erro ao remover');
+          const data = await resp.json();
+          if (data && data.success) {
+            // remover localmente
+            const idx = enderecos.findIndex(x => String(x.id_endereco) === String(id));
+            if (idx >= 0) enderecos.splice(idx, 1);
+            atualizarListaEnderecos();
+            alert('Endereço removido com sucesso.');
+          } else {
+            alert('Erro ao remover endereço');
+          }
+        } catch (err) {
+          console.error('Erro ao remover endereço:', err);
+          alert('Erro ao remover endereço. Veja o console.');
         }
       });
     });
@@ -230,66 +296,38 @@
     // editar abre modal populando campos
     listaEl.querySelectorAll(".addr-edit-btn").forEach(btn => {
       btn.addEventListener("click", (ev) => {
-        const idx = Number(ev.currentTarget.getAttribute("data-idx"));
-        if (!Number.isNaN(idx)) {
-          const data = enderecos[idx];
-          // preenche modal
-          if (cepInput) cepInput.value = data.cep;
-          if (logradouroInput) logradouroInput.value = data.logradouro;
-          if (bairroInput) bairroInput.value = data.bairro;
-          if (cidadeInput) cidadeInput.value = data.cidade;
-          if (ufInput) ufInput.value = data.uf;
-          document.getElementById("modal-numero").value = data.numero;
+        const id = ev.currentTarget.getAttribute("data-id");
+        if (!id) return;
+        const data = enderecos.find(x => String(x.id_endereco) === String(id));
+        if (!data) return;
+        // preenche modal
+        if (cepInput) cepInput.value = data.cep;
+        if (logradouroInput) logradouroInput.value = data.logradouro;
+        if (bairroInput) bairroInput.value = data.bairro;
+        if (cidadeInput) cidadeInput.value = data.cidade;
+        if (ufInput) ufInput.value = data.estado || data.uf || '';
+        document.getElementById("modal-numero").value = data.numero;
+        // optional complemento field
+        if (document.getElementById('modal-complemento')) document.getElementById('modal-complemento').value = data.complemento || '';
 
-          // guarda índice temporário para edição
-          modal.setAttribute("data-edit-idx", idx);
-          modal.style.display = "flex";
-          document.body.style.overflow = "hidden";
+        // guarda id para edição
+        modal.setAttribute("data-edit-id", data.id_endereco);
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
 
-          // Inicializa mapa se não estiver
-          if (map === null && mapContainer) {
-            setTimeout(() => {
-              initMap();
-              map.invalidateSize();
-            }, 100);
-          }
+        // Inicializa mapa se não estiver
+        if (map === null && mapContainer) {
+          setTimeout(() => {
+            initMap();
+            map.invalidateSize();
+          }, 100);
         }
       });
     });
   }
 
   // Ao submeter (salvar) quando estamos editando, substituir em vez de push
-  const originalSalvar = window.salvarEndereco;
-  window.salvarEndereco = function (ev) {
-    if (ev && ev.preventDefault) ev.preventDefault();
-
-    const editIdxAttr = modal?.getAttribute("data-edit-idx");
-    const isEdit = editIdxAttr !== null;
-    const idx = isEdit ? Number(editIdxAttr) : -1;
-
-    const cep = document.getElementById("modal-cep")?.value?.trim() || "";
-    const logradouro = logradouroInput?.value?.trim() || "";
-    const bairro = bairroInput?.value?.trim() || "";
-    const cidade = cidadeInput?.value?.trim() || "";
-    const uf = ufInput?.value?.trim() || "";
-    const numero = document.getElementById("modal-numero")?.value?.trim() || "";
-
-    if (!cep || !logradouro || !bairro || !cidade || !uf || !numero) {
-      alert("Preencha todos os campos do novo endereço.");
-      return false;
-    }
-
-    if (isEdit && !Number.isNaN(idx) && enderecos[idx]) {
-      enderecos[idx] = { cep, logradouro, bairro, cidade, uf, numero };
-      modal.removeAttribute("data-edit-idx");
-    } else {
-      enderecos.push({ cep, logradouro, bairro, cidade, uf, numero });
-    }
-
-    atualizarListaEnderecos();
-    window.fecharModalEndereco();
-    return false;
-  };
+  
 
   // esc fecha modal
   document.addEventListener("keydown", (e) => {
@@ -308,6 +346,19 @@
 
   // inicializa (mensagem default)
   document.addEventListener("DOMContentLoaded", () => {
-    atualizarListaEnderecos();
+    // carregue endereços salvos do servidor
+    (async function loadEnderecos() {
+      try {
+        const resp = await fetch('/api/enderecos', { credentials: 'same-origin' });
+        if (!resp.ok) throw new Error('Erro ao buscar endereços');
+        const data = await resp.json();
+        if (data && data.success && Array.isArray(data.enderecos)) {
+          enderecos = data.enderecos;
+        }
+      } catch (err) {
+        console.warn('Não foi possível carregar endereços do servidor:', err);
+      }
+      atualizarListaEnderecos();
+    })();
   });
 })();

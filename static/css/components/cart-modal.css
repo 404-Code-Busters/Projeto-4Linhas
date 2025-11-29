@@ -18,3 +18,31 @@
 .cart-item-remove { background: none; border: none; color: #e05b2d; cursor: pointer; }
 .cart-actions { margin-top: 1rem; display:flex; justify-content: flex-end; }
 .cart-checkout { background: #FF6B35; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+
+/* Quantity control styling inside cart modal */
+.cart-item-qty .qty-decr,
+.cart-item-qty .qty-incr {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 6px;
+	border: 1px solid #e6e6e6;
+	background: #fff;
+	padding: 0;
+	cursor: pointer;
+}
+
+.cart-item-qty .qty-decr img,
+.cart-item-qty .qty-incr img {
+	display: block;
+	width: 14px;
+	height: 14px;
+}
+
+.cart-item-qty .qty-decr:focus,
+.cart-item-qty .qty-incr:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}

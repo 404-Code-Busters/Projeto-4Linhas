@@ -157,6 +157,18 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Update cart count
+  // Cart button behavior (moved from inline script in template)
+  const cartBtn = document.getElementById('cart-button');
+  if (cartBtn) {
+    cartBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      try { if (typeof openCartModal === 'function') return openCartModal(); } catch (err) { /* ignore */ }
+      try { if (typeof mostrarCarrinho === 'function') return mostrarCarrinho(); } catch (err) { /* ignore */ }
+      const fake = document.querySelector('a[data-cart]');
+      if (fake) { fake.click(); }
+    });
+  }
+
   updateCartCount();
 
   // Scroll to top button

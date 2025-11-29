@@ -52,7 +52,23 @@ def pedido_confirmacao(request: Request, id: int = None, db: Session = Depends(g
         return templates.TemplateResponse("pages/pedidos/confirmacao.html", {"request": request, "pedido": None})
 
     pedido = db.query(Pedidos).filter(Pedidos.id_pedido == id).first()
-    return templates.TemplateResponse("pages/pedidos/confirmacao.html", {"request": request, "pedido": pedido})
+    if not pedido:
+        return templates.TemplateResponse("pages/pedidos/confirmacao.html", {"request": request, "pedido": None})
+
+    # Fetch items for the order and include product image paths when available
+    itens_raw = db.query(ItemPedido).filter(ItemPedido.pedido_id == pedido.id_pedido).all()
+    itens = []
+    for it in itens_raw:
+        produto = db.query(Produtos).filter(Produtos.id_produto == it.produto_id).first()
+        itens.append({
+            "nome": produto.nome if produto else getattr(it, 'produto_nome', 'Produto'),
+            "quantidade": it.quantidade,
+            "preco_unitario": float(it.preco_unitario or 0),
+            "imagem": produto.imagem_caminho if produto and getattr(produto, 'imagem_caminho', None) else None,
+            "produto_id": it.produto_id
+        })
+
+    return templates.TemplateResponse("pages/pedidos/confirmacao.html", {"request": request, "pedido": pedido, "itens": itens})
 
 
 # rota para acompanhe

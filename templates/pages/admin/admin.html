@@ -155,7 +155,7 @@
               <tr>
                 <td>{{ p.id_produto }}</td>
                 <td>{{ p.nome }}</td>
-                <td>R$ {{ "%.2f"|format(p.preco) }}</td>
+                <td>R$ {{ "%.2f"|format(p.preco)|replace('.', ',') }}</td>
                 <td>{{ p.estoque if p.estoque is not none else '-' }}</td>
                 <td>
                   <form action="/admin/produto/deletar/{{ p.id_produto }}" method="POST" style="display:inline;" onsubmit="return confirmarExclusao('{{ p.id_produto }}')">
