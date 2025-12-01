@@ -1,4 +1,5 @@
 @import url('../colors.css');
+@import url('../components/auth-modal.css'); /* Alteração Gemini: Garante que o modal de sessão funcione na home */
 
 /* ===== BASE GERAL ===== */
 * {
@@ -356,6 +357,7 @@ img {
   .outfit-card {
     width: 100%;
     max-width: 200px;
+    height: auto; /* Let content determine height on mobile */
   }
   .outfit-card img {
     height: 250px;
@@ -425,7 +427,7 @@ img {
 
 /* Pergunta */
 .faq-item summary {
-  padding: 1.5rem;
+  padding: 1.2rem 1.5rem; /* Reverted padding change */
   font-weight: 600;
   font-size: 1.1rem;
   color: #0D1B2A;
@@ -449,7 +451,7 @@ img {
   border-bottom: 2px solid #0D1B2A;
   transform: translateY(-50%) rotate(45deg);
   position: absolute;
-  right: 1.5rem;
+  right: 1.5rem; /* Kept horizontal padding for the icon */
   top: 50%;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
@@ -471,20 +473,25 @@ img {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  padding: 0 1.5rem 0;
+  padding: 0 1.5rem; /* Adjusted padding for transition */
   color: #333;
   line-height: 1.6;
   margin: 0;
+  transform: translateY(-10px); /* Add a slight vertical move */
   transition:
-    max-height 0.35s ease,
-    opacity 0.35s ease,
-    padding 0.35s ease;
+    max-height 0.4s ease-in-out,
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out,
+    padding-top 0.4s ease-in-out,
+    padding-bottom 0.4s ease-in-out;
 }
 
 .faq-item[open] p {
-  max-height: 300px;
+  max-height: 400px; /* Increased max-height for longer answers */
   opacity: 1;
-  padding: 0 1.5rem 1.5rem;
+  padding-top: 1rem; /* Add space between summary and answer */
+  padding-bottom: 1.5rem;
+  transform: translateY(0);
 }
 
 /* ===== RESPONSIVIDADE ===== */
@@ -500,12 +507,18 @@ img {
     height: 50vh;
   }
 
+  .outfit-inspiration {
+    padding: 2rem 1rem 1rem; /* Reduzido padding inferior */
+  }
+  .competitividade {
+    padding: 1rem 1rem 2rem; /* Reduzido padding superior */
+  }
   .hero-content h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .hero-content p {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .about {
@@ -516,6 +529,8 @@ img {
   .about-text,
   .about-image {
     max-width: 100%;
+    flex-basis: 100%; /* Garante que cada item ocupe a largura total */
+    text-align: center; /* Centraliza o texto e o botão */
   }
 
   .nav-bottom {
@@ -547,11 +562,11 @@ img {
   }
 
   .hero-content h1 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   .hero-content p {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   .hero-button {
@@ -578,6 +593,3 @@ img {
     height: 50%;
   }
 }
-
-
-

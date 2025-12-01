@@ -57,6 +57,10 @@ def criar_token(dados: dict):
     return token_jwt
 
 def verificar_token(token: str):
+    # Se não houver token, retorna None para permitir tratamento pelo chamador # coloca pois retonava o erro a o user 
+    if not token:
+        return None
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload

@@ -48,13 +48,14 @@
     </section>
 
     <!-- Seção de Produtos -->
-    <section id="produtos" class="card">
-      <h2>📦 Gerenciar Produtos</h2>
+    <section id="produtos-cadastro" class="card"> {# Renomeado para clareza #}
+      <h2 class="card-header-toggle">📦 Gerenciar Produtos</h2>
       
-      <!-- Formulário para Novo Produto -->
-      <section id="cadastrar-produto" class="admin-section">
-        <h2>Cadastrar Novo Produto</h2>
-        <form action="{{ url_for('criar_produto') }}" method="post" enctype="multipart/form-data" class="product-form">
+      <div class="card-content"> {# Alteração Gemini: Adicionado wrapper de conteúdo #}
+        <!-- Formulário para Novo Produto -->
+        <section id="cadastrar-produto" class="admin-section">
+          <h2>Cadastrar Novo Produto</h2>
+          <form action="{{ url_for('criar_produto') }}" method="post" enctype="multipart/form-data" class="product-form">
           
           <div class="form-grid">
             <!-- Coluna 1: Informações Básicas -->
@@ -95,37 +96,33 @@
             <label>Imagens do Produto</label>
             <div class="image-upload-container">
               <!-- Imagem Principal -->
-              <div class="image-upload-slot">
+              <label for="imagem" class="image-upload-slot">
                 <div class="image-preview" id="preview-imagem">
                   <span class="preview-text">Principal</span>
                 </div>
-                <label for="imagem" class="btn-upload">Adicionar</label>
                 <input type="file" id="imagem" name="imagem" accept="static/upload/img/*" data-preview-target="preview-imagem">
-              </div>
+              </label>
               <!-- Imagem 1 -->
-              <div class="image-upload-slot">
+              <label for="imagem1" class="image-upload-slot">
                 <div class="image-preview" id="preview-imagem1">
                   <span class="preview-text">Img. 2</span>
                 </div>
-                <label for="imagem1" class="btn-upload">Adicionar</label>
                 <input type="file" id="imagem1" name="imagem1" accept="static/upload/img/*" data-preview-target="preview-imagem1">
-              </div>
+              </label>
               <!-- Imagem 2 -->
-              <div class="image-upload-slot">
+              <label for="imagem2" class="image-upload-slot">
                 <div class="image-preview" id="preview-imagem2">
                   <span class="preview-text">Img. 3</span>
                 </div>
-                <label for="imagem2" class="btn-upload">Adicionar</label>
                 <input type="file" id="imagem2" name="imagem2" accept="static/upload/img/*" data-preview-target="preview-imagem2">
-              </div>
+              </label>
               <!-- Imagem 3 -->
-              <div class="image-upload-slot">
+              <label for="imagem3" class="image-upload-slot">
                 <div class="image-preview" id="preview-imagem3">
                   <span class="preview-text">Img. 4</span>
                 </div>
-                <label for="imagem3" class="btn-upload">Adicionar</label>
                 <input type="file" id="imagem3" name="imagem3" accept="static/upload/img/*" data-preview-target="preview-imagem3">
-              </div>
+              </label>
             </div>
           </div>
       
@@ -133,320 +130,101 @@
             <button type="submit" class="btn-primary">Salvar Produto</button>
           </div>
         </form>
-      </section>
+        </section> {# Fim da seção de cadastro #}
+      </div> {# Fim de .card-content #}
+    </section> {# Fim do card de cadastro de produtos #}
 
-      <!-- Tabela de Produtos -->
-      <div class="table-section">
-        <h3>Lista de Produtos</h3>
-        <input type="text" class="busca" id="buscaProdutos" placeholder="Buscar produtos...">
-        <table class="tabela">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Preço</th>
-              <th>Estoque</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if produtos %}
-              {% for p in produtos %}
-              <tr>
-                <td>{{ p.id_produto }}</td>
-                <td>{{ p.nome }}</td>
-                <td>R$ {{ "%.2f"|format(p.preco)|replace('.', ',') }}</td>
-                <td>{{ p.estoque if p.estoque is not none else '-' }}</td>
-                <td>
-                  <form action="/admin/produto/deletar/{{ p.id_produto }}" method="POST" style="display:inline;" onsubmit="return confirmarExclusao('{{ p.id_produto }}')">
-                    <button type="submit" class="btn small danger">Excluir</button>
-                  </form>
-                  <button type="button" class="btn small editar-produto-btn"
-                    data-id="{{ p.id_produto }}"
-                    data-nome="{{ p.nome|e }}"
-                    data-descricao="{{ p.descricao|e }}"
-                    data-preco="{{ p.preco }}"
-                    data-tamanho="{{ p.tamanho }}"
-                    data-categoria="{{ p.categoria if p.categoria else '' }}" {# Adicionado data-categoria #}
-                    data-cor="{{ p.cor }}"
-                    data-estoque="{{ p.estoque if p.estoque is not none else '' }}"
-                    data-imagem="{{ p.imagem_caminho if p.imagem_caminho else '' }}"
-                    data-imagem1="{{ p.imagem_caminho1 if p.imagem_caminho1 else '' }}"
-                    data-imagem2="{{ p.imagem_caminho2 if p.imagem_caminho2 else '' }}"
-                    data-imagem3="{{ p.imagem_caminho3 if p.imagem_caminho3 else '' }}"
-                  >Editar</button>
-                </td>
-              </tr>
-              {% endfor %}
-            {% else %}
-              <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
-            {% endif %}
-          </tbody>
-        </table>
-    </section>
+    <!-- Inicia um novo card para a "Lista de Produtos" -->
+    <section id="lista-produtos-secao" class="card">
+      <h2 class="card-header-toggle">Lista de Produtos</h2>
+      <div class="card-content"> {# Alteração Gemini: Adicionado wrapper de conteúdo #}
+        <div class="table-section"> <!-- Mantém a div para consistência -->
+          <input type="text" class="busca" id="buscaProdutos" placeholder="Buscar produtos...">
+          <div class="table-responsive">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Preço</th>
+                  <th>Estoque</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if produtos %}
+                  {% for p in produtos %}
+                  <tr>
+                    <td data-label="ID">{{ p.id_produto }}</td>
+                    <td data-label="Nome">{{ p.nome }}</td>
+                    <td data-label="Preço">R$ {{ "%.2f"|format(p.preco)|replace('.', ',') }}</td>
+                    <td data-label="Estoque">{{ p.estoque if p.estoque is not none else '-' }}</td>
+                    <td data-label="Ações">
+                      <form action="/admin/produto/deletar/{{ p.id_produto }}" method="POST" style="display:inline;" onsubmit="return confirmarExclusao('{{ p.id_produto }}')">
+                        <button type="submit" class="btn small danger">Excluir</button>
+                      </form>
+                      <button type="button" class="btn small editar-produto-btn"
+                        data-id="{{ p.id_produto }}"
+                        data-nome="{{ p.nome|e }}"
+                        data-descricao="{{ p.descricao|e }}"
+                        data-preco="{{ p.preco }}"
+                        data-tamanho="{{ p.tamanho }}"
+                        data-categoria="{{ p.categoria if p.categoria else '' }}" {# Adicionado data-categoria #}
+                        data-cor="{{ p.cor }}"
+                        data-estoque="{{ p.estoque if p.estoque is not none else '' }}"
+                        data-imagem="{{ p.imagem_caminho if p.imagem_caminho else '' }}"
+                        data-imagem1="{{ p.imagem_caminho1 if p.imagem_caminho1 else '' }}"
+                        data-imagem2="{{ p.imagem_caminho2 if p.imagem_caminho2 else '' }}"
+                        data-imagem3="{{ p.imagem_caminho3 if p.imagem_caminho3 else '' }}"
+                      >Editar</button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div> {# Fim de .table-section #}
+      </div> {# Fim de .card-content #}
+    </section> {# Fim do card de lista de produtos #}
 
     <!-- Seção de Pedidos -->
     <section id="pedidos" class="card">
-      <h2>📋 Gerenciar Pedidos</h2>
-      {% if pedidos %}
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th>ID Pedido</th>
-            <th>Cliente</th>
-            <th>Total</th>
-            <th>Data</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-
-      </table>
-      {% else %}
-      <p>Nenhum pedido encontrado.</p>
-      {% endif %}
+      <h2 class="card-header-toggle">📋 Gerenciar Pedidos</h2>
+      <div class="card-content"> {# Conteúdo colapsável #}
+        {% if pedidos %}
+        <div class="table-responsive">
+          <table class="tabela">
+            <thead>
+              <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        {% else %}
+        <p>Nenhum pedido encontrado.</p>
+        {% endif %}
+      </div> {# Fim de .card-content #}
     </section>
     <!-- Seção de Gráficos -->
     <section id="graficos" class="card graficos">
-      <h2>📊 Resumo de Vendas</h2>
-      <img src="#" alt="Gráfico ilustrativo">
+      <h2 class="card-header-toggle">📊 Resumo de Vendas</h2>
+      <div class="card-content"> {# Conteúdo colapsável #}
+        <img src="#" alt="Gráfico ilustrativo">
+      </div>
     </section>
 
   </main>
 
-  <!-- Alteração feita pelo Gemini: Estilos do modal foram aprimorados para uma melhor experiência visual. -->
-  <style>
-    /* Alteração feita pelo Gemini: Estilos para alinhar os botões de upload de imagem lado a lado. */
-    .file-buttons-row {
-      display: flex;
-      flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas pequenas */
-      gap: 1rem; /* Espaçamento entre os grupos de botões */
-      align-items: flex-start;
-    }
-    .file-button-group {
-      flex: 1; /* Faz com que cada grupo tente ocupar o mesmo espaço */
-      min-width: 150px; /* Largura mínima antes de quebrar a linha */
-      display: flex;
-      flex-direction: row; /* Alteração feita pelo Gemini: Alinha o botão e a pré-visualização lado a lado */
-      align-items: center; /* Centraliza verticalmente o botão e a pré-visualização */
-      gap: 0.5rem; /* Espaçamento entre o botão e a pré-visualização */
-      padding: 0.5rem; /* Adiciona um pouco de padding para melhor visual */
-      border: 1px solid #eee; /* Borda para cada grupo */
-      border-radius: 6px;
-      background-color: #fcfcfc;
-    }
-    .file-button-group .image-btn {
-      padding: 8px 12px; /* Padding menor para o botão */
-      font-size: 0.9rem; /* Fonte menor */
-      white-space: nowrap; /* Evita que o texto do botão quebre */
-      flex-shrink: 0; /* Impede que o botão encolha */
-    }
-    .file-button-group .file-preview {
-      width: 60px; /* Tamanho fixo para a pré-visualização */
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px dashed #ccc;
-      border-radius: 4px;
-      overflow: hidden;
-      flex-shrink: 0; /* Impede que a pré-visualização encolha */
-      background-color: #fff;
-    }
-    .file-button-group .file-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover; /* Garante que a imagem preencha o espaço */
-    }
-    .file-button-group .file-preview .file-name {
-      font-size: 0.75rem; /* Fonte menor para o texto "Nenhuma" */
-      color: #888;
-      text-align: center;
-    }
 
-    /* Estilos do Modal de Edição */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 2rem;
-    }
-    .modal {
-      background: #fff;
-      padding: 2rem; /* Ajustado o espaçamento interno para menor */
-      border-radius: 12px;
-      width: 100%;
-      max-width: 900px; /* Ajustado o tamanho máximo para menor */
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .modal header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem; /* Ajustado o espaçamento */
-      border-bottom: 1px solid #e5e5e5;
-      padding-bottom: 1rem;
-    }
-    .modal header h2 {
-      margin: 0;
-      font-size: 1.5rem; /* Título ajustado para menor */
-      color: #333;
-    }
-    .modal header button#modalClose {
-      background: #f0f0f0;
-      border: none;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: #555;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.2s, color 0.2s;
-    }
-    .modal header button#modalClose:hover {
-      background-color: #e0e0e0;
-      color: #111;
-    }
-    .modal .fields {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem; /* Aumentado o espaçamento entre os campos */
-    }
-    .modal .fields .full {
-      grid-column: 1 / -1;
-    }
-    .modal .fields label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem; /* Espaçamento entre label e input */
-      color: #444;
-    }
-    .modal .fields input[type="text"],
-    .modal .fields input[type="number"],
-    .modal .fields textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .modal .fields input:focus,
-    .modal .fields textarea:focus {
-      outline: none;
-      border-color: var(--cor-laranja, #FF6B35);
-      box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
-    }
-    .modal .image-previews {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      background-color: #f9f9f9;
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid #eee;
-    }
-    .modal .image-previews .preview-item {
-      position: relative;
-    }
-    .modal .image-previews img,
-    .modal .image-previews .no-image {
-      width: 140px; /* Imagens de preview maiores */
-      height: 140px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    .modal .image-previews .no-image {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f0f0f0;
-      color: #999;
-      border-style: dashed;
-    }
-    .modal .image-previews .remove-btn {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: white;
-      border-radius: 50%;
-      border: 1px solid #ccc;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-      transition: transform 0.2s, background-color 0.2s;
-    }
-    .modal .image-previews .remove-btn:hover {
-      transform: scale(1.1);
-      background-color: #fdecec;
-      color: #c53030;
-    }
-    .modal .file-inputs {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-    .modal .actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e5e5e5;
-    }
-    .modal .actions .btn {
-      padding: 12px 24px;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .modal .actions .btn-primary {
-      background-color: var(--cor-laranja, #FF6B35);
-      color: white;
-    }
-    .modal .actions .btn-primary:hover {
-      background-color: #e05b2d;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
-    }
-    .modal .actions .btn-secondary {
-      background-color: #e2e8f0;
-      color: #4a5568;
-    }
-    .modal .actions .btn-secondary:hover {
-      background-color: #cbd5e0;
-    }
-    @media (max-width: 768px) {
-      .modal .fields, .modal .file-inputs {
-        grid-template-columns: 1fr;
-      }
-      .modal {
-        padding: 1.5rem;
-      }
-      .modal .image-previews {
-        flex-wrap: wrap;
-      }
-    }
-  </style>
 
   <!-- Edit product modal (hidden) -->
   <div id="modalOverlay" class="modal-overlay">
@@ -462,60 +240,64 @@
         <input type="hidden" name="remove_imagem2" id="remove_imagem2" value="0">
         <input type="hidden" name="remove_imagem3" id="remove_imagem3" value="0">
         <input type="hidden" name="id_produto" id="modal_id"> {# Campo oculto para o ID do produto #}
-        <div class="fields">
-          <div>
-            <label>Nome</label>
-            <input type="text" name="nome" id="modal_nome" required>
-          </div>
-          <div>
-            <label>Preço</label>
-            <input type="number" step="0.01" name="preco" id="modal_preco" required>
-          </div>
-          <div>
-            <label>Tamanho</label>
-            <input type="text" name="tamanho" id="modal_tamanho" required>
-          </div>
-          <div>
-            <label>Estoque</label>
-            <input type="number" name="estoque" id="modal_estoque" required>
-          </div>
-          <div class="full">
-            <label>Descrição</label>
-            <textarea name="descricao" id="modal_descricao" rows="3"></textarea>
-          </div>
-          <div>
-            <label>Categoria</label> {# Campo de categoria adicionado #}
-            <input type="text" name="categoria" id="modal_categoria" placeholder="Ex: Camisa, Calça">
-          </div>
-          <div> {# Campo de cor adicionado #}
-            <label>Cor</label>
-            <input type="text" name="cor" id="modal_cor">
-          </div>
-          <div class="full">
-            <label>Imagens (substituir até 4)</label>
-            <div class="image-previews" id="modal_image_previews">
-              <!-- previews inserted by JS -->
+
+        <!-- Alteração Gemini: Estrutura de acordeão para o formulário do modal -->
+        <div class="modal-accordion">
+          <!-- Seção 1: Informações Básicas -->
+          <div class="modal-section">
+            <h3 class="modal-section-toggle">Informações Básicas</h3>
+            <div class="modal-section-content">
+              <div class="fields">
+                <div><label>Nome</label><input type="text" name="nome" id="modal_nome" required></div>
+                <div><label>Preço</label><input type="number" step="0.01" name="preco" id="modal_preco" required></div>
+                <div><label>Tamanho</label><input type="text" name="tamanho" id="modal_tamanho" required></div>
+                <div><label>Estoque</label><input type="number" name="estoque" id="modal_estoque" required></div>
+                <div><label>Categoria</label><input type="text" name="categoria" id="modal_categoria" placeholder="Ex: Camisa, Calça"></div>
+                <div><label>Cor</label><input type="text" name="cor" id="modal_cor"></div>
+              </div>
             </div>
           </div>
-          <div class="full file-inputs">
-            <div>
-              <label>Imagem 1</label>
-              <input type="file" name="imagem" id="modal_imagem" accept="image/*">
-            </div>
-            <div>
-              <label>Imagem 2</label>
-              <input type="file" name="imagem1" id="modal_imagem1" accept="image/*">
-            </div>
-            <div>
-              <label>Imagem 3</label>
-              <input type="file" name="imagem2" id="modal_imagem2" accept="image/*">
-            </div>
-            <div>
-              <label>Imagem 4</label>
-              <input type="file" name="imagem3" id="modal_imagem3" accept="image/*">
+
+          <!-- Seção 2: Descrição -->
+          <div class="modal-section">
+            <h3 class="modal-section-toggle">Descrição</h3>
+            <div class="modal-section-content">
+              <div class="fields">
+                <div class="full"><textarea name="descricao" id="modal_descricao" rows="4"></textarea></div>
+              </div>
             </div>
           </div>
-        </div>
+
+          <!-- Seção 3: Imagens -->
+          <div class="modal-section">
+            <h3 class="modal-section-toggle">Imagens do Produto</h3>
+            <div class="modal-section-content">
+              <div class="full">
+                <label>Imagens Atuais (clique no 'X' para remover)</label>
+                <div class="image-previews" id="modal_image_previews">
+                  <!-- previews inserted by JS -->
+                </div>
+              </div>
+              <!-- Alteração Gemini: Substituído o input padrão por botões estilizados -->
+              <div class="full">
+                <h4 class="upload-title">Substituir Imagens (opcional)</h4>
+              </div>
+              <div class="full file-inputs">
+                <div class="upload-buttons-grid">
+                  <label for="modal_imagem" class="btn-upload-modal">Principal</label>
+                  <label for="modal_imagem1" class="btn-upload-modal">Imagem 2</label>
+                  <label for="modal_imagem2" class="btn-upload-modal">Imagem 3</label>
+                  <label for="modal_imagem3" class="btn-upload-modal">Imagem 4</label>
+                </div>
+                <input type="file" name="imagem" id="modal_imagem" accept="image/*" class="hidden-file-input">
+                <input type="file" name="imagem1" id="modal_imagem1" accept="image/*" class="hidden-file-input">
+                <input type="file" name="imagem2" id="modal_imagem2" accept="image/*" class="hidden-file-input">
+                <input type="file" name="imagem3" id="modal_imagem3" accept="image/*" class="hidden-file-input">
+              </div>
+            </div>
+          </div>
+        </div> <!-- Fim de .modal-accordion -->
+
         <div class="actions">
           <button type="button" class="btn btn-secondary" id="modalCancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Salvar Alterações</button>
@@ -675,6 +457,114 @@
       window.confirmarExclusao = function(productId) {
         return confirm(`Tem certeza que deseja excluir o produto ID ${productId}?`);
       };
+
+      // Funcionalidade do menu hambúrguer
+      const hamburger = document.querySelector('.hamburger-menu');
+      const nav = document.querySelector('.admin-nav');
+      hamburger.addEventListener('click', () => {
+        nav.classList.toggle('active');
+      });
+
+      // Alteração Gemini: Funcionalidade de busca na tabela de produtos
+      const buscaProdutosInput = document.getElementById('buscaProdutos');
+      const tabelaProdutos = document.querySelector('.tabela tbody');
+      const linhasProdutos = tabelaProdutos.getElementsByTagName('tr');
+
+      buscaProdutosInput.addEventListener('keyup', function() {
+        const termoBusca = this.value.toLowerCase();
+
+        for (let i = 0; i < linhasProdutos.length; i++) {
+          const linha = linhasProdutos[i];
+          // Pega o texto de todas as células da linha, exceto a de ações
+          const textoLinha = linha.textContent || linha.innerText;
+
+          if (textoLinha.toLowerCase().indexOf(termoBusca) > -1) {
+            linha.style.display = ""; // Mostra a linha se corresponder
+          } else {
+            linha.style.display = "none"; // Esconde a linha se não corresponder
+          }
+        }
+      });
+
+      // Alteração Gemini: Funcionalidade de cards colapsáveis
+      const cardToggles = document.querySelectorAll('.card-header-toggle');
+
+      cardToggles.forEach(toggle => {
+        const card = toggle.closest('.card');
+        const cardContent = card.querySelector('.card-content');
+
+        // Adiciona um ícone de seta ao toggle
+        const arrowIcon = document.createElement('span');
+        arrowIcon.classList.add('card-toggle-icon');
+        toggle.appendChild(arrowIcon);
+
+        // Verifica o tamanho da tela para definir o estado inicial
+        if (window.innerWidth <= 768) {
+          card.classList.add('collapsed'); // Colapsado por padrão em mobile
+          if (cardContent) cardContent.style.maxHeight = '0';
+        } else {
+          card.classList.remove('collapsed'); // Expandido por padrão em desktop
+          if (cardContent) cardContent.style.maxHeight = cardContent.scrollHeight + 'px';
+        }
+
+        toggle.addEventListener('click', () => {
+          card.classList.toggle('collapsed');
+          if (cardContent) {
+            if (card.classList.contains('collapsed')) {
+              cardContent.style.maxHeight = '0';
+            } else {
+              cardContent.style.maxHeight = cardContent.scrollHeight + 'px';
+            }
+          }
+        });
+
+        // Ajusta max-height ao redimensionar a janela se o card estiver expandido
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 768) {
+            card.classList.remove('collapsed');
+            if (cardContent) cardContent.style.maxHeight = cardContent.scrollHeight + 'px';
+          } else if (!card.classList.contains('collapsed')) {
+            // Se for mobile e não estiver explicitamente colapsado, ajusta max-height
+            if (cardContent) cardContent.style.maxHeight = cardContent.scrollHeight + 'px';
+          }
+        });
+      });
+
+      // Alteração Gemini: Funcionalidade de acordeão DENTRO do modal de edição
+      function setupModalAccordion() {
+        const modalToggles = document.querySelectorAll('.modal-section-toggle');
+        modalToggles.forEach((toggle, index) => {
+          const section = toggle.closest('.modal-section');
+          const content = section.querySelector('.modal-section-content');
+
+          // Adiciona ícone se não existir
+          if (!toggle.querySelector('.modal-toggle-icon')) {
+            const icon = document.createElement('span');
+            icon.className = 'modal-toggle-icon';
+            toggle.appendChild(icon);
+          }
+
+          // Em mobile, colapsa todas exceto a primeira
+          if (window.innerWidth <= 768) {
+            if (index > 0) { // Deixa a primeira seção aberta
+              section.classList.add('collapsed');
+              content.style.maxHeight = '0';
+            } else {
+              section.classList.remove('collapsed');
+              content.style.maxHeight = content.scrollHeight + 'px';
+            }
+          }
+
+          toggle.addEventListener('click', () => {
+            section.classList.toggle('collapsed');
+            if (section.classList.contains('collapsed')) {
+              content.style.maxHeight = '0';
+            } else {
+              content.style.maxHeight = content.scrollHeight + 'px';
+            }
+          });
+        });
+      }
     });
   </script>
 

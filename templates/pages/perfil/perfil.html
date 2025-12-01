@@ -474,7 +474,17 @@
           const isActive = link.getAttribute('data-tab') === tabName;
           link.classList.toggle('active', isActive);
           link.setAttribute('aria-selected', isActive);
-          if (isActive) tabFound = true;
+          if (isActive) {
+            tabFound = true;
+            // Center the active tab on mobile view
+            if (window.innerWidth <= 960) {
+              link.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+              });
+            }
+          }
         });
 
         tabContents.forEach(content => {

@@ -27,7 +27,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 #------------------------------FOI ATUALIZADO SÓ AS FUNÇÕES DESTE BLOCO--------------------
 
 #Rota admin crud nos produtos
-@router.get("/admin", response_class=HTMLResponse)
+@router.get("/admin", response_class=HTMLResponse, name="admin")
 def pagina_admin(request:Request, db:Session=Depends(get_db)):
     #Token do admin
     token = request.cookies.get("token")

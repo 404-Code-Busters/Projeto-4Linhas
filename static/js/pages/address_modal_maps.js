@@ -248,13 +248,13 @@
       const item = document.createElement("div");
       item.className = "endereco-item";
       item.innerHTML = `
-        <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
-          <div style="flex-grow:1">
+        <div class="endereco-item-content">
+          <div class="endereco-item-details">
             <strong>${escapeHtml(e.logradouro)}, ${escapeHtml(e.numero)}</strong><br>
             ${escapeHtml(e.bairro)} — ${escapeHtml(e.cidade)} / ${escapeHtml(e.estado || e.uf)}<br>
-            <small style="color:#999">CEP: ${escapeHtml(e.cep)}</small>
+            <small class="endereco-item-cep">CEP: ${escapeHtml(e.cep)}</small>
           </div>
-          <div style="display:flex;gap:8px;flex-shrink:0">
+          <div class="endereco-item-actions">
             <button data-id="${e.id_endereco || i}" class="addr-edit-btn" type="button">Editar</button>
             <button data-id="${e.id_endereco || i}" class="addr-remove-btn" type="button">Excluir</button>
           </div>

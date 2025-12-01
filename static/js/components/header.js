@@ -3,6 +3,9 @@
 // scroll handler (toggles `body.scrolled`), scroll-to-top button and cart count update.
 
 (function(){
+	// Debug: header module loaded
+	try { console.log('[header.js] module loaded'); } catch(e) {}
+
 	// Throttled Scroll handler: toggle `body.scrolled` class for better performance
 	let isThrottled = false;
 	const scrollThreshold = 50;
@@ -25,6 +28,8 @@
 	handleScroll();
 
 	document.addEventListener('DOMContentLoaded', function() {
+		// Debug: DOMContentLoaded (header.js)
+		try { console.log('[header.js] DOMContentLoaded'); } catch(e) {}
 		// Promo messages cycling
 		const promoMessage = document.querySelector('.promo-message');
 		const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
@@ -117,6 +122,7 @@ if (searchButton) {
 		const activeDropdown = benefitsDropdown || userDropdown; // Pega o dropdown que existir na página
 
 		if (promoArrow && activeDropdown) {
+			try { console.log('[header.js] promoArrow & activeDropdown found', {promoArrow, activeDropdown}); } catch(e) {}
 			const toggleDropdown = (e) => {
 				e.stopPropagation();
 				const isActive = activeDropdown.classList.toggle('active');
@@ -128,7 +134,7 @@ if (searchButton) {
 				promoArrow.style.transform = 'rotate(0deg)';
 			};
 
-			promoArrow.addEventListener('click', toggleDropdown);
+			promoArrow.addEventListener('click', (e) => { try { console.log('[header.js] promoArrow click'); } catch(err){}; toggleDropdown(e); });
 
 			// Fecha o dropdown ao clicar fora
 			document.addEventListener('click', (e) => {
@@ -148,18 +154,19 @@ if (searchButton) {
 		// Update cart count if function exists (cart.js provides updateCartCount)
 		try { if (typeof updateCartCount === 'function') updateCartCount(); } catch (err) { /* ignore */ }
 
-		// Ensure cart button opens the cart modal like on home page
-		const cartBtn = document.getElementById('cart-button');
-		if (cartBtn) {
-			cartBtn.addEventListener('click', function(e) {
-				e.preventDefault();
-				// Try to open modal via known functions, fallback to any anchor that cart.js may bind
-				try { if (typeof openCartModal === 'function') return openCartModal(); } catch (err) { /* ignore */ }
-				try { if (typeof mostrarCarrinho === 'function') return mostrarCarrinho(); } catch (err) { /* ignore */ }
-				const fake = document.querySelector('a[data-cart]');
-				if (fake) { fake.click(); }
-			});
-		}
+		// Use event delegation to reliably handle cart icon clicks across pages
+		// This avoids problems when scripts load in different orders or when
+		// elements are covered by overlays on specific pages (ex: home hero).
+		document.addEventListener('click', function(e) {
+			const cartIcon = e.target.closest('#cart-button, .cart-button');
+			if (!cartIcon) return;
+			e.preventDefault();
+			// Prefer a page-local open function, then the global mostrarCarrinho
+			try { if (typeof openCartModal === 'function') { openCartModal(); return; } } catch (err) { /* ignore */ }
+			try { if (typeof mostrarCarrinho === 'function') { mostrarCarrinho(); return; } } catch (err) { /* ignore */ }
+			const fake = document.querySelector('a[data-cart]');
+			if (fake) { fake.click(); }
+		});
 
 		// Scroll to top button
 		const scrollToTopBtn = document.querySelector('.scroll-to-top');

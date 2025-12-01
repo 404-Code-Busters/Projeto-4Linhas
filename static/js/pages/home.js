@@ -1,5 +1,6 @@
 
 // Promo code validation
+try { console.log('[home.js] module loaded'); } catch(e) {}
 function validatePromoCode(code) {
   const validCodes = ['DESCONTO10', 'FRETEGRATIS', 'PROMO20'];
   return validCodes.includes(code.toUpperCase());
@@ -61,6 +62,7 @@ window.addEventListener('scroll', () => {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+  try { console.log('[home.js] DOMContentLoaded'); } catch(e) {}
   // Promo messages cycling
   const promoMessage = document.querySelector('.promo-message');
   const messages = ['30% OFF em toda a loja', '4linhas para tudo e todos', 'Frete grátis acima de R$100', 'Novidades toda semana'];
@@ -129,32 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const benefitsDropdown = document.querySelector('.benefits-dropdown');
   let isDropdownOpen = false;
 
-  if (promoArrow && benefitsDropdown) {
-    promoArrow.addEventListener('click', (e) => {
-      e.stopPropagation();
-      isDropdownOpen = !isDropdownOpen;
-      benefitsDropdown.classList.toggle('active');
-      promoArrow.style.transform = isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-    });
-
-    // Fecha o dropdown ao clicar fora
-    document.addEventListener('click', (e) => {
-      if (!promoArrow.contains(e.target) && !benefitsDropdown.contains(e.target) && isDropdownOpen) {
-        isDropdownOpen = false;
-        benefitsDropdown.classList.remove('active');
-        promoArrow.style.transform = 'rotate(0deg)';
-      }
-    });
-
-    // Fecha com ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isDropdownOpen) {
-        isDropdownOpen = false;
-        benefitsDropdown.classList.remove('active');
-        promoArrow.style.transform = 'rotate(0deg)';
-      }
-    });
-  }
+  // NOTE: promoArrow listener and dropdown handling intentionally
+  // moved to `static/js/components/header.js` to avoid duplicated
+  // handlers on pages that include the shared header. header.js
+  // performs the toggle and global click/ESC handling.
 
   // Update cart count
   // Cart button behavior (moved from inline script in template)
@@ -162,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (cartBtn) {
     cartBtn.addEventListener('click', function(e) {
       e.preventDefault();
+      try { console.log('[home.js] cartBtn click'); } catch(e) {}
       try { if (typeof openCartModal === 'function') return openCartModal(); } catch (err) { /* ignore */ }
       try { if (typeof mostrarCarrinho === 'function') return mostrarCarrinho(); } catch (err) { /* ignore */ }
       const fake = document.querySelector('a[data-cart]');

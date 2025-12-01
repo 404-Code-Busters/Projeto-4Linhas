@@ -130,20 +130,47 @@ body.scrolled .scroll-to-top {
   transform: rotate(180deg);
 }
 
+/* Alteração Gemini: Responsividade para o dropdown de benefícios */
+@media (max-width: 1024px) {
+  .benefits-content {
+    flex-direction: column; /* Empilha os itens verticalmente */
+    gap: 1.5rem; /* Adiciona um espaço entre as seções de login e cadastro */
+    padding: 0.5rem; /* Reduz o padding para eliminar espaço extra à direita */
+    text-align: center; /* Centraliza o conteúdo */
+    max-width: 100%; /* Ocupa toda a largura em mobile e tablet */
+    margin: 0; /* Remove margem para centralizar melhor */
+  }
+  .benefits-main,
+  .benefits-secondary {
+    text-align: center; /* Centraliza o texto e botões nas seções */
+    padding: 0; /* Remove padding lateral para centralizar melhor */
+  }
+  .benefits-content p {
+    max-width: none; /* Remove limite de largura para centralizar melhor em mobile */
+  }
+  .benefits-buttons {
+    display: flex; /* Usa flexbox para centralizar */
+    justify-content: center; /* Centraliza os botões horizontalmente */
+    gap: 1rem; /* Espaço entre os botões */
+  }
+  .benefits-divider {
+    display: none; /* Esconde a linha divisória no mobile e tablet */
+  }
+}
+
 /* Benefits dropdown (hidden by default, shown when .active is added) */
 .user-dropdown,
 .benefits-dropdown {
   position: absolute;
-  /* ensure a 1px gap to avoid overlap with the top bar */
   top: calc(100% + 1px);
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
   width: 100%;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -151,7 +178,7 @@ body.scrolled .scroll-to-top {
 .benefits-dropdown.active {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
 }
 
 .benefits-content {
@@ -411,9 +438,10 @@ body.scrolled .main-nav {
   list-style: none;
   display: flex;
   gap: 1rem;
-  flex: 1;
-  justify-content: center;
-  align-self: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .menu-links li a {
@@ -624,6 +652,8 @@ body.menu-open .mobile-menu {
     justify-content: center;
     flex-wrap: wrap;
     gap: 1rem;
+    position: static;
+    transform: none;
   }
 
   .search-button {
@@ -827,4 +857,3 @@ body.menu-open .mobile-menu {
   background-color: #0D1B2A; /* Cor mais escura no hover */
   transform: translateY(-2px); /* Leve elevação no hover */
 }
-

@@ -1,3 +1,6 @@
+/* Alteração Gemini: Garante que o modal de sessão funcione na página de perfil */
+@import url('../components/auth-modal.css');
+
 /* === Estrutura Principal da Página de Perfil === */
 .profile-page {
   max-width: 1200px;
@@ -461,13 +464,47 @@
     width: 100%;
     position: static;
   }
+
+  /* Alteração Gemini: Adiciona um indicador de rolagem (>) na barra de abas */
+  .profile-nav {
+    position: relative; /* Necessário para posicionar o indicador */
+    overflow: hidden; /* Esconde o indicador se não houver overflow, embora o gradiente faça o trabalho visual */
+  }
+
+  /* Alteração Gemini: Substitui a lista de botões por uma barra de abas horizontal e rolável */
   .profile-nav ul {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-wrap: nowrap; /* Impede que os itens quebrem a linha */
+    overflow-x: auto; /* Permite a rolagem horizontal */
+    -webkit-overflow-scrolling: touch; /* Melhora a experiência de rolagem no iOS */
+    scrollbar-width: none; /* Esconde a barra de rolagem no Firefox */
+    padding-bottom: 1rem; /* Espaço para a sombra não ser cortada */
+    margin: 0 -1rem; /* Compensa o padding da página para a barra ir de ponta a ponta */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+
+
+
+  .profile-nav ul::-webkit-scrollbar {
+    display: none; /* Esconde a barra de rolagem no Chrome/Safari */
+  }
+
+  .profile-nav-link {
+    flex-shrink: 0; /* Impede que os itens encolham */
+    white-space: nowrap; /* Garante que o texto não quebre */
+    margin-bottom: 0;
+  }
+
+  /* Alteração Gemini: Garante que o botão de logout não tenha margem superior no mobile */
+  .profile-nav-link.logout {
+    margin-top: 0;
   }
 
   /* Alteração Gemini: Transforma a tabela do carrinho em cards no mobile */
+  /* (Este bloco foi movido para baixo para melhor organização) */
+
   .cart-table {
     display: block;
     width: 100%;
@@ -508,6 +545,31 @@
   .item-image-large {
     width: 100px; /* Aumenta um pouco a imagem no mobile */
     height: 100px;
+  }
+
+  /* Alteração Gemini: Esconde a caixa de usuário da sidebar, pois as informações estarão no header */
+  .profile-user-box {
+    display: none;
+  }
+}
+
+/* Alteração Gemini: Melhorias de centralização para telas de celular */
+@media (max-width: 768px) {
+  .content-body {
+    align-items: center; /* Centraliza os cards de conteúdo */
+  }
+
+  .data-card, .address-card {
+    width: 100%;
+    max-width: 450px; /* Limita a largura máxima para melhor leitura */
+  }
+
+  .password-update-form {
+    flex-direction: column; /* Empilha os campos e o botão */
+    align-items: stretch; /* Faz os itens ocuparem a largura total */
+  }
+  .btn-primary {
+    width: 100%; /* Faz o botão ocupar a largura total */
   }
 }
 /* === Estilos para a Seção de Carrinho/Checkout na Página de Perfil === */
@@ -759,4 +821,89 @@
 /* Espaçamento para o resumo do pedido */
 .order-summary {
     margin-top: 20px; /* Adiciona espaço acima do resumo do pedido */
+}
+
+/* Estilos para a lista de endereços dinâmica */
+.endereco-item-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px; /* Aumentar o espaçamento */
+  align-items: center; /* Centralizar verticalmente */
+}
+
+.endereco-item-details {
+  flex-grow: 1;
+  line-height: 1.5;
+}
+
+.endereco-item-details strong {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.endereco-item-cep {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.endereco-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Estilos para os botões de Editar/Excluir endereço */
+.addr-edit-btn,
+.addr-remove-btn {
+  background-color: transparent;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addr-edit-btn {
+  color: #555;
+  border-color: #ccc;
+}
+
+.addr-edit-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #999;
+  color: #000;
+}
+
+.addr-remove-btn {
+  color: #c53030; /* a51212 */
+  border-color: #f5c6cb;
+}
+
+.addr-remove-btn:hover {
+  background-color: #f8d7da; /* f1e0e1 */
+  border-color: #e6818a;
+  color: #721c24; /* 5c0b11 */
+}
+
+@media (max-width: 768px) {
+  .modal-content-endereco {
+    flex-direction: column;
+    width: 95%;
+    max-width: 500px; /* Limita a largura em telas de tablet/portrait */
+    height: auto;
+    max-height: 90vh; /* Ocupa no máximo 90% da altura da tela */
+    overflow-y: auto; /* Permite scroll no conteúdo se for maior */
+  }
+
+  .modal-left {
+    width: 100%;
+    padding: 24px; /* Reduz o padding em telas menores */
+    border-radius: 22px; /* Adiciona o radius em todos os cantos */
+  }
+
+  .modal-right {
+    display: none; /* Esconde o mapa em telas mobile */
+  }
 }

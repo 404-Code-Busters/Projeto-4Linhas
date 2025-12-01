@@ -1,4 +1,21 @@
 /**
+ * Alteração Gemini: Verifica a resposta da API e mostra o modal de sessão expirada se for 401.
+ * Esta função agora chama um handler global de autenticação.
+ * @param {Response} response - O objeto de resposta do fetch.
+ * @returns {boolean} - Retorna true se a sessão expirou, caso contrário false.
+ */
+function handleAuthError(response) {
+  if (response.status === 401) {
+    // Verifica se a função global do modal de autenticação existe antes de chamar.
+    if (typeof showSessionExpiredModal === 'function') {
+      showSessionExpiredModal();
+    }
+    return true; // Indica que um erro de autenticação foi tratado.
+  }
+  return false;
+}
+
+/**
  * cart.js
  *
  * Este script JavaScript é responsável por gerenciar a funcionalidade do modal do carrinho de compras.
@@ -146,8 +163,8 @@ async function mostrarCarrinho() {
         const response = await fetch('/carrinho/itens', { credentials: 'same-origin' });
 
         // Se a resposta for 401 (Não Autorizado), significa que o usuário não está logado.
-        if (response.status === 401) {
-            renderCartMessage('Faça login para ver seu carrinho.', true);
+        // Alteração Gemini: Usa a nova função para tratar o erro 401
+        if (handleAuthError(response)) {
             return;
         }
 
@@ -223,8 +240,8 @@ async function adicionarAoCarrinho(itemOrId) {
         // Envia uma requisição POST para adicionar o item ao carrinho.
         const response = await fetch(`/carrinho/adicionar/${produtoId}`, { method: 'POST', credentials: 'same-origin' });
         // Se o usuário não estiver autenticado, redireciona para a página de login.
-        if (response.status === 401) {
-            window.location.href = '/login';
+        // Alteração Gemini: Usa a nova função para tratar o erro 401
+        if (handleAuthError(response)) {
             return;
         }
         // Se a requisição não foi bem-sucedida, lança um erro.
@@ -248,6 +265,12 @@ async function removerDoCarrinho(produtoId) {
     try {
         // Envia uma requisição POST para remover o item do carrinho.
         const resp = await fetch(`/carrinho/remover/${produtoId}`, { method: 'POST', credentials: 'same-origin' });
+
+        // Alteração Gemini: Trata erro de autenticação
+        if (handleAuthError(resp)) {
+            return;
+        }
+
         // Se a requisição não foi bem-sucedida, lança um erro.
         if (!resp.ok) throw new Error('Falha ao remover item.');
 
@@ -291,6 +314,11 @@ async function atualizarQuantidade(produtoId, delta) {
         formData.append('quantidade', newQty);
         // Envia a requisição POST para atualizar a quantidade do item.
         const resp = await fetch(`/carrinho/atualizar/${produtoId}`, { method: 'POST', body: formData, credentials: 'same-origin' });
+
+        // Alteração Gemini: Trata erro de autenticação
+        if (handleAuthError(resp)) {
+            return;
+        }
 
         // Lança um erro se a requisição não for bem-sucedida.
         if (!resp.ok) throw new Error('Falha ao atualizar quantidade.');
