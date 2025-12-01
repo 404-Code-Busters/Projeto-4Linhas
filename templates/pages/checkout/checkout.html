@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Checkout - 4linhas</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/checkout.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/perfil-novo.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  </head>
+  <body>
+    {% include 'partials/header.html' %}
+
+    <main class="checkout-page">
+      <div class="checkout-container">
+        <section class="checkout-main">
+          <div class="checkout-steps">
+            <nav class="steps-nav">
+              <span class="step completed">Carrinho</span>
+              <span class="step completed">Endereço</span>
+              <span class="step active">Pagamento</span>
+              <span class="step">Confirmação</span>
+            </nav>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title"><span class="icon">&#128179;</span> Checkout</h2>
+
+            <!-- Form will POST to server checkout route -->
+            <form id="checkout-form" class="checkout-form" action="{{ url_for('checkout') }}" method="post">
+              <!-- Hidden fields to submit selected address to backend -->
+              <input type="hidden" name="logradouro" id="rua" />
+              <input type="hidden" name="numero" id="numero" />
+              <input type="hidden" name="bairro" id="bairro" />
+              <input type="hidden" name="cidade" id="cidade" />
+              <input type="hidden" name="uf" id="estado" />
+              <input type="hidden" name="cep" id="cep" />
+              <!-- Hidden flag to indicate request originated from profile page -->
+              <input type="hidden" name="from_profile" id="from_profile_input" value="{{ 'true' if from_profile else '' }}" />
+              <!-- STEP 0: CARRINHO -->
+              <div class="step-panel" id="step-cart">
+                <h3>Revisão do Carrinho</h3>
+                <div class="cart-review">
+                  {% if carrinho and carrinho|length > 0 %}
+                    <ul class="cart-items">
+                      {% for item in carrinho %}
+                        <li class="cart-item">
+                          <!-- Correção Gemini: Usando url_for para o caminho da imagem e adicionando um fallback -->
+                          <img 
+                            src="{{ url_for('static', path='/upload/img/' + item.imagem) if item.imagem else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" 
+                            alt="{{ item.nome }}" width="64" height="64">
+                          <div class="cart-item-info">
+                            <div class="name">{{ item.nome }}</div>
+                            <div class="qty">Qtd: {{ item.quantidade }}</div>
+                          </div>
+                          <div class="price">R$ {{ '%.2f'|format(item.preco) }}</div>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p>Seu carrinho está vazio.</p>
+                  {% endif %}
+                </div>
+                <div class="actions">
+                  <button type="button" class="btn-primary" data-action="next">CONTINUAR</button>
+                </div>
+              </div>
+
+              <!-- STEP 1: ENDEREÇO -->
+              <div class="step-panel" id="step-address" style="display:none;">
+                <h3>Endereço de entrega</h3>
+
+                <div class="notice error" data-error="address-method" style="display: none; margin-bottom: 1rem;">
+                  Selecione um endereço de entrega antes de continuar.
+                </div>
+
+                <!-- Lista dinâmica de endereços salvos -->
+                <div id="addresses-container">
+                  <h4>Meus Endereços</h4>
+                  <div id="saved-addresses-list" style="display: grid; gap: 1rem; margin-bottom: 1rem;">
+                    <!-- Preenchido via JavaScript -->
+                  </div>
+                  <button type="button" id="add-new-address-btn" class="btn-link" style="margin-bottom: 1rem;">+ Adicionar novo endereço</button>
+                </div>
+
+
+
+                <div class="actions">
+                  <button type="button" class="btn-outline" data-action="prev">VOLTAR</button>
+                  <button type="button" class="btn-primary" data-action="next">CONTINUAR</button>
+                </div>
+              </div>
+
+              <!-- STEP 2: PAGAMENTO -->
+              <div class="step-panel" id="step-payment" style="display:none;">
+                <h3>Forma de Pagamento</h3>
+                <div class="notice error" data-error="payment-method" style="display: none; margin-bottom: 1rem;">
+                  Selecione uma forma de pagamento antes de continuar.
+                </div>
+                <label class="payment-option selected">
+                  <input type="radio" name="payment" value="pix" checked />
+                  <div>
+                    <strong>PIX</strong>
+                    <div class="muted">Até 22% de desconto com aprovação imediata</div>
+                  </div>
+                </label>
+
+                <label class="payment-option">
+                  <input type="radio" name="payment" value="card" />
+                  <div>
+                    <strong>Cartão de Crédito</strong>
+                    <div class="muted">Parcelamos em até 10x sem juros</div>
+                  </div>
+                </label>
+
+                <label class="payment-option">
+                  <input type="radio" name="payment" value="nupay" />
+                  <div>
+                    <strong>NUPAY</strong>
+                  </div>
+                </label>
+
+                <div class="actions">
+                  <button type="button" class="btn-outline" data-action="prev">VOLTAR</button>
+                  <button type="button" class="btn-primary" data-action="next">CONTINUAR</button>
+                </div>
+              </div>
+
+              <!-- STEP 3: CONFIRMAÇÃO (revisão final e submit) -->
+              <div class="step-panel" id="step-confirm" style="display:none;">
+                <h3>Revisão do Pedido</h3>
+                <div class="review-summary">
+                  <p>Revise seus itens, endereço e forma de pagamento abaixo. Se estiver tudo certo, finalize a compra.</p>
+
+                  <!-- Revisão: Itens do Carrinho -->
+                  <section id="review-cart" class="review-section">
+                    <h4>Carrinho</h4>
+                    <div id="review-cart-items">
+                      <!-- Preenchido pelo JS a partir da lista do carrinho -->
+                    </div>
+                  </section>
+
+                  <!-- Revisão: Endereço Selecionado -->
+                  <section id="review-address" class="review-section">
+                    <h4>Endereço de Entrega</h4>
+                    <div id="review-address-content">
+                      <!-- Preenchido pelo JS a partir dos inputs ocultos -->
+                    </div>
+                  </section>
+
+                  <!-- Revisão: Método de Pagamento -->
+                  <section id="review-payment" class="review-section">
+                    <h4>Forma de Pagamento</h4>
+                    <div id="review-payment-content">
+                      <!-- Preenchido pelo JS a partir do método selecionado -->
+                    </div>
+                  </section>
+
+                </div>
+                <div class="actions">
+                  <button type="button" class="btn-outline" data-action="prev">VOLTAR</button>
+                  <button type="submit" class="btn-primary">FINALIZAR COMPRA</button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </section>
+
+        <aside class="checkout-sidebar">
+          <div class="summary-card">
+            <h3>Resumo</h3>
+
+            <dl class="summary-list">
+              <div class="line"><dt>Valor dos Produtos:</dt><dd>R$ {{ '%.2f'|format(total or 0) }}</dd></div>
+              <div class="line"><dt>Descontos:</dt><dd class="neg">- R$ 0,00</dd></div>
+              <div class="line"><dt>Frete:</dt><dd>R$ 15,90</dd></div>
+            </dl>
+
+            <div class="total-box">
+              <div class="label">Valor à vista no PIX:</div>
+              <div class="price">R$ {{ '%.2f'|format((total or 0) + 15.90) }}</div>
+              <div class="muted small">(Economize: R$ 0,00)</div>
+            </div>
+
+            <div class="sidebar-actions">
+              <button class="btn-primary" data-action="next">CONTINUAR</button>
+              <button class="btn-outline" data-action="prev">VOLTAR</button>
+            </div>
+          </div>
+
+          <div class="promo-card">
+            <h4>Cupom de Desconto</h4>
+            <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+              <input 
+                id="promo-code" 
+                type="text" 
+                name="promo_code"
+                placeholder="Digite seu cupom" 
+                style="flex:1; padding:0.5rem; border-radius:6px; border:1px solid #ddd;" 
+              />
+              <button type="button" class="apply-promo-btn btn-outline" style="padding:0.5rem 0.75rem;">Aplicar</button>
+            </div>
+            <small style="display:block; margin-top:0.5rem; color:#666;">O cupom será validado no pagamento</small>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+    <!-- Modal de Endereço (mesmo do perfil) -->
+    <div id="modal-endereco" class="modal-endereco" style="display: none;">
+      <div class="modal-content-endereco">
+        <!-- LADO ESQUERDO -->
+        <div class="modal-left">
+          <h3>Adicionar Novo Endereço</h3>
+
+          <label for="modal-cep">CEP</label>
+          <input type="text" id="modal-cep" maxlength="8" placeholder="Digite seu CEP" />
+
+          <label for="modal-logradouro">Endereço</label>
+          <input type="text" id="modal-logradouro" readonly />
+
+          <label for="modal-bairro">Bairro</label>
+          <input type="text" id="modal-bairro" readonly />
+
+          <label for="modal-cidade">Cidade</label>
+          <input type="text" id="modal-cidade" readonly />
+
+          <label for="modal-uf">Estado</label>
+          <input type="text" id="modal-uf" readonly />
+
+          <label for="modal-numero">Número</label>
+          <input type="text" id="modal-numero" placeholder="Digite o número" />
+
+          <div class="modal-botoes">
+            <button class="btn-salvar" onclick="salvarEndereco()">
+              Salvar
+            </button>
+            <button
+              class="btn-cancelar"
+              onclick="fecharModalEndereco()"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+
+        <!-- LADO DIREITO (MAPA) -->
+        <div class="modal-right">
+          <div id="map-container" style="width: 100%; height: 100%; border-radius: 0 22px 22px 0;"></div>
+        </div>
+      </div>
+    </div>
+    <div id="server-error" data-error="{{ erro or '' }}" style="display:none"></div>
+    <script>
+      let enderecosSalvos = [];
+      let enderecoSelecionado = null;
+
+      // Carrega endereços salvos da API ao inicializar a página
+      async function carregarEnderecos() {
+        try {
+          const resp = await fetch('/api/enderecos', { credentials: 'same-origin' });
+          if (!resp.ok) throw new Error('Erro ao carregar endereços');
+          const data = await resp.json();
+          if (data && data.success && Array.isArray(data.enderecos)) {
+            enderecosSalvos = data.enderecos;
+            renderizarEnderecos();
+          }
+        } catch (err) {
+          console.warn('Erro ao carregar endereços:', err);
+        }
+      }
+
+      // Renderiza cards de endereços salvos
+      function renderizarEnderecos() {
+        const lista = document.getElementById('saved-addresses-list');
+        lista.innerHTML = '';
+
+        if (enderecosSalvos.length === 0) {
+          lista.innerHTML = '<p style="color: #999; text-align: center;">Nenhum endereço salvo. Clique em "Adicionar novo endereço" para começar.</p>';
+          return;
+        }
+
+        enderecosSalvos.forEach(endereco => {
+          const card = document.createElement('div');
+          card.className = 'saved-address-card';
+          card.style.border = '1px solid #ddd';
+          card.style.padding = '1rem';
+          card.style.borderRadius = '8px';
+          card.style.cursor = 'pointer';
+          card.style.transition = 'all 0.2s';
+          
+          card.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <input type="radio" name="selected-address" value="${endereco.id_endereco}" style="width: 20px; height: 20px;">
+              <div style="flex: 1;">
+                <strong>${endereco.logradouro}, ${endereco.numero}</strong><br>
+                ${endereco.bairro} — ${endereco.cidade} / ${endereco.estado}<br>
+                <small style="color: #999;">CEP: ${endereco.cep}</small>
+              </div>
+            </div>
+          `;
+
+          card.addEventListener('click', () => {
+            // Marcar radio button
+            document.querySelector(`input[value="${endereco.id_endereco}"]`).checked = true;
+            // Preencher campos ocultos para submit
+            document.getElementById('cep').value = endereco.cep;
+            document.getElementById('rua').value = endereco.logradouro;
+            document.getElementById('numero').value = endereco.numero;
+            document.getElementById('bairro').value = endereco.bairro;
+            document.getElementById('cidade').value = endereco.cidade;
+            document.getElementById('estado').value = endereco.estado;
+            enderecoSelecionado = endereco.id_endereco;
+            // Destacar card
+            document.querySelectorAll('.saved-address-card').forEach(c => c.style.borderColor = '#ddd');
+            card.style.borderColor = '#FF6B35';
+            card.style.backgroundColor = '#fff8f5';
+          });
+
+          lista.appendChild(card);
+        });
+      }
+
+      // Abre modal de novo endereço (reutiliza o mesmo modal do perfil)
+      document.getElementById('add-new-address-btn').addEventListener('click', () => {
+        // Limpar campos do modal antes de abrir
+        document.getElementById('modal-cep').value = '';
+        document.getElementById('modal-logradouro').value = '';
+        document.getElementById('modal-bairro').value = '';
+        document.getElementById('modal-cidade').value = '';
+        document.getElementById('modal-uf').value = '';
+        document.getElementById('modal-numero').value = '';
+        // Abrir modal
+        document.getElementById('modal-endereco').style.display = 'flex';
+      });
+
+      // Aguardar que o script address_modal_maps.js carregue e override a função salvarEndereco
+      document.addEventListener('DOMContentLoaded', () => {
+        // Aguardar um pouco para garantir que address_modal_maps.js já carregou
+        setTimeout(() => {
+          const originalSalvarEndereco = window.salvarEndereco;
+          if (originalSalvarEndereco) {
+            window.salvarEndereco = async function() {
+              const result = await originalSalvarEndereco.call(this);
+              // Se o endereço foi salvo com sucesso, recarregar lista no checkout
+              if (result !== false) {
+                carregarEnderecos();
+              }
+              return result;
+            };
+          }
+        }, 500);
+        
+        carregarEnderecos();
+      });
+    </script>
+
+    
+
+    <script src="{{ url_for('static', path='js/pages/checkout.js') }}"></script>
+    
+    <!-- Leaflet Library para Maps -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    
+    <!-- Script para gerenciar modal de endereços (mesmo do perfil) -->
+    <script src="/static/js/pages/address_modal_maps.js"></script>
+  </body>
+</html>

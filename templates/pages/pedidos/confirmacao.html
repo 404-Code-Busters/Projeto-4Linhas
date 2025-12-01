@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pedido Confirmado - 4linhas</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
+  <style>
+    .confirm-card{max-width:800px;margin:3rem auto;padding:2rem;background:#fff;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.05)}
+    .confirm-success{font-size:1.4rem;color:#1aab5a}
+  </style>
+</head>
+<body>
+  {% include 'partials/header.html' %}
+
+  <main>
+    <div class="confirm-card">
+      {% if pedido %}
+        <div class="confirm-success">Pedido <strong>#{{ pedido.id_pedido }}</strong> confirmado!</div>
+        <p>Obrigado pela sua compra. Enviaremos atualizações por e-mail sobre o status do pedido.</p>
+
+        <!-- Items -->
+        <h4 style="margin-top:1rem;">Itens do pedido</h4>
+        {% if itens and itens|length > 0 %}
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:1rem;">
+            {% for it in itens %}
+              <div style="display:flex;align-items:center;gap:12px;border:1px solid #f2f2f2;padding:12px;border-radius:8px;">
+                {% if it.imagem %}
+                  <img src="{{ url_for('static', path='/upload/img/' + it.imagem) }}" alt="{{ it.nome }}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;">
+                {% else %}
+                  <img src="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="{{ it.nome }}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;">
+                {% endif %}
+                <div>
+                  <div style="font-weight:700;color:#203647">{{ it.nome }}</div>
+                  <div style="color:#666">Qtd: {{ it.quantidade }} — R$ {{ "%.2f"|format(it.preco_unitario)|replace('.', ',') }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <dl>
+          <dt>Valor total:</dt><dd>R$ {{ '%.2f'|format(pedido.valor_total)|replace('.', ',') }}</dd>
+          <dt>Endereço de entrega:</dt><dd>{{ pedido.endereco_entrega }} - CEP: {{ pedido.cep_entrega }}</dd>
+          <dt>Data:</dt><dd>{{ pedido.data_pedido }}</dd>
+        </dl>
+        <div style="margin-top:1rem;display:flex;gap:12px;align-items:center;">
+          <a href="/perfil#orders" class="btn-primary">Ver meus pedidos</a>
+          <a href="/" class="btn-outline">Continuar comprando</a>
+        </div>
+      {% else %}
+        <h2>Nenhum pedido encontrado</h2>
+        <p>Se você acabou de finalizar, tente novamente em alguns segundos.</p>
+        <a href="/" class="btn-outline">Voltar à loja</a>
+      {% endif %}
+    </div>
+  </main>
+
+  {% include 'partials/footer.html' %}
+</body>
+</html>

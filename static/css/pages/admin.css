@@ -1,0 +1,1063 @@
+@import url('../src/css/colors.css');
+
+/* ===== BASE GERAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  color: #0D1B2A;
+  background-color: #f9f9f9;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== HEADER ===== */
+.admin-header {
+  background-color: #FF6B35;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.admin-nav a {
+  color: #fff;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.admin-nav a:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.hamburger-menu span {
+  width: 25px;
+  height: 3px;
+  background-color: #fff;
+  margin: 3px 0;
+  transition: 0.3s;
+}
+
+/* ===== MAIN CONTENT ===== */
+.admin-main {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+/* Alteração Gemini: Estilos para cards colapsáveis */
+.card h2.card-header-toggle {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 0.5rem; /* Espaço para o ícone */
+  margin-bottom: 0; /* Remove margem inferior padrão */
+}
+
+.card h2.card-header-toggle .card-toggle-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.card h2.card-header-toggle .card-toggle-icon::before {
+  content: '▼'; /* Ícone de seta para baixo */
+  font-size: 0.8em;
+  color: #666;
+}
+
+.card.collapsed h2.card-header-toggle .card-toggle-icon::before {
+  content: '▶'; /* Ícone de seta para a direita quando colapsado */
+}
+
+/* Conteúdo do card que será colapsado/expandido */
+.card-content {
+  transition: max-height 0.5s ease-in-out, opacity 0.3s ease;
+  overflow: hidden;
+  padding-top: 1.5rem; /* Adiciona espaço entre o título e o conteúdo quando expandido */
+}
+
+/* Alteração Gemini: Garante que o conteúdo seja visível quando expandido */
+.card:not(.collapsed) .card-content {
+  opacity: 1;
+}
+.card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0D1B2A;
+  margin-bottom: 1.5rem;
+}
+
+/* Alteração Gemini: Estilos para o campo de busca da lista de produtos */
+.table-section .busca {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  margin-bottom: 1.5rem; /* Espaço abaixo do campo de busca */
+}
+
+.table-section .busca:focus {
+  border-color: var(--cor--laranja, #FF6B35);
+  outline: none;
+}
+
+.destaque {
+  background: linear-gradient(135deg, #FF6B35, #FF8C42);
+  color: #fff;
+}
+
+.destaque h2 {
+  color: #fff;
+}
+
+.tiles {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.tile {
+  text-align: center;
+  flex: 1;
+}
+
+.tile span {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.tile strong {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* ===== FORM STYLES ===== */
+.admin-section h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #0D1B2A;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #0D1B2A;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--cor--laranja, #FF6B35);
+  outline: none;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+.btn-primary {
+  background: var(--cor--laranja, #FF6B35);
+  color: white;
+  padding: 0.85rem 2rem; /* Aumenta o padding para um botão mais robusto */
+  border: none;
+  border-radius: 8px;
+  font-weight: 600; /* Aumenta o peso da fonte */
+  font-size: 1.05rem; /* Aumenta o tamanho da fonte */
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-primary:hover {
+  background: #e85a2a;
+  transform: translateY(-2px); /* Efeito de elevação */
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3); /* Sombra suave */
+}
+
+/* ===== TABELA DE PRODUTOS (Estilos restaurados de admin_Antigo.css) ===== */
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+}
+
+.tabela { /* Alterado de 'table' para '.tabela' para ser mais específico */
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.tabela th, .tabela td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.tabela th {
+  background: #f8f8f8;
+  font-weight: 600;
+  color: #333;
+}
+
+.tabela tr:hover {
+  background: #f5f5f5;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+
+/* ===== Button Styles ===== */
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn.small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.btn-primary,
+.btn.primary {
+  background-color: #FF6B35;
+}
+.btn-primary:hover,
+.btn.primary:hover {
+  background-color: #e85a2a;
+}
+
+.btn.danger {
+  background-color: #c1121f;
+}
+
+.btn.danger:hover {
+  background-color: #a10f1a;
+}
+
+.btn.editar-produto-btn {
+  background-color: #6c757d; /* A neutral gray */
+}
+
+.btn.editar-produto-btn:hover {
+  background-color: #5a6268;
+}
+
+/* Inline inputs (label + input side-by-side) for new-product form */
+.new-product-form .field-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.new-product-form .field-label {
+  min-width: 160px;
+  color: #333;
+  font-weight: 600;
+  margin: 0;
+  text-align: right;
+}
+
+.small-input {
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  width: 100%;
+}
+
+.file-buttons-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.file-button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 160px;
+}
+
+.file-preview {
+  width: 140px;
+  height: 140px;
+  background: #f8f8f8;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.file-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-btn {
+  background: var(--cor--laranja, #FF6B35);
+  color: white;
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s, transform 0.08s;
+}
+
+.image-btn:hover { background: #e85a2a; transform: translateY(-1px); }
+
+.file-name {
+  font-size: 0.9rem;
+  color: #555;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .new-product-form .field-row { flex-direction: column; align-items: stretch; }
+  .new-product-form .field-label { min-width: 110px; text-align: left; }
+  .file-name { max-width: 120px; }
+}
+
+/* Simple modal styles (improved) */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.modal { background: #fff; padding: 1.5rem; border-radius: 10px; width: 100%; max-width: 960px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+.modal header { position: relative; text-align: center; margin-bottom: 0.75rem; }
+.modal header h2 { margin: 0; padding: 0.6rem 1rem; display: inline-block; border-radius: 6px; color: #fff; background: var(--cor--laranja, #FF6B35); font-size: 1.25rem; }
+.modal header button { position: absolute; right: 0.5rem; top: 0.25rem; background: transparent; border: none; font-size: 1.1rem; cursor: pointer; color: #333; }
+.modal .fields { display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+.modal .fields .full { grid-column: 1 / -1; }
+.modal .image-previews { display:flex; gap:0.5rem; align-items:center; }
+.modal .image-previews img { width: 128px; height: 128px; object-fit:cover; border-radius:6px; border:1px solid #eee; }
+.modal .image-previews .preview-item { position: relative; display: inline-block; }
+.modal .image-previews .remove-btn { position: absolute; top: -6px; right: -6px; background: #fff; border-radius: 50%; border: 1px solid #ddd; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
+.modal .image-previews .preview-item .no-image { width:128px; height:128px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; color:#999; border-radius:6px; border:1px dashed #eee; }
+.modal .file-inputs { display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; }
+.modal .actions { display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem; }
+@media (max-width:640px) { .modal .fields { grid-template-columns: 1fr; } .modal .file-inputs { grid-template-columns: 1fr; } }
+
+/* === Estilos para o Novo Formulário de Produto === */
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.product-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0; /* Reset margin from old rules */
+}
+
+.product-form .form-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+.product-form input[type="text"],
+.product-form input[type="number"],
+.product-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.product-form input:focus,
+.product-form textarea:focus {
+  outline: none;
+  border-color: var(--cor--laranja, #FF6B35);
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+}
+
+/* Estilos para Upload de Imagem */
+.upload-title {
+  text-align: center;
+  font-weight: 600;
+  color: #555;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.image-upload-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.image-upload-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem; /* Aumenta o espaço entre a preview e o texto */
+  cursor: pointer; /* Indica que a área é clicável */
+  transition: background-color 0.2s;
+}
+
+.image-upload-slot:hover {
+  background-color: #f5f5f5; /* Feedback visual ao passar o mouse */
+}
+
+.image-preview {
+  width: 120px;
+  height: 120px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  overflow: hidden;
+}
+
+.image-preview .preview-text {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Esconde o input[type=file] padrão */
+.product-form input[type="file"] {
+  display: none;
+}
+
+/* === ESTILOS RESPONSIVOS PARA O HEADER === */
+
+.hamburger-menu {
+  display: none; /* Escondido por padrão */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 101;
+}
+
+.hamburger-menu span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: #fff;
+  margin: 5px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .admin-header .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .admin-nav {
+    display: none;
+    position: absolute;
+    top: 68px; /* Altura do header */
+    left: 0;
+    right: 0;
+    background-color: #0d1b2a;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    gap: 1rem;
+    border-top: 1px solid #132f4c;
+  }
+
+  .admin-nav.active {
+    display: flex;
+  }
+
+  .admin-nav a {
+    margin-left: 0;
+    font-size: 1.1rem;
+  }
+
+  .hamburger-menu {
+    display: block; /* Visível em telas menores */
+  }
+}
+
+/* =================================== */
+/* ===== MODAL DE EDIÇÃO DE PRODUTO ===== */
+/* =================================== */
+
+/* Alteração feita pelo Gemini: Estilos para alinhar os botões de upload de imagem lado a lado. */
+.file-buttons-row {
+  display: flex;
+  flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas pequenas */
+  gap: 1rem; /* Espaçamento entre os grupos de botões */
+  align-items: flex-start;
+}
+.file-button-group {
+  flex: 1; /* Faz com que cada grupo tente ocupar o mesmo espaço */
+  min-width: 150px; /* Largura mínima antes de quebrar a linha */
+  display: flex;
+  flex-direction: row; /* Alteração feita pelo Gemini: Alinha o botão e a pré-visualização lado a lado */
+  align-items: center; /* Centraliza verticalmente o botão e a pré-visualização */
+  gap: 0.5rem; /* Espaçamento entre o botão e a pré-visualização */
+  padding: 0.5rem; /* Adiciona um pouco de padding para melhor visual */
+  border: 1px solid #eee; /* Borda para cada grupo */
+  border-radius: 6px;
+  background-color: #fcfcfc;
+}
+.file-button-group .image-btn {
+  padding: 8px 12px; /* Padding menor para o botão */
+  font-size: 0.9rem; /* Fonte menor */
+  white-space: nowrap; /* Evita que o texto do botão quebre */
+  flex-shrink: 0; /* Impede que o botão encolha */
+}
+.file-button-group .file-preview {
+  width: 60px; /* Tamanho fixo para a pré-visualização */
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0; /* Impede que a pré-visualização encolha */
+  background-color: #fff;
+}
+.file-button-group .file-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Garante que a imagem preencha o espaço */
+}
+.file-button-group .file-preview .file-name {
+  font-size: 0.75rem; /* Fonte menor para o texto "Nenhuma" */
+  color: #888;
+  text-align: center;
+}
+
+/* Estilos do Modal de Edição */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+.modal {
+  background: #fff;
+  padding: 2rem; /* Ajustado o espaçamento interno para menor */
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px; /* Ajustado o tamanho máximo para menor */
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem; /* Ajustado o espaçamento */
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 1rem;
+}
+.modal header h2 {
+  margin: 0;
+  font-size: 1.5rem; /* Título ajustado para menor */
+  color: #333;
+}
+.modal header button#modalClose {
+  background: #f0f0f0;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #555;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+.modal header button#modalClose:hover {
+  background-color: #e0e0e0;
+  color: #111;
+}
+.modal .fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem; /* Aumentado o espaçamento entre os campos */
+}
+.modal .fields .full {
+  grid-column: 1 / -1;
+}
+.modal .fields label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem; /* Espaçamento entre label e input */
+  color: #444;
+}
+.modal .fields input[type="text"],
+.modal .fields input[type="number"],
+.modal .fields textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.modal .fields input:focus,
+.modal .fields textarea:focus {
+  outline: none;
+  border-color: var(--cor-laranja, #FF6B35);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+}
+/* Alteração Gemini: Organiza as pré-visualizações de imagem do modal em uma grade 2x2 */
+.modal .image-previews {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Cria duas colunas de tamanho igual */
+  gap: 1rem; /* Espaçamento entre as imagens */
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+.modal .image-previews .preview-item {
+  position: relative;
+}
+.modal .image-previews img,
+.modal .image-previews .no-image {
+  width: 140px; /* Imagens de preview maiores */
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+.modal .image-previews .no-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  color: #999;
+  border-style: dashed;
+}
+.modal .image-previews .remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: white;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  transition: transform 0.2s, background-color 0.2s;
+}
+.modal .image-previews .remove-btn:hover {
+  transform: scale(1.1);
+  background-color: #fdecec;
+  color: #c53030;
+}
+.modal .file-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.modal .actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e5e5;
+}
+.modal .actions .btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.modal .actions .btn-primary {
+  background-color: var(--cor-laranja, #FF6B35);
+  color: white;
+}
+.modal .actions .btn-primary:hover {
+  background-color: #e05b2d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
+}
+.modal .actions .btn-secondary {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+.modal .actions .btn-secondary:hover {
+  background-color: #cbd5e0;
+}
+}
+
+/* Alteração Gemini: Estilos para o acordeão DENTRO do modal */
+.modal-section {
+  border-bottom: 1px solid #f0f0f0;
+}
+.modal-section:last-child {
+  border-bottom: none;
+}
+
+.modal-section-toggle {
+  cursor: pointer;
+  padding: 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+}
+
+.modal-section-toggle .modal-toggle-icon::before {
+  content: '▼';
+  font-size: 0.8em;
+  color: #666;
+  transition: transform 0.3s ease;
+}
+
+.modal-section.collapsed .modal-section-toggle .modal-toggle-icon::before {
+  transform: rotate(-90deg);
+}
+
+.modal-section-content {
+  overflow: hidden;
+  transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+  max-height: 1000px; /* Altura grande para desktop */
+  padding-bottom: 1.5rem;
+}
+
+.modal-section.collapsed .modal-section-content {
+  max-height: 0;
+  padding-bottom: 0;
+}
+
+/* Alteração Gemini: Estilos para os botões de upload no modal */
+.upload-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.btn-upload-modal {
+  background-color: #f0f2f5;
+  color: #4a5568;
+  padding: 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+.btn-upload-modal:hover {
+  background-color: #e2e8f0;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+}
+.hidden-file-input {
+  display: none;
+}
+
+/* Alteração Gemini: Melhorias de responsividade para o modal de edição */
+@media (max-width: 768px) {
+  .modal {
+    padding: 1.5rem 1rem; /* Ajusta o padding para mobile */
+    max-height: 95vh; /* Garante que o modal não saia da tela */
+  }
+  .modal header h2 {
+    font-size: 1.3rem; /* Reduz o título do modal */
+  }
+
+  /* Alteração Gemini: Aumenta o espaçamento entre os campos principais */
+  .modal .fields {
+    gap: 1.5rem; 
+  }
+
+  /* Alteração Gemini: Força layout de coluna única e aumenta espaçamento */
+  .modal .fields, .modal .file-inputs {
+    grid-template-columns: 1fr; /* Força uma única coluna para os campos */
+    gap: 1.5rem; /* Aumenta o espaçamento entre os campos */
+    margin-bottom: 1.5rem; /* Adiciona espaço abaixo das seções de campos */
+  }
+
+  /* Alteração Gemini: Transforma a pré-visualização de imagens em uma grade vertical */
+  .modal .image-previews {
+    display: grid; /* Muda para grid */
+    grid-template-columns: 1fr; /* Uma coluna */
+    gap: 1rem; /* Espaço entre os itens de preview */
+    background-color: transparent; /* Remove o fundo para um visual mais limpo */
+    border: none;
+  }
+  .modal .actions {
+    flex-direction: column-reverse; /* Empilha os botões, com o primário no topo */
+    gap: 1rem; /* Aumenta o espaçamento entre os botões */
+  }
+  .modal .actions .btn {
+    width: 100%; /* Faz os botões ocuparem a largura total */
+  }
+  .modal .fields, .modal .file-inputs {
+    grid-template-columns: 1fr;
+  }
+  .modal {
+    padding: 1.5rem;
+  }
+  .modal .image-previews {
+    flex-wrap: wrap;
+  }
+}
+
+/* =================================== */
+/* ===== ESTILOS RESPONSIVOS GERAIS ===== */
+/* =================================== */
+
+@media (max-width: 768px) {
+  .admin-header {
+    padding: 1rem;
+  }
+  .admin-main {
+    padding: 1rem;
+  }
+  .card {
+    padding: 1rem;
+  }
+
+  .tiles {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Alteração Gemini: Em mobile, o conteúdo dos cards colapsados fica oculto */
+  .card.collapsed .card-content {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0; /* Remove o padding quando colapsado */
+  }
+
+  /* Table to Card Reflow */
+  .table-responsive {
+    overflow-x: auto; /* Mantido para segurança, mas o reflow deve evitar */
+  }
+  
+  .tabela {
+    border: none;
+  }
+
+  .tabela thead {
+    display: none; /* Esconde o cabeçalho em mobile */
+  }
+
+  .tabela tr {
+    display: block;
+    margin-bottom: 1.5rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    padding: 1rem;
+  }
+
+  .tabela td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #f5f5f5;
+    text-align: right; /* Alinha o valor à direita */
+  }
+
+  .tabela td:last-child {
+    border-bottom: none;
+  }
+
+  .tabela td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    text-align: left; /* Alinha o rótulo à esquerda */
+    padding-right: 1rem;
+    color: #333;
+  }
+
+  /* Ações da tabela */
+  .tabela td[data-label="Ações"] {
+    display: flex;
+    justify-content: flex-end; /* Alinha botões à direita */
+    gap: 0.5rem;
+  }
+
+  .tabela td[data-label="Ações"]::before {
+    display: none; /* Esconde o rótulo "Ações" */
+  }
+
+  /* Ajustes para o formulário de novo produto em mobile */
+  .product-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+}

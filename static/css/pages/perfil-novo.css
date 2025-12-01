@@ -1,0 +1,909 @@
+/* Alteração Gemini: Garante que o modal de sessão funcione na página de perfil */
+@import url('../components/auth-modal.css');
+
+/* === Estrutura Principal da Página de Perfil === */
+.profile-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+.profile-hero {
+  text-align: left;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+.profile-hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+.profile-container {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+} /* === Barra Lateral (Sidebar) === */
+.profile-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 2rem;
+}
+.profile-user-box {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.profile-pic-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--cor-laranja, #ff6b35);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 auto 1rem;
+}
+.profile-user-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+.profile-user-email {
+  font-size: 0.9rem;
+  color: #666;
+  word-break: break-all;
+}
+.profile-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.profile-nav-link {
+  display: block;
+  padding: 0.8rem 1.2rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+.profile-nav-link:hover {
+  background-color: #f0f0f0;
+}
+.profile-nav-link.active {
+  background-color: var(--cor-preto, #111);
+  color: white;
+  font-weight: 600;
+}
+.profile-nav-link.logout {
+  color: #c53030;
+  margin-top: 1rem;
+}
+.profile-nav-link.logout:hover {
+  background-color: #fed7d7;
+} /* === Conteúdo Principal === */
+.profile-content {
+  flex-grow: 1;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.content-header {
+  margin-bottom: 1.5rem;
+}
+.content-header h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.25rem;
+}
+.content-header p {
+  color: #666;
+}
+.content-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+} /* Estilos para cartões de conteúdo (pedidos, dados, etc.) */
+.order-card,
+.data-card,
+.address-card {
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.order-status {
+  background-color: #e2e8f0;
+  color: #4a5568;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.order-card-details summary {
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 1rem;
+  color: var(--cor-laranja);
+}
+.order-items-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1rem;
+}
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.order-item:last-child {
+  border-bottom: none;
+}
+.order-item .item-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.order-item .item-details {
+  flex-grow: 1;
+}
+
+/* ============================
+   SEÇÃO: MEUS ENDEREÇOS (ISOLADA)
+   ============================ */
+
+#tab-addresses {
+  padding: 32px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cabeçalho exclusivo */
+.addr-header {
+  margin-bottom: 24px;
+}
+
+.addr-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0d1b2a;
+}
+
+.addr-header p {
+  font-size: 15px;
+  color: #4a5568;
+}
+
+/* Card exclusivo */
+.addr-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Form-group exclusivo */
+.addr-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.addr-form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #203647;
+}
+
+.addr-input {
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #d7dfe6;
+  background-color: #f9fafb;
+  transition: border 0.2s, background 0.2s;
+}
+
+/* Focus */
+.addr-input:not([readonly]):focus {
+  border-color: #ff5c2b;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 92, 43, 0.25);
+}
+
+.addr-input[readonly] {
+  opacity: 0.9;
+  cursor: not-allowed;
+}
+
+/* Botão exclusivo */
+.addr-btn {
+  margin-top: 8px;
+  padding: 14px;
+  background-color: #ff5c2b;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s ease;
+}
+
+.addr-btn:hover {
+  background-color: #e14c1a;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  #tab-addresses {
+    padding: 16px;
+  }
+  .addr-card {
+    padding: 20px;
+  }
+}
+
+/* #################################### */
+ /* ------------ CARD DE ADICIONAR NOVO ENDEREÇO -------------- */ 
+ 
+/* Botão de adicionar */
+.btn-add-endereco {
+  margin-top: 20px;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--cor-laranja, #ff6b35);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.btn-add-endereco:hover {
+  background-color: #e55a24;
+} 
+/* Itens da lista */
+.endereco-item {
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border-left: 4px solid #4c7cf3;
+} 
+/* ------------ MODAL -------------- */
+
+.modal-endereco {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.modal-content-endereco {
+  background: white;
+  width: 1000px;
+  height: 500px;
+  border-radius: 22px;
+  padding: 0;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+/* LADO ESQUERDO – FORMULÁRIO */
+.modal-left {
+  width: 50%;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.modal-content-endereco h3 {
+  margin-bottom: 15px;
+}
+.modal-content-endereco input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+} 
+
+/* Botões do modal */
+.modal-botoes {
+  display: flex;
+  justify-content: space-between;
+ 
+}
+.btn-salvar {
+  padding: 8px 14px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-salvar:hover {
+  background: #398d3f;
+}
+.btn-cancelar {
+  padding: 8px 14px;
+  background: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 6px; 
+  cursor: pointer;
+}
+.btn-cancelar:hover {
+  background: #b84643;
+}
+
+/* LADO DIREITO – MAPA */
+.modal-right {
+  width: 50%;
+  background-color: #f5f5f5;
+  border-radius: 0 22px 22px 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#map-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* #################################### */
+/* Formulário de atualização de senha */
+.password-update-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.password-update-form .form-group {
+  flex-grow: 1;
+}
+.password-update-form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+.password-update-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Estado Vazio */
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: #f9f9f9;
+  border: 1px dashed #ddd;
+  border-radius: 12px;
+}
+.empty-state p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #555;
+}
+/* Botões */
+
+.btn-primary {
+  background-color: var(--cor-laranja, #ff6b35);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+}
+/* === Responsividade === */
+@media (max-width: 960px) {
+  .profile-container {
+    flex-direction: column;
+  }
+  .profile-sidebar {
+    width: 100%;
+    position: static;
+  }
+
+  /* Alteração Gemini: Adiciona um indicador de rolagem (>) na barra de abas */
+  .profile-nav {
+    position: relative; /* Necessário para posicionar o indicador */
+    overflow: hidden; /* Esconde o indicador se não houver overflow, embora o gradiente faça o trabalho visual */
+  }
+
+  /* Alteração Gemini: Substitui a lista de botões por uma barra de abas horizontal e rolável */
+  .profile-nav ul {
+    display: flex;
+    flex-wrap: nowrap; /* Impede que os itens quebrem a linha */
+    overflow-x: auto; /* Permite a rolagem horizontal */
+    -webkit-overflow-scrolling: touch; /* Melhora a experiência de rolagem no iOS */
+    scrollbar-width: none; /* Esconde a barra de rolagem no Firefox */
+    padding-bottom: 1rem; /* Espaço para a sombra não ser cortada */
+    margin: 0 -1rem; /* Compensa o padding da página para a barra ir de ponta a ponta */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+
+
+
+  .profile-nav ul::-webkit-scrollbar {
+    display: none; /* Esconde a barra de rolagem no Chrome/Safari */
+  }
+
+  .profile-nav-link {
+    flex-shrink: 0; /* Impede que os itens encolham */
+    white-space: nowrap; /* Garante que o texto não quebre */
+    margin-bottom: 0;
+  }
+
+  /* Alteração Gemini: Garante que o botão de logout não tenha margem superior no mobile */
+  .profile-nav-link.logout {
+    margin-top: 0;
+  }
+
+  /* Alteração Gemini: Transforma a tabela do carrinho em cards no mobile */
+  /* (Este bloco foi movido para baixo para melhor organização) */
+
+  .cart-table {
+    display: block;
+    width: 100%;
+  }
+  .cart-table thead {
+    display: none; /* Esconde o cabeçalho da tabela */
+  }
+  .cart-table tbody, .cart-table tr, .cart-table td {
+    display: block;
+    width: 100%;
+  }
+  .cart-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .cart-table td {
+    padding: 0.5rem 0;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cart-table td::before {
+    content: attr(data-label); /* Usa o data-label como título da "coluna" */
+    font-weight: 600;
+    margin-right: 1rem;
+  }
+  .cart-table td.product-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .cart-table td.product-cell::before {
+    display: none; /* Não precisa de label para o produto principal */
+  }
+  .item-image-large {
+    width: 100px; /* Aumenta um pouco a imagem no mobile */
+    height: 100px;
+  }
+
+  /* Alteração Gemini: Esconde a caixa de usuário da sidebar, pois as informações estarão no header */
+  .profile-user-box {
+    display: none;
+  }
+}
+
+/* Alteração Gemini: Melhorias de centralização para telas de celular */
+@media (max-width: 768px) {
+  .content-body {
+    align-items: center; /* Centraliza os cards de conteúdo */
+  }
+
+  .data-card, .address-card {
+    width: 100%;
+    max-width: 450px; /* Limita a largura máxima para melhor leitura */
+  }
+
+  .password-update-form {
+    flex-direction: column; /* Empilha os campos e o botão */
+    align-items: stretch; /* Faz os itens ocuparem a largura total */
+  }
+  .btn-primary {
+    width: 100%; /* Faz o botão ocupar a largura total */
+  }
+}
+/* === Estilos para a Seção de Carrinho/Checkout na Página de Perfil === */
+.cart-page-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.cart-table th,
+.cart-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+.cart-table th {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+.item-image-large {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.qty-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.qty-input {
+  width: 60px;
+  padding: 0.5rem;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.btn-update-qty {
+  background: #f0f0f0;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+.btn-remove-item {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+}
+.cart-summary-box {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.cart-summary-box h4 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.cart-summary-box .summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.cart-summary-box .summary-row.total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.checkout-full-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+@media (max-width: 960px) {
+  .cart-page-content {
+    grid-template-columns: 1fr;
+  }
+}
+.user-profile {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.profile-header {
+  background: var(--cor--laranja, #FF6B35);
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.profile-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.informacoes-usuario {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.info-item {
+  display: flex;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: bold;
+  width: 120px;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.info-value {
+  color: #666;
+  flex: 1;
+}
+
+.pedidos-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pedido-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.pedido-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.pedido-produtos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.produto-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f8f8;
+  border-radius: 4px;
+}
+
+.produto-imagem {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.produto-info {
+  flex: 1;
+}
+
+.produto-nome {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.produto-preco {
+  color: var(--cor--laranja, #FF6B35);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .info-item {
+    flex-direction: column;
+  }
+  
+  .info-label {
+    width: auto;
+    margin-bottom: 0.5rem;
+  }
+  
+  .pedido-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Estilos para os botões de quantidade */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    text-align: center;
+    margin: 0 5px;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Espaçamento para o resumo do pedido */
+.order-summary {
+    margin-top: 20px; /* Adiciona espaço acima do resumo do pedido */
+}
+
+/* Estilos para a lista de endereços dinâmica */
+.endereco-item-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px; /* Aumentar o espaçamento */
+  align-items: center; /* Centralizar verticalmente */
+}
+
+.endereco-item-details {
+  flex-grow: 1;
+  line-height: 1.5;
+}
+
+.endereco-item-details strong {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.endereco-item-cep {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.endereco-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Estilos para os botões de Editar/Excluir endereço */
+.addr-edit-btn,
+.addr-remove-btn {
+  background-color: transparent;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addr-edit-btn {
+  color: #555;
+  border-color: #ccc;
+}
+
+.addr-edit-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #999;
+  color: #000;
+}
+
+.addr-remove-btn {
+  color: #c53030; /* a51212 */
+  border-color: #f5c6cb;
+}
+
+.addr-remove-btn:hover {
+  background-color: #f8d7da; /* f1e0e1 */
+  border-color: #e6818a;
+  color: #721c24; /* 5c0b11 */
+}
+
+@media (max-width: 768px) {
+  .modal-content-endereco {
+    flex-direction: column;
+    width: 95%;
+    max-width: 500px; /* Limita a largura em telas de tablet/portrait */
+    height: auto;
+    max-height: 90vh; /* Ocupa no máximo 90% da altura da tela */
+    overflow-y: auto; /* Permite scroll no conteúdo se for maior */
+  }
+
+  .modal-left {
+    width: 100%;
+    padding: 24px; /* Reduz o padding em telas menores */
+    border-radius: 22px; /* Adiciona o radius em todos os cantos */
+  }
+
+  .modal-right {
+    display: none; /* Esconde o mapa em telas mobile */
+  }
+}

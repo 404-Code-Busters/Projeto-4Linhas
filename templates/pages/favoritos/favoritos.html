@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoritos | 4linhas</title>
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+    <!-- CSS dos favoritos -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/favoritos.css') }}">
+
+    <!-- Fonte -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    {% include 'partials/header.html' %}
+
+    <main class="favoritos-container">
+        <h1 class="favoritos-title">Meus Favoritos</h1>
+
+        <!-- Mensagem caso a lista esteja vazia -->
+        <div class="favoritos-vazio">
+            <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Vazio">
+            <p>Você ainda não adicionou nenhum item aos favoritos.</p>
+        </div>
+
+        <!-- Grid dos produtos favoritos (quando tiver) -->
+        <div class="favoritos-grid">
+            <!-- Exemplo de card -->
+            <div class="favorito-card">
+                <div class="card-heart">
+                    <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Favorito">
+                </div>
+
+                <img src="{{ url_for('static', path='assets/produtos/camisa.webp') }}" class="card-img" alt="Produto">
+
+                <h3 class="card-name">Camisa Esportiva Azul</h3>
+                <p class="card-price">R$ 129,90</p>
+
+                <button class="btn-carrinho">Adicionar ao carrinho</button>
+            </div>
+
+            <!-- Copiar esse bloco quando quiser mais cards -->
+        </div>
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+</body>
+</html>

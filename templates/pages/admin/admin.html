@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4Linhas - Painel Administrativo</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/pages/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/components/modal.css') }}">
+  <link rel="icon" href="{{ url_for('static', path='assets/logo/4linhas-bg-red.svg') }}">
+</head>
+<body>
+  <header class="admin-header">
+    <div class="wrap">
+      <h1>Painel Administrativo</h1>
+      <button class="hamburger-menu" aria-label="Abrir menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="admin-nav">
+        <a href="#pedidos">Pedidos</a>
+        <a href="#usuarios">Usuários</a>
+        <a href="/">Voltar ao Site</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-main wrap">
+
+    <!-- Seção de Boas-vindas -->
+    <section id="inicio" class="card destaque">
+      <h2>Bem-vindo ao Painel Administrativo 👋</h2>
+      <p>Gerencie os produtos, pedidos e usuários de forma prática e centralizada.</p>
+      <div class="tiles">
+        <div class="tile">
+          <span>Produtos Cadastrados</span>
+          <strong id="produtosCount">{{ produtos|length }}</strong>
+        </div>
+        <div class="tile">
+          <span>Total de Pedidos</span>
+          <strong>{{ pedidos|length }}</strong>
+        </div>
+        <div class="tile">
+          <span>Usuários Cadastrados</span>
+          <strong>{{ clientes|length }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Produtos -->
+    <section id="produtos-cadastro" class="card"> {# Renomeado para clareza #}
+      <h2 class="card-header-toggle">📦 Gerenciar Produtos</h2>
+      
+      <div class="card-content"> {# Alteração Gemini: Adicionado wrapper de conteúdo #}
+        <!-- Formulário para Novo Produto -->
+        <section id="cadastrar-produto" class="admin-section">
+          <h2>Cadastrar Novo Produto</h2>
+          <form action="{{ url_for('criar_produto') }}" method="post" enctype="multipart/form-data" class="product-form">
+          
+          <div class="form-grid">
+            <!-- Coluna 1: Informações Básicas -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="nome">Nome do Produto</label>
+                <input type="text" id="nome" name="nome" placeholder="Ex: Camisa Esportiva" required>
+              </div>
+              <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" rows="4" placeholder="Detalhes sobre o material, corte, etc."></textarea>
+              </div>
+            </div>
+      
+            <!-- Coluna 2: Preço, Estoque e Atributos -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="preco">Preço (R$)</label>
+                <input type="number" id="preco" name="preco" step="0.01" placeholder="Ex: 149.90" required>
+              </div>
+              <div class="form-group">
+                <label for="estoque">Estoque</label>
+                <input type="number" id="estoque" name="estoque" placeholder="Ex: 50" required>
+              </div>
+              <div class="form-group">
+                <label for="tamanho">Tamanho</label>
+                <input type="text" id="tamanho" name="tamanho" placeholder="Ex: P, M, G" required>
+              </div>
+              <div class="form-group">
+                <label for="cor">Cor</label>
+                <input type="text" id="cor" name="cor" placeholder="Ex: Azul Marinho" required>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Seção de Upload de Imagens -->
+          <div class="form-group">
+            <label>Imagens do Produto</label>
+            <div class="image-upload-container">
+              <!-- Imagem Principal -->
+              <label for="imagem" class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem">
+                  <span class="preview-text">Principal</span>
+                </div>
+                <input type="file" id="imagem" name="imagem" accept="static/upload/img/*" data-preview-target="preview-imagem">
+              </label>
+              <!-- Imagem 1 -->
+              <label for="imagem1" class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem1">
+                  <span class="preview-text">Img. 2</span>
+                </div>
+                <input type="file" id="imagem1" name="imagem1" accept="static/upload/img/*" data-preview-target="preview-imagem1">
+              </label>
+              <!-- Imagem 2 -->
+              <label for="imagem2" class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem2">
+                  <span class="preview-text">Img. 3</span>
+                </div>
+                <input type="file" id="imagem2" name="imagem2" accept="static/upload/img/*" data-preview-target="preview-imagem2">
+              </label>
+              <!-- Imagem 3 -->
+              <label for="imagem3" class="image-upload-slot">
+                <div class="image-preview" id="preview-imagem3">
+                  <span class="preview-text">Img. 4</span>
+                </div>
+                <input type="file" id="imagem3" name="imagem3" accept="static/upload/img/*" data-preview-target="preview-imagem3">
+              </label>
+            </div>
+          </div>
+      
+          <div class="btn-container">
+            <button type="submit" class="btn-primary">Salvar Produto</button>
+          </div>
+        </form>
+        </section> {# Fim da seção de cadastro #}
+      </div> {# Fim de .card-content #}
+    </section> {# Fim do card de cadastro de produtos #}
+
+    <!-- Inicia um novo card para a "Lista de Produtos" -->
+    <section id="lista-produtos-secao" class="card">
+      <h2 class="card-header-toggle">Lista de Produtos</h2>
+      <div class="card-content"> {# Alteração Gemini: Adicionado wrapper de conteúdo #}
+        <div class="table-section"> <!-- Mantém a div para consistência -->
+          <input type="text" class="busca" id="buscaProdutos" placeholder="Buscar produtos...">
+          <div class="table-responsive">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Preço</th>
+                  <th>Estoque</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if produtos %}
+                  {% for p in produtos %}
+                  <tr>
+                    <td data-label="ID">{{ p.id_produto }}</td>
+                    <td data-label="Nome">{{ p.nome }}</td>
+                    <td data-label="Preço">R$ {{ "%.2f"|format(p.preco)|replace('.', ',') }}</td>
+                    <td data-label="Estoque">{{ p.estoque if p.estoque is not none else '-' }}</td>
+                    <td data-label="Ações">
+                      <form action="/admin/produto/deletar/{{ p.id_produto }}" method="POST" style="display:inline;" onsubmit="return confirmarExclusao('{{ p.id_produto }}')">
+                        <button type="submit" class="btn small danger">Excluir</button>
+                      </form>
+                      <button type="button" class="btn small editar-produto-btn"
+                        data-id="{{ p.id_produto }}"
+                        data-nome="{{ p.nome|e }}"
+                        data-descricao="{{ p.descricao|e }}"
+                        data-preco="{{ p.preco }}"
+                        data-tamanho="{{ p.tamanho }}"
+                        data-categoria="{{ p.categoria if p.categoria else '' }}" {# Adicionado data-categoria #}
+                        data-cor="{{ p.cor }}"
+                        data-estoque="{{ p.estoque if p.estoque is not none else '' }}"
+                        data-imagem="{{ p.imagem_caminho if p.imagem_caminho else '' }}"
+                        data-imagem1="{{ p.imagem_caminho1 if p.imagem_caminho1 else '' }}"
+                        data-imagem2="{{ p.imagem_caminho2 if p.imagem_caminho2 else '' }}"
+                        data-imagem3="{{ p.imagem_caminho3 if p.imagem_caminho3 else '' }}"
+                      >Editar</button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div> {# Fim de .table-section #}
+      </div> {# Fim de .card-content #}
+    </section> {# Fim do card de lista de produtos #}
+
+    <!-- Seção de Pedidos -->
+    <section id="pedidos" class="card">
+      <h2 class="card-header-toggle">📋 Gerenciar Pedidos</h2>
+      <div class="card-content"> {# Conteúdo colapsável #}
+        {% if pedidos %}
+        <div class="table-responsive">
+          <table class="tabela">
+            <thead>
+              <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        {% else %}
+        <p>Nenhum pedido encontrado.</p>
+        {% endif %}
+      </div> {# Fim de .card-content #}
+    </section>
+    <!-- Seção de Gráficos -->
+    <section id="graficos" class="card graficos">
+      <h2 class="card-header-toggle">📊 Resumo de Vendas</h2>
+      <div class="card-content"> {# Conteúdo colapsável #}
+        <img src="#" alt="Gráfico ilustrativo">
+      </div>
+    </section>
+
+  </main>
+
+
+
+  <!-- Edit product modal (hidden) -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header>
+        <h2 id="modalTitle">Editar Produto</h2>
+        <button id="modalClose" type="button" aria-label="Fechar">&times;</button>
+      </header>
+      <form id="editProductForm" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="post">
+        <input type="hidden" name="remove_imagem" id="remove_imagem" value="0">
+        <input type="hidden" name="remove_imagem1" id="remove_imagem1" value="0">
+        <input type="hidden" name="remove_imagem2" id="remove_imagem2" value="0">
+        <input type="hidden" name="remove_imagem3" id="remove_imagem3" value="0">
+        <input type="hidden" name="id_produto" id="modal_id"> {# Campo oculto para o ID do produto #}
+
+        <!-- Alteração Gemini: Estrutura de acordeão para o formulário do modal -->
+        <div class="modal-accordion">
+          <!-- Seção 1: Informações Básicas -->
+          <div class="modal-section">
+            <h3 class="modal-section-toggle">Informações Básicas</h3>
+            <div class="modal-section-content">
+              <div class="fields">
+                <div><label>Nome</label><input type="text" name="nome" id="modal_nome" required></div>
+                <div><label>Preço</label><input type="number" step="0.01" name="preco" id="modal_preco" required></div>
+                <div><label>Tamanho</label><input type="text" name="tamanho" id="modal_tamanho" required></div>
+                <div><label>Estoque</label><input type="number" name="estoque" id="modal_estoque" required></div>
+                <div><label>Categoria</label><input type="text" name="categoria" id="modal_categoria" placeholder="Ex: Camisa, Calça"></div>
+                <div><label>Cor</label><input type="text" name="cor" id="modal_cor"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção 2: Descrição -->
+          <div class="modal-section">
+            <h3 class="modal-section-toggle">Descrição</h3>
+            <div class="modal-section-content">
+              <div class="fields">
+                <div class="full"><textarea name="descricao" id="modal_descricao" rows="4"></textarea></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção 3: Imagens -->
+          <div class="modal-section">
+            <h3 class="modal-section-toggle">Imagens do Produto</h3>
+            <div class="modal-section-content">
+              <div class="full">
+                <label>Imagens Atuais (clique no 'X' para remover)</label>
+                <div class="image-previews" id="modal_image_previews">
+                  <!-- previews inserted by JS -->
+                </div>
+              </div>
+              <!-- Alteração Gemini: Substituído o input padrão por botões estilizados -->
+              <div class="full">
+                <h4 class="upload-title">Substituir Imagens (opcional)</h4>
+              </div>
+              <div class="full file-inputs">
+                <div class="upload-buttons-grid">
+                  <label for="modal_imagem" class="btn-upload-modal">Principal</label>
+                  <label for="modal_imagem1" class="btn-upload-modal">Imagem 2</label>
+                  <label for="modal_imagem2" class="btn-upload-modal">Imagem 3</label>
+                  <label for="modal_imagem3" class="btn-upload-modal">Imagem 4</label>
+                </div>
+                <input type="file" name="imagem" id="modal_imagem" accept="image/*" class="hidden-file-input">
+                <input type="file" name="imagem1" id="modal_imagem1" accept="image/*" class="hidden-file-input">
+                <input type="file" name="imagem2" id="modal_imagem2" accept="image/*" class="hidden-file-input">
+                <input type="file" name="imagem3" id="modal_imagem3" accept="image/*" class="hidden-file-input">
+              </div>
+            </div>
+          </div>
+        </div> <!-- Fim de .modal-accordion -->
+
+        <div class="actions">
+          <button type="button" class="btn btn-secondary" id="modalCancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const modalOverlay = document.getElementById('modalOverlay');
+      const modalCloseBtn = document.getElementById('modalClose');
+      const editProductForm = document.getElementById('editProductForm');
+      const editButtons = document.querySelectorAll('.editar-produto-btn');
+
+      // Campos do formulário no modal
+      const modalId = document.getElementById('modal_id');
+      const modalNome = document.getElementById('modal_nome');
+      const modalDescricao = document.getElementById('modal_descricao');
+      const modalPreco = document.getElementById('modal_preco');
+      const modalTamanho = document.getElementById('modal_tamanho');
+      const modalCor = document.getElementById('modal_cor');
+      const modalEstoque = document.getElementById('modal_estoque');
+      const modalCategoria = document.getElementById('modal_categoria');
+
+      // Pré-visualizações e inputs de imagem
+      const modalImagePreviews = document.getElementById('modal_image_previews');
+      const modalImagemInput = document.getElementById('modal_imagem');
+      const modalImagem1Input = document.getElementById('modal_imagem1');
+      const modalImagem2Input = document.getElementById('modal_imagem2');
+      const modalImagem3Input = document.getElementById('modal_imagem3');
+
+      // Inputs ocultos para remoção de imagem
+      const removeImagem = document.getElementById('remove_imagem');
+      const removeImagem1 = document.getElementById('remove_imagem1');
+      const removeImagem2 = document.getElementById('remove_imagem2');
+      const removeImagem3 = document.getElementById('remove_imagem3');
+
+      function openModal() {
+        modalOverlay.style.display = 'flex';
+        modalOverlay.classList.add('open');
+      }
+
+      function closeModal() {
+        modalOverlay.style.display = 'none';
+        modalOverlay.classList.remove('open');
+        // Resetar formulário e pré-visualizações de imagem
+        editProductForm.reset();
+        modalImagePreviews.innerHTML = '';
+        removeImagem.value = '0';
+        removeImagem1.value = '0';
+        removeImagem2.value = '0';
+        removeImagem3.value = '0';
+        // Limpar inputs de arquivo
+        modalImagemInput.value = '';
+        modalImagem1Input.value = '';
+        modalImagem2Input.value = '';
+        modalImagem3Input.value = '';
+      }
+
+      modalCloseBtn.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+          closeModal();
+        }
+      });
+
+      editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const productId = this.dataset.id;
+          const nome = this.dataset.nome;
+          const descricao = this.dataset.descricao;
+          const preco = this.dataset.preco;
+          const tamanho = this.dataset.tamanho;
+          const cor = this.dataset.cor;
+          const estoque = this.dataset.estoque;
+          const categoria = this.dataset.categoria;
+
+          // Definir a ação do formulário
+          editProductForm.action = `/admin/produto/atualizar/${productId}`;
+
+          // Preencher os campos do formulário
+          modalId.value = productId;
+          modalNome.value = nome;
+          modalDescricao.value = descricao;
+          modalPreco.value = preco;
+          modalTamanho.value = tamanho;
+          modalCor.value = cor;
+          modalEstoque.value = estoque;
+          modalCategoria.value = categoria;
+
+          // Lidar com as pré-visualizações de imagem
+          const images = [
+            this.dataset.imagem,
+            this.dataset.imagem1,
+            this.dataset.imagem2,
+            this.dataset.imagem3
+          ];
+          const imageInputs = [modalImagemInput, modalImagem1Input, modalImagem2Input, modalImagem3Input];
+          const removeImageFlags = [removeImagem, removeImagem1, removeImagem2, removeImagem3];
+
+          modalImagePreviews.innerHTML = ''; // Limpar pré-visualizações anteriores
+
+          images.forEach((imgPath, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            if (imgPath) {
+              const img = document.createElement('img');
+              img.src = `/static/upload/img/${imgPath}`; // Assumindo que as imagens estão em static/
+              img.alt = `Imagem ${index + 1}`;
+              previewItem.appendChild(img);
+
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.className = 'remove-btn';
+              removeBtn.textContent = '✕';
+              removeBtn.addEventListener('click', () => {
+                imageInputs[index].value = ''; // Limpar input de arquivo
+                removeImageFlags[index].value = '1'; // Marcar para remoção
+                previewItem.remove(); // Remover pré-visualização
+              });
+              previewItem.appendChild(removeBtn);
+            } else {
+              const noImage = document.createElement('div');
+              noImage.className = 'no-image';
+              noImage.textContent = 'Sem imagem';
+              previewItem.appendChild(noImage);
+            }
+            modalImagePreviews.appendChild(previewItem);
+          });
+
+          openModal();
+        });
+      });
+
+      // Lidar com as mudanças nos inputs de arquivo do formulário de novo produto (para pré-visualizações)
+      const imageInputs = document.querySelectorAll('input[type="file"][data-preview-target]');
+      
+      imageInputs.forEach(input => {
+        input.addEventListener('change', function() {
+          const targetId = this.dataset.previewTarget;
+          const previewContainer = document.getElementById(targetId);
+          
+          if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+              previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview da imagem">`;
+            }
+            
+            reader.readAsDataURL(this.files[0]);
+          }
+        });
+      });
+
+      // Confirmação para o botão de exclusão
+      window.confirmarExclusao = function(productId) {
+        return confirm(`Tem certeza que deseja excluir o produto ID ${productId}?`);
+      };
+
+      // Funcionalidade do menu hambúrguer
+      const hamburger = document.querySelector('.hamburger-menu');
+      const nav = document.querySelector('.admin-nav');
+      hamburger.addEventListener('click', () => {
+        nav.classList.toggle('active');
+      });
+
+      // Alteração Gemini: Funcionalidade de busca na tabela de produtos
+      const buscaProdutosInput = document.getElementById('buscaProdutos');
+      const tabelaProdutos = document.querySelector('.tabela tbody');
+      const linhasProdutos = tabelaProdutos.getElementsByTagName('tr');
+
+      buscaProdutosInput.addEventListener('keyup', function() {
+        const termoBusca = this.value.toLowerCase();
+
+        for (let i = 0; i < linhasProdutos.length; i++) {
+          const linha = linhasProdutos[i];
+          // Pega o texto de todas as células da linha, exceto a de ações
+          const textoLinha = linha.textContent || linha.innerText;
+
+          if (textoLinha.toLowerCase().indexOf(termoBusca) > -1) {
+            linha.style.display = ""; // Mostra a linha se corresponder
+          } else {
+            linha.style.display = "none"; // Esconde a linha se não corresponder
+          }
+        }
+      });
+
+      // Alteração Gemini: Funcionalidade de cards colapsáveis
+      const cardToggles = document.querySelectorAll('.card-header-toggle');
+
+      cardToggles.forEach(toggle => {
+        const card = toggle.closest('.card');
+        const cardContent = card.querySelector('.card-content');
+
+        // Adiciona um ícone de seta ao toggle
+        const arrowIcon = document.createElement('span');
+        arrowIcon.classList.add('card-toggle-icon');
+        toggle.appendChild(arrowIcon);
+
+        // Verifica o tamanho da tela para definir o estado inicial
+        if (window.innerWidth <= 768) {
+          card.classList.add('collapsed'); // Colapsado por padrão em mobile
+          if (cardContent) cardContent.style.maxHeight = '0';
+        } else {
+          card.classList.remove('collapsed'); // Expandido por padrão em desktop
+          if (cardContent) cardContent.style.maxHeight = cardContent.scrollHeight + 'px';
+        }
+
+        toggle.addEventListener('click', () => {
+          card.classList.toggle('collapsed');
+          if (cardContent) {
+            if (card.classList.contains('collapsed')) {
+              cardContent.style.maxHeight = '0';
+            } else {
+              cardContent.style.maxHeight = cardContent.scrollHeight + 'px';
+            }
+          }
+        });
+
+        // Ajusta max-height ao redimensionar a janela se o card estiver expandido
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 768) {
+            card.classList.remove('collapsed');
+            if (cardContent) cardContent.style.maxHeight = cardContent.scrollHeight + 'px';
+          } else if (!card.classList.contains('collapsed')) {
+            // Se for mobile e não estiver explicitamente colapsado, ajusta max-height
+            if (cardContent) cardContent.style.maxHeight = cardContent.scrollHeight + 'px';
+          }
+        });
+      });
+
+      // Alteração Gemini: Funcionalidade de acordeão DENTRO do modal de edição
+      function setupModalAccordion() {
+        const modalToggles = document.querySelectorAll('.modal-section-toggle');
+        modalToggles.forEach((toggle, index) => {
+          const section = toggle.closest('.modal-section');
+          const content = section.querySelector('.modal-section-content');
+
+          // Adiciona ícone se não existir
+          if (!toggle.querySelector('.modal-toggle-icon')) {
+            const icon = document.createElement('span');
+            icon.className = 'modal-toggle-icon';
+            toggle.appendChild(icon);
+          }
+
+          // Em mobile, colapsa todas exceto a primeira
+          if (window.innerWidth <= 768) {
+            if (index > 0) { // Deixa a primeira seção aberta
+              section.classList.add('collapsed');
+              content.style.maxHeight = '0';
+            } else {
+              section.classList.remove('collapsed');
+              content.style.maxHeight = content.scrollHeight + 'px';
+            }
+          }
+
+          toggle.addEventListener('click', () => {
+            section.classList.toggle('collapsed');
+            if (section.classList.contains('collapsed')) {
+              content.style.maxHeight = '0';
+            } else {
+              content.style.maxHeight = content.scrollHeight + 'px';
+            }
+          });
+        });
+      }
+    });
+  </script>
+
+
+  </div>
+</body>
+</html>
