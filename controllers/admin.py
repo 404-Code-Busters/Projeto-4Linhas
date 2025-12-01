@@ -23,6 +23,15 @@ UPLOAD_DIR = '../static/upload/img'
 # caminho para o os
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+def _salvar_upload_file(upload_file: UploadFile):
+    """Função auxiliar para salvar um UploadFile no UPLOAD_DIR e retornar o nome do arquivo."""
+    if upload_file and upload_file.filename:
+        caminho_arquivo = os.path.join(UPLOAD_DIR, upload_file.filename)
+        with open(caminho_arquivo, "wb") as buffer:
+            shutil.copyfileobj(upload_file.file, buffer)
+        return upload_file.filename
+    return None
+
 #------------------------------AÇÕES DE UM ADMIN-------------------------------------------
 #------------------------------FOI ATUALIZADO SÓ AS FUNÇÕES DESTE BLOCO--------------------
 
@@ -62,20 +71,11 @@ def criar_produto(request: Request,
     estoque: int = Form(...),
     db: Session = Depends(get_db)
 ):
-    # Função auxiliar para salvar imagens e retornar o nome do arquivo
-    def salvar_upload_file(upload_file: UploadFile):
-        if upload_file and upload_file.filename:
-            caminho_arquivo = os.path.join(UPLOAD_DIR, upload_file.filename)
-            with open(caminho_arquivo, "wb") as buffer:
-                shutil.copyfileobj(upload_file.file, buffer)
-            return upload_file.filename
-        return None
-
     # Salva cada imagem e obtém seu nome de arquivo
-    nome_imagem = salvar_upload_file(imagem)
-    nome_imagem1 = salvar_upload_file(imagem1)
-    nome_imagem2 = salvar_upload_file(imagem2)
-    nome_imagem3 = salvar_upload_file(imagem3)
+    nome_imagem = _salvar_upload_file(imagem)
+    nome_imagem1 = _salvar_upload_file(imagem1)
+    nome_imagem2 = _salvar_upload_file(imagem2)
+    nome_imagem3 = _salvar_upload_file(imagem3)
     
     novo_produto = Produtos( #TODAS AS INFORMAÇÕES ABAIXO ESTÃO ATUALIZADAS - 12/11/2025
         nome=nome,
@@ -127,15 +127,6 @@ def atualizar_produto(id: int,
     if not produto:
         return RedirectResponse(url="/admin", status_code=303)
     
-    # Função auxiliar para salvar imagens
-    def salvar_upload_file(upload_file: UploadFile):
-        if upload_file and upload_file.filename:
-            caminho_arquivo = os.path.join(UPLOAD_DIR, upload_file.filename)
-            with open(caminho_arquivo, "wb") as buffer:
-                shutil.copyfileobj(upload_file.file, buffer)
-            return upload_file.filename
-        return None
-
     # Atualiza os campos do produto
     produto.nome = nome
     produto.descricao = descricao
@@ -146,13 +137,13 @@ def atualizar_produto(id: int,
     produto.estoque = estoque
     
     # Atualiza as imagens se novos arquivos forem enviados
-    if nome_imagem := salvar_upload_file(imagem):
+    if nome_imagem := _salvar_upload_file(imagem):
         produto.imagem_caminho = nome_imagem
-    if nome_imagem1 := salvar_upload_file(imagem1):
+    if nome_imagem1 := _salvar_upload_file(imagem1):
         produto.imagem_caminho1 = nome_imagem1
-    if nome_imagem2 := salvar_upload_file(imagem2):
+    if nome_imagem2 := _salvar_upload_file(imagem2):
         produto.imagem_caminho2 = nome_imagem2
-    if nome_imagem3 := salvar_upload_file(imagem3):
+    if nome_imagem3 := _salvar_upload_file(imagem3):
         produto.imagem_caminho3 = nome_imagem3
     
     db.commit()

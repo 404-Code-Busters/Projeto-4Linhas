@@ -433,25 +433,13 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
         for item in carrinho
         ]
 
-    db.commit()
-
-    carrinhos[cliente.id_cliente] = []
-
-    # -----------------------------------------------
-    # ---- ENVIAR EMAIL DE CONFIRMAÇÃO DE COMPRA ----
-    # -----------------------------------------------
-
-    itens_email = [
-        {
-            "nome": item["nome"],
-            "quantidade": item["quantidade"],
-            "preco": item["preco"]
-        }
-        for item in carrinho
-    ]
-
+    # Adiciona a tarefa de enviar o e-mail em background ANTES de limpar o carrinho
     background_tasks.add_task(send_order_email, cliente.email, pedido, itens_email)
 
+    db.commit()
+
+    # Limpa o carrinho da memória após o pedido ser finalizado e o e-mail agendado
+    carrinhos[cliente.id_cliente] = []
 
     # Redireciona para página de confirmação com id do pedido
     return RedirectResponse(url=f"/pedidos/confirmacao?id={pedido.id_pedido}", status_code=303)
