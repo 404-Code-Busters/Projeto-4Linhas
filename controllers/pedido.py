@@ -109,43 +109,6 @@ def calcular_endereco(
 
     return dados  # devolve o JSON do ViaCEP diretamente
 
-#rota que calcula o frete FEITO PELO PIETRO - 13/11/2025
-@router.get("/api/frete")
-def calcular_frete(
-    request: Request,
-    cep_destino: str = Query(...),
-    db: Session = Depends(get_db)
-):
-    token = request.cookies.get("token")
-    payload = verificar_token(token)
-    if not payload:
-        raise HTTPException(status_code=401, detail="Usuário não autenticado")
-
-    if not cep_destino.isdigit() or len(cep_destino) != 8:
-        raise HTTPException(status_code=400, detail="CEP inválido")
-
-    # Consulta correta ao ViaCEP
-    via_cep_url = f"https://viacep.com.br/ws/{cep_destino}/json/"
-    resposta = requests.get(via_cep_url)  # <--- CORRETO
-
-    if resposta.status_code != 200:
-        raise HTTPException(status_code=400, detail="Erro ao consultar o CEP")
-
-    dados = resposta.json()
-    if "erro" in dados:
-        raise HTTPException(status_code=400, detail="CEP não encontrado")
-
-    valor_frete = 15.00
-    prazo_estimado = 5
-
-    return {
-        "endereco": f"{dados.get('logradouro')} - {dados.get('bairro')} - {dados.get('localidade')} - {dados.get('uf')}",
-        "cep": cep_destino,
-        "valor_frete": valor_frete,
-        "prazo_estimado_dias": prazo_estimado,
-        "status": "Simulação concluída"
-    }
-
 #rota para calcular o frete
 @router.get("/frete", response_class=HTMLResponse)
 def pagina_frete(request: Request):

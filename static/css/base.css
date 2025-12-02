@@ -83,3 +83,11 @@ body {
 .cart-item-remove { background: none; border: none; color: #e05b2d; cursor: pointer; }
 .cart-actions { margin-top: 1rem; display:flex; justify-content: flex-end; }
 .cart-checkout { background: #FF6B35; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+
+/* Estilo para o clique no favorito (adicionado pelo Gemini) */
+.favorite-clicked {
+    /* Converte o ícone para a cor vermelha para feedback instantâneo */
+    filter: invert(25%) sepia(87%) saturate(7483%) hue-rotate(358deg) brightness(100%) contrast(114%);
+    transition: filter 0.2s ease-in-out;
+}
+

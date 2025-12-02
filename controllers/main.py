@@ -88,8 +88,14 @@ async def catalogo(
 
         produtos = query.all()
         
+        # Adiciona a lista de IDs de produtos favoritos ao contexto, se o usuário estiver logado
+        favoritos_ids = []
+        if context.get("user"):
+            favoritos_ids = [fav.produto_id for fav in context["user"].favoritos]
+
         # Adiciona os produtos ao contexto e renderiza
         context["produtos"] = produtos
+        context["favoritos_ids"] = favoritos_ids # Adiciona os IDs dos favoritos ao contexto
         return templates.TemplateResponse("pages/produtos/produtos.html", context)
     except Exception as e:
         # Em desenvolvimento, mostra detalhes do erro
@@ -112,5 +118,12 @@ async def detalhe_produto(request: Request, id_produto: int, db: Session = Depen
     produto = db.query(Produtos).filter(Produtos.id_produto == id_produto).first()
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
+    
+    is_favorited = False
+    if context.get("user"):
+        # Verifica se o produto está na lista de favoritos do usuário
+        is_favorited = any(fav.produto_id == produto.id_produto for fav in context["user"].favoritos)
+
     context["produto"] = produto
+    context["is_favorited"] = is_favorited # Adiciona a informação de favorito ao contexto
     return templates.TemplateResponse('pages/produto/produto.html', context)

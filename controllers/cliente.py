@@ -480,64 +480,98 @@ def logout(request: Request):
     response.delete_cookie("token")
     return response
 
-# rota favoritos feito por Giovanni 26/11/2025
-favoritos = {}
 
-@router.post("/favoritos/adicionar/{produto_id}")
-async def adicionar_favoritos(
-    request:Request, 
-    produto_id:int,
-    db:Session = Depends(get_db)
-):
+# ---------- ROTAS DE FAVORITOS (ADICIONADO/MODIFICADO PELO GEMINI) ----------
+
+# ROTA DE API PARA ADICIONAR/REMOVER UM FAVORITO
+@router.post("/api/favoritos/toggle", name="toggle_favorito")
+async def toggle_favorito(request: Request, db: Session = Depends(get_db)):
+    """
+    Adiciona ou remove um produto da lista de favoritos do usuário.
+    Esta rota é chamada via JavaScript (Fetch API).
+    """
+    print("----- Início da requisição /api/favoritos/toggle -----")
     token = request.cookies.get("token")
+    print(f"Token recebido: {token is not None}")
     payload = verificar_token(token)
     if not payload:
-        return JSONResponse({"mensagem": "Login necessário"}, status_code=401)
+        print("Erro: Payload do token inválido ou token ausente.")
+        return JSONResponse({'status': 'error', 'message': 'Login necessário.'}, status_code=401)
 
-    email = payload.get("sub")
-    cliente = db.query(Clientes).filter_by(email=email).first()
-    if not cliente:
-        return JSONResponse({"mensagem": "Cliente não encontrado"}, status_code=401)
+    user = get_user_from_token(request, db)
+    if not user:
+        print("Erro: Usuário não encontrado após verificação do token.")
+        return JSONResponse({'status': 'error', 'message': 'Usuário não encontrado.'}, status_code=404)
+    print(f"Usuário autenticado: {user.id_cliente}")
 
-    produto = db.query(Produtos).filter_by(id_produto=produto_id).first()
+    try:
+        data = await request.json()
+        product_id = data.get('product_id')
+        print(f"product_id recebido: {product_id}, Tipo: {type(product_id)}")
+        if not product_id:
+            print("Erro: ID do produto não fornecido no corpo da requisição.")
+            return JSONResponse({'status': 'error', 'message': 'ID do produto não fornecido.'}, status_code=400)
+    except Exception as e:
+        print(f"Erro ao parsear JSON da requisição: {e}")
+        return JSONResponse({'status': 'error', 'message': 'Dados inválidos.'}, status_code=400)
+
+
+    # Verifica se o produto existe
+    produto = db.query(Produtos).get(product_id)
     if not produto:
-        return JSONResponse({"mensagem": "Produto não encontrado"}, status_code=404)
-    
-    lista_favoritos = favoritos.get(cliente.id_cliente, [])
-    
-    print(f"Adicionando produto {produto_id} aos favoritos do cliente {cliente.id_cliente}")
-    print(f"Produto encontrado: {produto.nome}, preço: {produto.preco}, imagem: {produto.imagem_caminho}")
+        print(f"Erro: Produto com ID {product_id} não encontrado no banco de dados.")
+        return JSONResponse({'status': 'error', 'message': 'Produto não encontrado.'}, status_code=404)
+    print(f"Produto encontrado: {produto.nome} (ID: {produto.id_produto})")
 
-    # Verifica se o produto já existe em favoritos
-    produto_existente = None
-    for item in favoritos:
-        if item["id"] == produto_id:
-            produto_existente = item
-            break
-            
-    if produto_existente:
-        print(f"Produto já existe em favoritos")
-        return JSONResponse({"mensagem":"Produto já está em favoritos"}, status_code=200)
-    else:
-        novo_item = {
-            "id": produto.id_produto,
-            "nome": produto.nome,
-            "preco": float(produto.preco),  # Converter Decimal para float
-            #"quantidade": quantidade,
-            "imagem": produto.imagem_caminho
-        }
-        lista_favoritos.append(novo_item)
-        print(f"Novo item adicionado aos favoritos", novo_item)
-    
-    favoritos[cliente.id_cliente] = lista_favoritos
-    print(f"Favoritos atualizados para cliente {cliente.id_cliente}: {lista_favoritos}")
-    return JSONResponse({"mensagem": "Produto adicionado aos favoritos", "success": True}, status_code=200)
+    # Verifica se o item já é um favorito do usuário atual
+    favorito_existente = db.query(Favoritos).filter_by(
+        cliente_id=user.id_cliente,
+        produto_id=product_id
+    ).first()
+    print(f"Favorito existente para (Cliente {user.id_cliente}, Produto {product_id}): {favorito_existente is not None}")
 
-# Rota favoritos
+    try:
+        if favorito_existente:
+            # Se já existe, remove
+            db.delete(favorito_existente)
+            db.commit()
+            print("Sucesso: Produto removido dos favoritos.")
+            return JSONResponse({'status': 'removed', 'message': 'Produto removido dos favoritos.'})
+        else:
+            # Se não existe, adiciona
+            novo_favorito = Favoritos(cliente_id=user.id_cliente, produto_id=product_id)
+            db.add(novo_favorito)
+            db.commit()
+            print("Sucesso: Produto adicionado aos favoritos.")
+            return JSONResponse({'status': 'added', 'message': 'Produto adicionado aos favoritos.'})
+
+    except Exception as e:
+        db.rollback()
+        import traceback
+        print(f"Erro no banco de dados durante operação de favorito: {e}")
+        print(traceback.format_exc())
+        return JSONResponse({'status': 'error', 'message': 'Erro ao processar a solicitação.'}), 500
+
+
+# ROTA PARA A PÁGINA DE FAVORITOS
 @router.get("/favoritos", response_class=HTMLResponse, name="favoritos")
 async def pagina_favoritos(request:Request, db: Session = Depends(get_db)):
+    """
+    Busca os produtos favoritados pelo usuário logado e renderiza a página de favoritos.
+    """
     context = get_base_context(request, db)
+    user = context.get("user")
+
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+
+    # Busca os produtos favoritos do usuário através da relação
+    # Acessa o objeto 'produto' de cada item 'favorito'
+    produtos_favoritos = [fav.produto for fav in user.favoritos]
+
+    context.update({"favoritos_list": produtos_favoritos})
     return templates.TemplateResponse("pages/favoritos/favoritos.html", context)
+
 
 # Rota sobre
 @router.get("/sobre", response_class=HTMLResponse, name="sobre")

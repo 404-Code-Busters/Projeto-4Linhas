@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', path='assets/favicon/favicon-4linhas.ico') }}" type="image/x-icon">
     <title>Favoritos | 4linhas</title>
 
     <!-- CSS base -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
     <!-- CSS dos favoritos -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/pages/favoritos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components/footer.css') }}">
 
     <!-- Fonte -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,32 +26,41 @@
         <h1 class="favoritos-title">Meus Favoritos</h1>
 
         <!-- Mensagem caso a lista esteja vazia -->
+        {% if not favoritos_list %}
         <div class="favoritos-vazio">
             <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Vazio">
             <p>Você ainda não adicionou nenhum item aos favoritos.</p>
         </div>
-
-        <!-- Grid dos produtos favoritos (quando tiver) -->
+        {% else %}
+        <!-- Grid dos produtos favoritos -->
         <div class="favoritos-grid">
-            <!-- Exemplo de card -->
-            <div class="favorito-card">
+            {% for produto in favoritos_list %}
+            <div class="favorito-card" data-product-id="{{ produto.id_produto }}">
                 <div class="card-heart">
-                    <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Favorito">
+                    <!-- O coração aqui já vem preenchido. O JS cuidará da remoção -->
+                    <button class="favorite-button favorited" data-product-id="{{ produto.id_produto }}">
+                        <img src="{{ url_for('static', path='assets/icons/add-to-favorites.png') }}" alt="Remover dos Favoritos">
+                    </button>
                 </div>
 
-                <img src="{{ url_for('static', path='assets/produtos/camisa.webp') }}" class="card-img" alt="Produto">
+                <a href="{{ url_for('detalhe_produto', id_produto=produto.id_produto) }}">
+                    <img src="{{ url_for('static', path='upload/img/' + produto.imagem_caminho) if produto.imagem_caminho else '' }}" class="card-img" alt="{{ produto.nome }}">
+                </a>
 
-                <h3 class="card-name">Camisa Esportiva Azul</h3>
-                <p class="card-price">R$ 129,90</p>
+                <h3 class="card-name">{{ produto.nome }}</h3>
+                <p class="card-price">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
 
-                <button class="btn-carrinho">Adicionar ao carrinho</button>
+                <button class="btn-carrinho" data-product-id="{{ produto.id_produto }}">Adicionar ao carrinho</button>
             </div>
-
-            <!-- Copiar esse bloco quando quiser mais cards -->
+            {% endfor %}
         </div>
+        {% endif %}
     </main>
 
     {% include 'partials/footer.html' %}
+
+    <!-- Adiciona o script para interatividade dos favoritos -->
+    <script src="{{ url_for('static', path='js/favoritos.js') }}"></script>
 
 </body>
 </html>

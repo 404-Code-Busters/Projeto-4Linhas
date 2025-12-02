@@ -6,7 +6,7 @@
 <header>
   <!-- Linha 1: Top Bar -->
   <div class="top-bar">
-    <a href="#home" class="top-logo">
+    <a href="{{ url_for('index') }}" class="top-logo">
       <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja" style="filter: brightness(0) invert(1);">
     </a>
     <div class="promo-container">
@@ -114,9 +114,9 @@
               <img src="{{ url_for('static', path='assets/icons/user.png') }}" alt="Login" class="nav-icons profile-icon">
             </a>
           {% endif %}
-          <a href="{{ url_for('index') }}">
-            <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons">
-          </a>
+          <!-- <a href="{{ url_for('favoritos') }}"> 
+            <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Wishlist" class="nav-icons"> 
+          </a> -->
           <button id="cart-button" class="cart-button" aria-label="Abrir carrinho">
             <img src="{{ url_for('static', path='assets/icons/carrinho-carrinho.png') }}" alt= "Carrinho" class="nav-icons">
             <span id="cart-count" class="cart-count"></span> <!-- havia um 0 = <span id="cart-count" class="cart-count">0</span>

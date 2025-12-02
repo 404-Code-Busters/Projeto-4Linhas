@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="{{ url_for('static', path='assets/favicon/favicon-4linhas.ico') }}" type="image/x-icon">
     <title>Perfil - 4linhas</title>
 
     <!-- CSS base (reset, variáveis, estilos globais) -->
@@ -112,14 +113,14 @@
                 >
               </li>
               <li>
-                <a
+                <!--<a
                   href="#favoritos"
                   class="profile-nav-link"
                   data-tab="favorites"
                   role="tab"
                   aria-selected="false"
                   >Favoritos</a
-                >
+                > -->
               </li>
               <li>
                 <a
@@ -412,7 +413,7 @@
           </section>          <!-- JS da funcionalidade com Maps -->
           <script src="/static/js/pages/address_modal_maps.js"></script>
 
-        <!-- Seção: Favoritos -->
+        <!-- Seção: Favoritos 
         <section id="tab-favorites" class="tab-content" role="tabpanel" hidden>
           <div class="content-header">
             <h2>Meus Favoritos</h2>
@@ -423,7 +424,7 @@
               <p>Você ainda não tem produtos favoritos.</p>
               <a href="{{ url_for('catalogo') }}" class="btn-primary">Ver Produtos</a>
             </div>
-            <!-- A lista de favoritos seria renderizada aqui -->
+             A lista de favoritos seria renderizada aqui --> 
           </div>
         </section>
       </div>

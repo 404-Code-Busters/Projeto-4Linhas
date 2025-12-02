@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DECIMAL, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DECIMAL, Boolean, ForeignKey, UniqueConstraint
 from database import Base, engine, SessionLocal
 from sqlalchemy.orm import relationship
 from auth import *
@@ -15,6 +15,7 @@ class Clientes(Base):
     telefone = Column(String(50),nullable=False)
     endereco = Column(String(100), nullable=False)
     pedidos=relationship("Pedidos",back_populates="clientes")
+    favoritos = relationship("Favoritos", back_populates="cliente", cascade="all, delete-orphan")
     is_admin = Column(Boolean,default=False)
 
 # tabela produtos
@@ -74,6 +75,28 @@ class Endereco(Base): #esperando o bda criar a tabela
     estado = Column(String, nullable=True)
     pais = Column(String, nullable=True)
     cep = Column(String, nullable=True)
+
+
+class Favoritos(Base):
+    __tablename__ = 'favoritos'
+    id_favorito = Column(Integer, primary_key=True, index=True)
+    cliente_id = Column(Integer, ForeignKey('clientes.id_cliente'), nullable=False)
+    produto_id = Column(Integer, ForeignKey('produtos.id_produto'), nullable=False)
+    valor_produto = Column(DECIMAL(10,2), nullable=True)
+
+    cliente = relationship("Clientes", back_populates="favoritos")
+    produto = relationship("Produtos", lazy="joined")
+
+    __table_args__ = (
+        UniqueConstraint('cliente_id', 'produto_id', name='_cliente_produto_uc'),
+    )
+
+class Cupom(Base):
+    __tablename__ = "cupons"
+    id_cupon = Column(Integer,primary_key=True,index=True)
+    chave_cupon = Column(String, nullable=True)
+    valor_desconto = Column(Float, nullable=True)
+    ativo = Column(Boolean,default=True)
 
 
 #Base.metadata.create_all(bind=engine)

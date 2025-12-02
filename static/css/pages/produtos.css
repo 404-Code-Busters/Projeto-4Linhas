@@ -327,7 +327,7 @@ img {
 }
 
 .outfit-card {
-    position: relative;
+    position: relative; /* Adicionado para posicionar o botão de favorito */
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -337,6 +337,35 @@ img {
     flex-direction: column;
     overflow: hidden;
 }
+
+/* Estilo para o botão de favorito dentro do card de produto */
+.favorite-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10; /* Garante que o botão fique acima da imagem */
+    background-color: rgba(255, 255, 255, 0.8); /* Fundo semi-transparente */
+    border-radius: 50%; /* Transforma em círculo */
+    width: 35px; /* Tamanho do botão */
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+}
+
+.favorite-button:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.favorite-button img {
+    width: 20px; /* Tamanho do ícone de coração */
+    height: 20px;
+    object-fit: contain;
+}
+
 
 .outfit-card:hover {
     transform: translateY(-5px);
@@ -622,51 +651,13 @@ img {
     font-size: 1rem;
   }
   .product-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
-  .main-nav {
-    flex-direction: column;
-    padding: 0.5rem 1rem;
-    align-items: flex-start;
+  .product-card img {
+    height: 150px;
   }
-  .menu-links {
-    display: none;
-  }
-  .hamburger {
-    display: flex;
-  }
-  .nav-right {
-    align-items: center;
-    width: 100%;
-    justify-content: center;
-  }
-  .user-top-links {
-    font-size: 0.65rem;
-  }
-  .nav-bottom {
-    gap: 1rem;
-  }
-  .search-form {
-    display: none;
-  }
-
-  .inspire-section {
-    padding: 1rem;
-    margin: 2rem 1rem;
-  }
-
-  .inspire-header h2 {
-    font-size: 1.8rem;
-  }
-
-  .outfit-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .outfit-card {
-    height: 250px;
-  }
+  .outfit-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); padding: 1rem; }
+  .outfit-card { min-height: 280px; }
 }
 
 @media (max-width: 480px) {
@@ -677,7 +668,24 @@ img {
     font-size: 0.9rem;
   }
   .product-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, minmax(90px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .product-card img {
+    height: 90px;
+  }
+
+  .product-card {
+    padding: 0.25rem;
+  }
+
+  .product-info h3 {
+    font-size: 0.75rem;
+  }
+
+  .product-info p {
+    font-size: 0.8rem;
   }
   .newsletter-form {
     flex-direction: column;
@@ -702,7 +710,7 @@ img {
   }
 
   .outfit-card {
-    height: 200px;
+    min-height: 200px;
   }
 }
 

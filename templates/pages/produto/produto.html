@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{{ url_for('static', path='assets/favicon/favicon-4linhas.ico') }}" type="image/x-icon">
   <title>Produto - 4linhas</title>
 
   <!-- CSS do Swiper (if needed for any sliders) -->
@@ -86,9 +87,12 @@
       </div>
 
       <div class="product-actions">
-  <button class="btn-primary add-to-cart" data-product-id="{{ produto.id_produto }}">Adicionar ao Carrinho</button>
-        <button class="btn-secondary add-to-wishlist">Adicionar à Lista de Desejos</button>
-      </div>
+        <button class="btn-primary add-to-cart" data-product-id="{{ produto.id_produto }}">Adicionar ao Carrinho</button>
+        <!-- >button class="btn-secondary favorite-button {% if is_favorited %}favorited{% endif %}" data-product-id="{{ produto.id_produto }}">
+            <img src="{{ url_for('static', path='assets/icons/') }}{% if is_favorited %}add-to-favorites.png{% else %}heart.png{% endif %}" alt="Favoritar Produto">
+            Favoritar
+        </button> -->
+      </div> 
 
       <div class="product-specs">
         <h3 class="specs-title">Especificações</h3>
@@ -160,5 +164,6 @@
 
   <!-- JS do Swiper (already included in head) -->
   <script src="{{ url_for('static', path='js/cart.js') }}"></script>
+  <script src="{{ url_for('static', path='js/favoritos.js') }}"></script>
 </body>
 </html>

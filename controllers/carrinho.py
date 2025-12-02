@@ -309,10 +309,12 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
             "from_profile": False,
         })
 
-    # Tenta obter endereço enviado pelo formulário (ex: usuário preencheu no checkout)
+    # -----------------------------
+    # RECEBE FORMULÁRIO
+    # -----------------------------
     form = await request.form()
     from_profile = form.get("from_profile") == "true"
-    
+
     form_logradouro = form.get("logradouro")
     form_numero = form.get("numero")
     form_bairro = form.get("bairro")
@@ -320,13 +322,20 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
     form_uf = form.get("uf")
     form_cep = form.get("cep")
 
+    # <-- RECEBE A DISTÂNCIA CALCULADA NO JS
+    distancia_str = form.get("distancia_km", "0")
+    try:
+        distancia_km = float(distancia_str)
+    except:
+        distancia_km = 0
+
     endereco_obj = db.query(Endereco).filter_by(id_cliente=cliente.id_cliente).first()
 
-    # Decide qual endereço usar: formulário > tabela Endereco > campo cliente.endereco
+    # Endereço via formulário
     if form_logradouro:
         endereco_str = f"{form_logradouro}, {form_numero or ''} - {form_bairro or ''} - {form_cidade or ''} - {form_uf or ''}"
         cep_used = form_cep or ""
-        # Se usuário optou por salvar, persiste/atualiza endereço no banco
+
         if form.get('salvar_endereco'):
             if endereco_obj:
                 endereco_obj.logradouro = form_logradouro
@@ -350,19 +359,20 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
                 )
                 db.add(novo_end)
             db.commit()
+
+    # Endereço salvo
     elif endereco_obj:
         endereco_str = f"{endereco_obj.logradouro}, {endereco_obj.numero or ''} - {endereco_obj.bairro or ''} - {endereco_obj.cidade or ''} - {endereco_obj.estado or ''}"
         cep_used = endereco_obj.cep or ""
+
     elif getattr(cliente, 'endereco', None):
         endereco_str = cliente.endereco
         cep_used = ""
+
     else:
-        # Se vem do perfil, permite que o usuário cadastre endereço no checkout (sem erro)
         if from_profile:
-            # Redirect to GET /checkout to implement PRG and preserve from_profile flag
             return RedirectResponse(url="/checkout?from_profile=true", status_code=303)
-        
-        # Nenhum endereço disponível: retorna para a página de checkout com erro legível
+
         total_produtos = sum(item["preco"] * item["quantidade"] for item in carrinho)
         return templates.TemplateResponse("pages/checkout/checkout.html", {
             "request": request,
@@ -373,22 +383,38 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
             "from_profile": False,
         })
 
+    # TOTAL PRODUTOS
     total_produtos = sum(item["preco"] * item["quantidade"] for item in carrinho)
-    valor_frete = 15.90
-    total_final = total_produtos + valor_frete
 
-    from datetime import datetime
+    # --- CÁLCULO DE FRETE ---
+    # O frete é calculado no frontend via /api/frete e enviado no formulário.
+    # Se não for enviado, o valor padrão é 0.
+    valor_frete_str = form.get("valor_frete", "0.0")
+    try:
+        valor_frete = float(valor_frete_str)
+    except (ValueError, TypeError):
+        valor_frete = 0.0
 
-    # Só cria o pedido se o formulário veio da etapa de pagamento
-    # Verifica se veio o campo 'payment' (PIX, cartão, etc)
+    # CUPOM
+    codigo_cupom = form.get("promo_code")
+    valor_desconto = 0
+
+    if codigo_cupom:
+        consultar = db.query(Cupom).filter(
+            Cupom.chave_cupon == codigo_cupom,
+            Cupom.ativo == True
+        ).first()
+        if consultar:
+            valor_desconto = total_produtos * consultar.valor_desconto
+
+    total_final = total_produtos + valor_frete - valor_desconto
+
+    # PAYMENT STEP
     payment_method = form.get('payment')
     if not payment_method:
-        # Se vem do perfil, permite que o usuário escolha pagamento no checkout (sem erro)
         if from_profile:
-            # Redirect to GET /checkout to implement PRG and preserve from_profile flag
             return RedirectResponse(url="/checkout?from_profile=true", status_code=303)
-        
-        # Se não veio, volta para o checkout na etapa correta
+
         return templates.TemplateResponse("pages/checkout/checkout.html", {
             "request": request,
             "cliente": cliente,
@@ -398,7 +424,11 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
             "from_profile": False,
         })
 
-    # Criar o pedido
+    # ------------------------------------------
+    # CRIA PEDIDO
+    # ------------------------------------------
+    from datetime import datetime
+
     pedido = Pedidos(
         id_cliente=cliente.id_cliente,
         endereco_entrega=endereco_str,
@@ -413,7 +443,7 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
     db.commit()
     db.refresh(pedido)
 
-    # Criar itens desse pedido
+    # ITENS DO PEDIDO
     for item in carrinho:
         novo_item = ItemPedido(
             pedido_id=pedido.id_pedido,
@@ -423,7 +453,6 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
         )
         db.add(novo_item)
 
-    # Preparar itens para enviar no email
     itens_email = [
         {
             "nome": item["nome"],
@@ -431,15 +460,12 @@ async def checkout(request: Request, background_tasks: BackgroundTasks, db: Sess
             "preco": item["preco"]
         }
         for item in carrinho
-        ]
+    ]
 
-    # Adiciona a tarefa de enviar o e-mail em background ANTES de limpar o carrinho
     background_tasks.add_task(send_order_email, cliente.email, pedido, itens_email)
 
     db.commit()
 
-    # Limpa o carrinho da memória após o pedido ser finalizado e o e-mail agendado
     carrinhos[cliente.id_cliente] = []
 
-    # Redireciona para página de confirmação com id do pedido
     return RedirectResponse(url=f"/pedidos/confirmacao?id={pedido.id_pedido}", status_code=303)

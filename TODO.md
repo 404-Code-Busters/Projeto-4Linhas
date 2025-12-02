@@ -1,3 +1,0 @@
-- [ ] Adjust hero-content h1 font-size in mobile media queries for better proportionality
-  - [ ] In @media (max-width: 768px): Change h1 to 1.8rem, p to 0.9rem
-  - [ ] In @media (max-width: 480px): Change h1 to 1.2rem, p to 0.8rem

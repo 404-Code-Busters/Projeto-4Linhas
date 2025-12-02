@@ -6,35 +6,111 @@ SMTP_PASSWORD = "egvd ctuo eveu tviw"
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
-#email após cadastrar
+# email após cadastrar (versão responsiva)
 async def send_welcome_email(to_email: str):
     msg = EmailMessage()
     msg["From"] = SMTP_EMAIL
     msg["To"] = to_email
     msg["Subject"] = "Bem-vindo ao nosso site!"
 
+    # HTML responsivo
     html_content = """\
-    <html>
-      <body style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2>Bem vindo!</h2>
-          <p>Seja bem-vindo à <strong>4Linhas</strong>, o seu e-commerce de artigos esportivos!</p>
-          <p>Para começar, aqui está seu cupom exclusivo:</p>
+<html>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, sans-serif;">
 
-          <div style="display: inline-block; background-color: #ff4d4f; color: white;
-                      font-weight: bold; padding: 15px 25px; border-radius: 5px;
-                      font-size: 20px; margin: 20px 0;">
-              BEMVINDO10
-          </div>
+  <!-- Container principal -->
+  <div style="
+      max-width: 600px;
+      width: 100%;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  ">
 
-          <p>Use-o no checkout e aproveite o desconto!</p>
-          <p>Boas compras e bons treinos! 🏃‍♂️⚽🏀</p>
+    <!-- Header -->
+    <div style="
+        background-color: #ff4d4f;
+        padding: 25px;
+        text-align: center;
+        color: white;
+    ">
+      <h1 style="margin: 0; font-size: 24px;">4Linhas Esportes</h1>
+      <p style="margin: 6px 0 0; font-size: 14px;">Bem-vindo ao nosso time! ⚽🔥</p>
+    </div>
 
-          <p style="margin-top: 20px;">Tenha um ótimo dia! 😊</p>
-      </body>
-    </html>
-    """
+    <!-- Corpo -->
+    <div style="padding: 25px;">
 
-    msg.set_content("Olá! Seu código é: BEMVINDO10")
+      <h2 style="color: #333; margin-top: 0; text-align: center;">
+        Bem-vindo! 🎉
+      </h2>
+
+      <p style="font-size: 16px; color: #555; line-height: 1.6;">
+        Estamos muito felizes por ter você com a gente na <strong>4Linhas</strong>,
+        o seu e-commerce de artigos esportivos preferido.
+      </p>
+
+      <p style="font-size: 16px; color: #555; line-height: 1.6;">
+        Como agradecimento, aqui está seu <strong>cupom exclusivo de boas-vindas</strong>:
+      </p>
+
+      <!-- Cupom -->
+      <div style="text-align: center; margin: 30px 0;">
+        <div style="
+            display: inline-block;
+            background-color: #ff4d4f;
+            color: white;
+            font-weight: bold;
+            padding: 16px 28px;
+            border-radius: 10px;
+            font-size: 22px;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255, 77, 79, 0.35);
+            width: auto;
+        ">
+          BEMVINDO10
+        </div>
+
+        <p style="font-size: 14px; color: #777; margin-top: 10px;">
+          Use no checkout para garantir seu desconto 🎁
+        </p>
+      </div>
+
+      <p style="font-size: 16px; color: #444; line-height: 1.6;">
+        Aproveite para explorar nossas categorias e encontrar
+        o que combina com seu esporte favorito.
+      </p>
+
+      <p style="font-size: 16px; color: #444; line-height: 1.6;">
+        Boas compras e bons treinos! 🏃‍♂️⚽🏀
+      </p>
+
+      <p style="margin-top: 25px; font-size: 14px; color: #777; text-align: center;">
+        Qualquer dúvida, nossa equipe está pronta para ajudar.
+      </p>
+
+    </div>
+
+    <!-- Rodapé -->
+    <div style="
+        background-color: #fafafa;
+        text-align: center;
+        padding: 15px;
+        font-size: 12px;
+        color: #888;
+    ">
+      © 2025 4Linhas Esportes — Todos os direitos reservados.
+    </div>
+
+  </div>
+
+</body>
+</html>
+"""
+
+    msg.set_content("Obrigado por se cadastrar! Seu cupom é: BEMVINDO10")
     msg.add_alternative(html_content, subtype="html")
 
     await aiosmtplib.send(
@@ -49,14 +125,14 @@ async def send_welcome_email(to_email: str):
     return True
 
 
-#email ao completar o pedido
+# email ao completar o pedido (versão responsiva)
 async def send_order_email(to_email: str, pedido, itens):
     msg = EmailMessage()
     msg["From"] = SMTP_EMAIL
     msg["To"] = to_email
     msg["Subject"] = f"Obrigado pela sua compra! Pedido #{pedido.id_pedido}"
 
-    # Texto simples (fallback)
+    # Fallback (texto simples)
     resumo = "Itens do pedido:\n"
     for item in itens:
         resumo += f"- {item['nome']} | Qtde: {item['quantidade']} | R$ {item['preco']:.2f}\n"
@@ -74,49 +150,97 @@ Agradecemos a preferência!
 Equipe 4Linhas
 """)
 
-    # HTML
-    html_itens = "".join(
-        f"""
+    # HTML dos itens com imagem + responsivo
+    html_itens = ""
+    for item in itens:
+        imagem = item.get("imagem", "https://via.placeholder.com/80")
+
+        html_itens += f"""
         <tr>
-            <td>{item['nome']}</td>
-            <td>{item['quantidade']}</td>
-            <td>R$ {item['preco']:.2f}</td>
+            <td style="padding: 15px 5px; border-bottom: 1px solid #eee; text-align: center;">
+                <img src="{imagem}" 
+                     style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                <div style="font-weight: bold; margin-top: 5px;">{item['nome']}</div>
+            </td>
+
+            <td style="padding: 15px 5px; border-bottom: 1px solid #eee; text-align: center;">
+                {item['quantidade']}
+            </td>
+
+            <td style="padding: 15px 5px; border-bottom: 1px solid #eee; text-align: center;">
+                R$ {item['preco']:.2f}
+            </td>
         </tr>
         """
-        for item in itens
-    )
 
+    # HTML final responsivo
     html_content = f"""
-    <html>
-    <body style="font-family: Arial; padding: 20px;">
-        <h2>Obrigado pela sua compra! 🎉</h2>
+<html>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
 
-        <p>Seu pedido <strong>#{pedido.id_pedido}</strong> foi recebido!</p>
+<!-- Container responsivo -->
+<div style="
+    max-width: 600px;
+    width: 100%;
+    margin: auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+">
 
-        <h3>Resumo do Pedido:</h3>
+    <h2 style="color: #FF6B35; text-align: center; margin-top: 0;">
+        Obrigado pela sua compra! 🎉
+    </h2>
 
-        <table style="width: 100%; border-collapse: collapse;">
+    <p style="font-size: 16px; text-align: center;">
+        Seu pedido <strong>#{pedido.id_pedido}</strong> foi confirmado!
+    </p>
+
+    <!-- Tabela responsiva -->
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 300px;">
             <thead>
-                <tr style="background-color: #FF6B35;">
-                    <th>Produto</th>
-                    <th>Qtde</th>
-                    <th>Preço</th>
+                <tr style="background-color: #FF6B35; color: white;">
+                    <th style="padding: 12px;">Produto</th>
+                    <th style="padding: 12px;">Qtde</th>
+                    <th style="padding: 12px;">Preço</th>
                 </tr>
             </thead>
             <tbody>
                 {html_itens}
             </tbody>
         </table>
+    </div>
 
-        <p style="margin-top: 20px; font-size: 18px;">
-            <strong>Total:</strong> R$ {pedido.valor_total:.2f}
-        </p>
+    <p style="margin-top: 25px; font-size: 20px; text-align: right;">
+        <strong>Total:</strong> R$ {pedido.valor_total:.2f}
+    </p>
 
-        <p>Obrigado por comprar conosco! 🛒</p>
-        <p>Equipe 4Linhas</p>
-    </body>
-    </html>
-    """
+    <p style="text-align: center; margin-top: 30px;">
+        <a href="#" 
+           style="
+                background-color:#FF6B35;
+                color:white;
+                padding:12px 25px;
+                border-radius:8px;
+                text-decoration:none;
+                font-size:16px;
+                display:inline-block;
+            ">
+            Acompanhar Pedido 🚚
+        </a>
+    </p>
+
+    <p style="margin-top: 20px; text-align: center; font-size: 15px;">
+        Obrigado por comprar conosco! 🛒<br>
+        <strong>Equipe 4Linhas</strong>
+    </p>
+
+</div>
+
+</body>
+</html>
+"""
 
     msg.add_alternative(html_content, subtype="html")
 

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="{{ url_for('static', path='assets/favicon/favicon-4linhas.ico') }}" type="image/x-icon">
     <title>Checkout - 4linhas</title>
     <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}" />
@@ -39,6 +40,8 @@
               <input type="hidden" name="cep" id="cep" />
               <!-- Hidden flag to indicate request originated from profile page -->
               <input type="hidden" name="from_profile" id="from_profile_input" value="{{ 'true' if from_profile else '' }}" />
+              <input type="hidden" name="promo_code" id="promo_code_hidden">
+              <input type="hidden" name="distancia_km" id="distancia_km_hidden">
               <!-- STEP 0: CARRINHO -->
               <div class="step-panel" id="step-cart">
                 <h3>Revisão do Carrinho</h3>
@@ -176,12 +179,26 @@
             <dl class="summary-list">
               <div class="line"><dt>Valor dos Produtos:</dt><dd>R$ {{ '%.2f'|format(total or 0) }}</dd></div>
               <div class="line"><dt>Descontos:</dt><dd class="neg">- R$ 0,00</dd></div>
-              <div class="line"><dt>Frete:</dt><dd>R$ 15,90</dd></div>
+              <div class="line">
+              <dt>Frete:</dt>
+                    <dd id="frete-valor">R$ 0,00</dd> <!-- ALTERADO -->
+                    <div id="shipping-loader" class="loader"></div>
+              </div>
+
+              <div class="line">
+                  <dt>Estimativa:</dt>
+                  <dd id="frete-estimativa">--</dd> <!-- NOVO -->
+              </div>
+
+              <div class="total">
+                  <dt>Total:</dt>
+                  <dd class="price" id="total-final">R$ {{ '%.2f'|format(total or 0) }}</dd> <!-- ALTERADO -->
+              </div>
             </dl>
 
             <div class="total-box">
               <div class="label">Valor à vista no PIX:</div>
-              <div class="price">R$ {{ '%.2f'|format((total or 0) + 15.90) }}</div>
+              <div class="price" id="total-pix">R$ {{ '%.2f'|format(total or 0) }}</div>
               <div class="muted small">(Economize: R$ 0,00)</div>
             </div>
 
@@ -302,8 +319,16 @@
                 ${endereco.bairro} — ${endereco.cidade} / ${endereco.estado}<br>
                 <small style="color: #999;">CEP: ${endereco.cep}</small>
               </div>
+              <button type="button" class="btn-primary calculate-shipping-btn" data-cep="${endereco.cep}">Calcular Frete</button>
             </div>
           `;
+
+          const calculateBtn = card.querySelector('.calculate-shipping-btn');
+          calculateBtn.addEventListener('click', (e) => {
+              e.stopPropagation(); // prevent card click event
+              const cep = e.target.dataset.cep;
+              calcularFrete(cep);
+          });
 
           card.addEventListener('click', () => {
             // Marcar radio button
@@ -358,9 +383,107 @@
         
         carregarEnderecos();
       });
+
+      function updateTotal() {
+          const totalProdutosTexto = document.querySelector(".summary-list .line dd").innerText.replace("R$ ", "").replace(",", ".");
+          const subtotal = parseFloat(totalProdutosTexto) || 0;
+
+          const descontoTexto = document.querySelector(".summary-list .line .neg").innerText.replace("- R$ ", "").replace(",", ".");
+          const discount = parseFloat(descontoTexto) || 0;
+
+          const freteTexto = document.getElementById("frete-valor").innerText.replace("R$ ", "").replace(",", ".");
+          const shipping = parseFloat(freteTexto) || 0;
+
+          const finalTotal = subtotal - discount + shipping;
+          document.getElementById("total-final").innerText = `R$ ${finalTotal.toFixed(2)}`;
+
+          const valorPix = (finalTotal * 0.78).toFixed(2); // Assuming 22% discount on PIX
+          document.getElementById("total-pix").innerText = `R$ ${valorPix}`;
+      }
+
     </script>
 
-    
+    <!--CALCULO CUPOM-->
+    <script>
+    document.querySelector(".apply-promo-btn").addEventListener("click", async () => {
+        const codigo = document.getElementById("promo-code").value.trim();
+        if (!codigo) return alert("Digite um cupom válido.");
+
+        const totalProdutosTexto = document.querySelector(".summary-list .line dd").innerText.replace("R$ ", "");
+        const totalProdutos = parseFloat(totalProdutosTexto.replace(",", "."));
+
+        const resp = await fetch(`/api/cupom/validar?codigo=${codigo}&total=${totalProdutos}`);
+        const data = await resp.json();
+
+        if (!data.success) {
+            alert(data.msg);
+            return;
+        }
+
+        // Atualiza desconto
+        document.querySelector(".summary-list .line .neg").innerText = `- R$ ${data.desconto.toFixed(2)}`;
+        
+        updateTotal();
+
+        // Preenche campo escondido
+        document.getElementById("promo_code_hidden").value = codigo;
+
+        alert("Cupom aplicado com sucesso!");
+    });
+    </script>
+
+    <!--CALCULO FRETE-->
+    <script>
+    async function calcularFrete(cep) {
+        console.log("Calculando frete para CEP:", cep); // Debugging line
+        const loader = document.getElementById('shipping-loader');
+        const freteValorElement = document.getElementById('frete-valor');
+        const freteEstimativaElement = document.getElementById('frete-estimativa');
+        
+        loader.style.display = 'inline-block';
+        freteValorElement.style.display = 'none';
+        freteEstimativaElement.style.display = 'none';
+
+        try {
+            const resposta = await fetch(`/api/frete?cep=${cep}`);
+            const data = await resposta.json();
+
+            if (!data.success) {
+                console.warn("Erro ao calcular frete:", data.msg);
+                freteValorElement.innerText = `R$ 0,00`; // Reset if error
+                freteEstimativaElement.innerText = `--`; // Reset if error
+                document.getElementById('distancia_km_hidden').value = 0; // Reset hidden field
+                alert(data.msg || "Erro ao calcular frete. Verifique o CEP.");
+                return;
+            }
+
+            const frete = data.frete;
+            const estimativa = data.estimativa;
+            const distancia_km = data.distancia_km; // Get distancia_km from API response
+
+            // Atualiza campo escondido
+            document.getElementById('distancia_km_hidden').value = distancia_km;
+
+            // Atualiza tela
+            freteValorElement.innerText = `R$ ${frete.toFixed(2)}`;
+            freteEstimativaElement.innerText = `${estimativa} dias`;
+
+            updateTotal();
+
+        } catch (e) {
+            console.error("Erro ao calcular frete:", e);
+            freteValorElement.innerText = `R$ 0,00`; // Reset if error
+            freteEstimativaElement.innerText = `--`; // Reset if error
+            document.getElementById('distancia_km_hidden').value = 0; // Reset hidden field
+            alert("Erro de conexão ao calcular frete.");
+        } finally {
+            loader.style.display = 'none';
+            freteValorElement.style.display = 'inline';
+            freteEstimativaElement.style.display = 'inline';
+        }
+    }
+    </script>
+        
 
     <script src="{{ url_for('static', path='js/pages/checkout.js') }}"></script>
     
