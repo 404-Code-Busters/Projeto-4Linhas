@@ -5,14 +5,21 @@
  * @returns {boolean} - Retorna true se a sessão expirou, caso contrário false.
  */
 function handleAuthError(response) {
-  if (response.status === 401) {
-    // Verifica se a função global do modal de autenticação existe antes de chamar.
-    if (typeof showSessionExpiredModal === 'function') {
-      showSessionExpiredModal();
+    if (response.status === 401) {
+        // Usuário não autenticado: abrir o modal do carrinho com botão para login
+        try {
+            const modal = getOrCreateCartModal();
+            // Renderiza mensagem com botão para login
+            renderCartMessage('Você precisa estar logado para adicionar itens ao carrinho.', true);
+            modal.classList.add('open');
+        } catch (e) {
+            console.warn('Erro ao mostrar modal de login via carrinho:', e);
+            // fallback: redireciona para login
+            window.location.href = '/login';
+        }
+        return true; // Indica que um erro de autenticação foi tratado.
     }
-    return true; // Indica que um erro de autenticação foi tratado.
-  }
-  return false;
+    return false;
 }
 
 /**
@@ -134,7 +141,7 @@ function renderCartMessage(message, showLoginButton = false) {
     const totalContainer = modal.querySelector('.cart-total');
     const checkoutButton = modal.querySelector('.cart-checkout');
 
-    container.innerHTML = `<p>${message}</p>`; // Define a mensagem principal
+    container.innerHTML = `<p style="font-size: 1rem; color: #333; padding: 1rem 0; text-align: center;">${message}</p>`; // Define a mensagem principal com estilo
     totalContainer.innerHTML = ''; // Limpa o total
     checkoutButton.style.display = 'none'; // Esconde o botão de finalizar compra
 
@@ -145,7 +152,14 @@ function renderCartMessage(message, showLoginButton = false) {
         loginBtn.className = 'cart-checkout';
         loginBtn.textContent = 'Fazer Login';
         loginBtn.style.display = 'block';
-        loginBtn.style.marginTop = '1rem';
+        loginBtn.style.marginTop = '1.5rem';
+        loginBtn.style.textAlign = 'center';
+        loginBtn.style.fontWeight = '600';
+        loginBtn.style.padding = '1rem';
+        loginBtn.style.borderRadius = '8px';
+        loginBtn.style.backgroundColor = 'var(--cor-laranja, #FF6B35)';
+        loginBtn.style.color = '#fff';
+        loginBtn.style.fontSize = '1rem';
         container.appendChild(loginBtn);
     }
 }
@@ -250,6 +264,10 @@ async function adicionarAoCarrinho(itemOrId) {
         await atualizarContadorCarrinho();
         // Após adicionar com sucesso, atualiza o contador e reabre o modal do carrinho para feedback visual.
         await mostrarCarrinho();
+            // Atualiza o checkout caso o usuário esteja na página de checkout
+            if (typeof window.reloadCheckoutCart === 'function') {
+                try { window.reloadCheckoutCart(); } catch(e) { console.warn('reloadCheckoutCart error', e); }
+            }
 
     } catch (e) {
         console.error('Erro adicionarAoCarrinho:', e);
@@ -277,6 +295,10 @@ async function removerDoCarrinho(produtoId) {
         // Após remover com sucesso, atualiza o contador e reabre o modal do carrinho.
         await atualizarContadorCarrinho();
         await mostrarCarrinho();
+        // Atualiza o checkout caso o usuário esteja na página de checkout
+        if (typeof window.reloadCheckoutCart === 'function') {
+            try { window.reloadCheckoutCart(); } catch(e) { console.warn('reloadCheckoutCart error', e); }
+        }
 
     } catch (e) {
         console.error('Erro removerDoCarrinho:', e);
@@ -326,6 +348,10 @@ async function atualizarQuantidade(produtoId, delta) {
         // Atualiza o contador de itens e reabre o modal para mostrar a quantidade atualizada.
         await atualizarContadorCarrinho();
         await mostrarCarrinho();
+        // Atualiza o checkout caso o usuário esteja na página de checkout
+        if (typeof window.reloadCheckoutCart === 'function') {
+            try { window.reloadCheckoutCart(); } catch(e) { console.warn('reloadCheckoutCart error', e); }
+        }
 
     } catch (e) {
         console.error('Erro atualizarQuantidade:', e);

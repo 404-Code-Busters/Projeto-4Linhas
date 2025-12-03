@@ -122,27 +122,20 @@
   <section class="related-products">
     <h2 class="related-title">Produtos Relacionados</h2>
     <div class="related-grid">
-      <div class="related-card">
-  <img src="{{ url_for('static', path='assets/products/related1.jpg') }}" alt="Produto Relacionado 1" class="related-image">
-        <div class="related-info">
-          <h3 class="related-card-title">Short Esportivo</h3>
-          <div class="related-price">R$ 59,90</div>
-        </div>
-      </div>
-      <div class="related-card">
-  <img src="{{ url_for('static', path='assets/products/related2.jpg') }}" alt="Produto Relacionado 2" class="related-image">
-        <div class="related-info">
-          <h3 class="related-card-title">Tênis Running</h3>
-          <div class="related-price">R$ 199,90</div>
-        </div>
-      </div>
-      <div class="related-card">
-  <img src="{{ url_for('static', path='assets/products/related3.jpg') }}" alt="Produto Relacionado 3" class="related-image">
-        <div class="related-info">
-          <h3 class="related-card-title">Meia Esportiva</h3>
-          <div class="related-price">R$ 29,90</div>
-        </div>
-      </div>
+      {% if related_produtos %}
+        {% for rel in related_produtos %}
+          <a href="{{ url_for('detalhe_produto', id_produto=rel.id_produto) }}" class="related-card">
+            {% set rel_img = rel.imagem_caminho or rel.imagem_caminho1 or rel.imagem_caminho2 or rel.imagem_caminho3 %}
+            <img src="{{ url_for('static', path='upload/img/' + rel_img) if rel_img else url_for('static', path='assets/logo/4linhas-bg-red.svg') }}" alt="{{ rel.nome }}" class="related-image">
+            <div class="related-info">
+              <h3 class="related-card-title">{{ rel.nome }}</h3>
+              <div class="related-price">R$ {{ "%.2f"|format(rel.preco)|replace('.', ',') }}</div>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <p>Não há produtos relacionados no momento.</p>
+      {% endif %}
     </div>
   </section>
 

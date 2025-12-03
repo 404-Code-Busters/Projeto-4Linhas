@@ -1,0 +1,35 @@
+/* Simple toast notifications styles */
+#toast-container {
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.toast {
+  min-width: 220px;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.info { background: linear-gradient(90deg,#2b6fbf,#2b90ff); }
+.toast.success { background: linear-gradient(90deg,#2bbf6f,#2bff90); color:#062b18 }
+.toast.error { background: linear-gradient(90deg,#bf2b2b,#ff2b2b); }
+.toast .title { font-weight: 700; margin-bottom: 4px; }
+.toast .message { font-size: 0.95rem; line-height: 1.2; }
+@media (max-width: 640px) {
+  #toast-container { left: 1rem; right: 1rem; top: auto; bottom: 1rem; }
+  .toast { width: 100%; }
+}

@@ -410,8 +410,10 @@
                 </div>
               </div>
             </div>
-          </section>          <!-- JS da funcionalidade com Maps -->
-          <script src="/static/js/pages/address_modal_maps.js"></script>
+          </section>
+          <!-- JS da funcionalidade do modal de endereços e Maps -->
+          <script src="{{ url_for('static', path='js/pages/address_modal.js') }}"></script>
+          <script src="{{ url_for('static', path='js/pages/address_modal_maps.js') }}"></script>
 
         <!-- Seção: Favoritos 
         <section id="tab-favorites" class="tab-content" role="tabpanel" hidden>
@@ -652,38 +654,20 @@
             </div>
           </div>`;
       }
+
+      // Carrega o carrinho inicial via API e renderiza
+      (async function fetchInitialCart(){
+        try {
+          const resp = await fetch('/carrinho/itens', { credentials: 'same-origin' });
+          if (!resp.ok) return; // não autenticado ou erro
+          const data = await resp.json();
+          renderProfileCart({ itens: data.itens, total: data.total });
+        } catch (err) {
+          console.error('Erro ao carregar carrinho inicial:', err);
+        }
+      })();
+
     });
   </script>
 </body>
 </html>
-
-          <!--TESTE DA SECTION ENDEREÇO-->
-          <script>
-            document.addEventListener("DOMContentLoaded", () => {
-              const cepInput = document.getElementById("cep");
-
-              cepInput.addEventListener("blur", async () => {
-                const cep = cepInput.value.replace(/\D/g, "");
-                if (cep.length !== 8) return;
-
-                try {
-                  const response = await fetch(`/api/frete?cep_destino=${cep}`);
-                  if (!response.ok) throw new Error("Erro ao consultar o CEP");
-
-                  const data = await response.json();
-
-                  // Preenche os campos automaticamente
-                  const enderecoParts = data.endereco.split(" - ");
-                  document.getElementById("logradouro").value =
-                    enderecoParts[0] || "";
-                  document.getElementById("bairro").value =
-                    enderecoParts[1] || "";
-                  document.getElementById("cidade").value =
-                    enderecoParts[2] || "";
-                  document.getElementById("uf").value = enderecoParts[3] || "";
-                } catch (error) {
-                  console.error("Erro ao buscar CEP:", error);
-                }
-              });
-            });
-          </script>

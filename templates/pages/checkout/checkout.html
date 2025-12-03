@@ -56,7 +56,7 @@
                             alt="{{ item.nome }}" width="64" height="64">
                           <div class="cart-item-info">
                             <div class="name">{{ item.nome }}</div>
-                            <div class="qty">Qtd: {{ item.quantidade }}</div>
+                            <div class="qty">Quantidade: {{ item.quantidade }}</div>
                           </div>
                           <div class="price">R$ {{ '%.2f'|format(item.preco) }}</div>
                         </li>
@@ -253,6 +253,9 @@
           <label for="modal-numero">Número</label>
           <input type="text" id="modal-numero" placeholder="Digite o número" />
 
+          <label for="modal-complemento">Complemento (opcional)</label>
+          <input type="text" id="modal-complemento" placeholder="Apartamento, apto, etc." />
+
           <div class="modal-botoes">
             <button class="btn-salvar" onclick="salvarEndereco()">
               Salvar
@@ -360,8 +363,17 @@
         document.getElementById('modal-cidade').value = '';
         document.getElementById('modal-uf').value = '';
         document.getElementById('modal-numero').value = '';
-        // Abrir modal
-        document.getElementById('modal-endereco').style.display = 'flex';
+        const modalComplemento = document.getElementById('modal-complemento');
+        if (modalComplemento) modalComplemento.value = '';
+        // Remover qualquer indicador de edição
+        document.getElementById('modal-endereco').removeAttribute('data-edit-id');
+        // Abrir modal — use a função pública que inicializa o mapa quando disponível
+        if (typeof window.abrirModalEndereco === 'function') {
+          window.abrirModalEndereco();
+        } else {
+          // fallback simples
+          document.getElementById('modal-endereco').style.display = 'flex';
+        }
       });
 
       // Aguardar que o script address_modal_maps.js carregue e override a função salvarEndereco
@@ -370,11 +382,13 @@
         setTimeout(() => {
           const originalSalvarEndereco = window.salvarEndereco;
           if (originalSalvarEndereco) {
-            window.salvarEndereco = async function() {
-              const result = await originalSalvarEndereco.call(this);
-              // Se o endereço foi salvo com sucesso, recarregar lista no checkout
-              if (result !== false) {
-                carregarEnderecos();
+            window.salvarEndereco = async function(ev) {
+              // Chama a função original do address_modal_maps
+              const result = await originalSalvarEndereco.call(this, ev);
+              // Se o endereço foi salvo com sucesso (result === false significa não houve erro e modal fechou), recarregar lista no checkout
+              if (result === false || result === undefined) {
+                // Aguarda um pouco para garantir que a API finalizou
+                setTimeout(() => carregarEnderecos(), 200);
               }
               return result;
             };
@@ -407,7 +421,7 @@
     <script>
     document.querySelector(".apply-promo-btn").addEventListener("click", async () => {
         const codigo = document.getElementById("promo-code").value.trim();
-        if (!codigo) return alert("Digite um cupom válido.");
+        if (!codigo) return (window.showToast ? window.showToast("Digite um cupom válido.", 'error') : alert("Digite um cupom válido."));
 
         const totalProdutosTexto = document.querySelector(".summary-list .line dd").innerText.replace("R$ ", "");
         const totalProdutos = parseFloat(totalProdutosTexto.replace(",", "."));
@@ -416,7 +430,8 @@
         const data = await resp.json();
 
         if (!data.success) {
-            alert(data.msg);
+            if (window.showToast) window.showToast(data.msg, 'error');
+            else alert(data.msg);
             return;
         }
 
@@ -428,7 +443,8 @@
         // Preenche campo escondido
         document.getElementById("promo_code_hidden").value = codigo;
 
-        alert("Cupom aplicado com sucesso!");
+        if (window.showToast) window.showToast("Cupom aplicado com sucesso!", 'success');
+        else alert("Cupom aplicado com sucesso!");
     });
     </script>
 
@@ -453,7 +469,8 @@
                 freteValorElement.innerText = `R$ 0,00`; // Reset if error
                 freteEstimativaElement.innerText = `--`; // Reset if error
                 document.getElementById('distancia_km_hidden').value = 0; // Reset hidden field
-                alert(data.msg || "Erro ao calcular frete. Verifique o CEP.");
+                if (window.showToast) window.showToast(data.msg || "Erro ao calcular frete. Verifique o CEP.", 'error');
+                else alert(data.msg || "Erro ao calcular frete. Verifique o CEP.");
                 return;
             }
 
@@ -475,7 +492,8 @@
             freteValorElement.innerText = `R$ 0,00`; // Reset if error
             freteEstimativaElement.innerText = `--`; // Reset if error
             document.getElementById('distancia_km_hidden').value = 0; // Reset hidden field
-            alert("Erro de conexão ao calcular frete.");
+            if (window.showToast) window.showToast("Erro de conexão ao calcular frete.", 'error');
+            else alert("Erro de conexão ao calcular frete.");
         } finally {
             loader.style.display = 'none';
             freteValorElement.style.display = 'inline';
@@ -483,6 +501,9 @@
         }
     }
     </script>
+    
+    <!-- Toast notifications script -->
+    <script src="{{ url_for('static', path='js/utils/toast.js') }}"></script>
         
 
     <script src="{{ url_for('static', path='js/pages/checkout.js') }}"></script>
@@ -492,5 +513,133 @@
     
     <!-- Script para gerenciar modal de endereços (mesmo do perfil) -->
     <script src="/static/js/pages/address_modal_maps.js"></script>
+    
+    <!-- Script: carregar carrinho dinamicamente do servidor para o checkout -->
+    <script>
+      // Lightweight cart sync for checkout: update only changed parts and notify when automatic
+      let __checkout_first_load = true;
+
+      function _formatBR(value){
+        return `R$ ${Number(value || 0).toFixed(2)}`.replace('.', ',');
+      }
+
+      function _updateSidebarTotal(total){
+        const subtotalDd = document.querySelector('.summary-list .line dd');
+        if (subtotalDd) subtotalDd.innerText = _formatBR(total);
+      }
+
+      function _updateStepCart(items){
+        const cartReview = document.querySelector('#step-cart .cart-review');
+        if (!cartReview) return;
+
+        const existingUl = cartReview.querySelector('ul.cart-items');
+        // If structure matches (same number of items), try incremental update
+        if (existingUl && existingUl.children.length === items.length) {
+          Array.from(existingUl.children).forEach((li, idx) => {
+            const it = items[idx];
+            const nameEl = li.querySelector('.name');
+            const qtyEl = li.querySelector('.qty');
+            const priceEl = li.querySelector('.price');
+            const imgEl = li.querySelector('img');
+            if (nameEl) nameEl.textContent = it.nome;
+            if (qtyEl) qtyEl.textContent = `Quantidade: ${it.quantidade}`;
+            if (priceEl) priceEl.textContent = _formatBR(Number(it.preco) * Number(it.quantidade));
+            if (imgEl && it.imagem) imgEl.src = `/static/upload/img/${it.imagem}`;
+          });
+        } else {
+          // fallback: rebuild list
+          if (!items.length) {
+            cartReview.innerHTML = '<p>Seu carrinho está vazio.</p>';
+            return;
+          }
+          const ul = document.createElement('ul');
+          ul.className = 'cart-items';
+          ul.innerHTML = items.map(item => `
+            <li class="cart-item">
+              <img src="${item.imagem ? '/static/upload/img/' + item.imagem : '/static/assets/logo/4linhas-bg-red.svg'}" alt="${item.nome}" width="64" height="64">
+              <div class="cart-item-info">
+                <div class="name">${item.nome}</div>
+                <div class="qty">Quantidade: ${item.quantidade}</div>
+              </div>
+              <div class="price">${_formatBR(Number(item.preco) * Number(item.quantidade))}</div>
+            </li>
+          `).join('');
+          cartReview.innerHTML = '';
+          cartReview.appendChild(ul);
+        }
+      }
+
+      function _updateReviewItems(items){
+        const review = document.getElementById('review-cart-items');
+        if (!review) return;
+        // If counts and ids match, try to update values only
+        const existing = Array.from(review.querySelectorAll('.cart-item-card'));
+        if (existing.length === items.length && existing.length > 0) {
+          existing.forEach((card, idx) => {
+            const it = items[idx];
+            const name = card.querySelector('.name');
+            const qty = card.querySelector('.muted');
+            const price = card.querySelector('.price');
+            const img = card.querySelector('img');
+            if (name) name.textContent = it.nome;
+            if (qty) qty.textContent = `Qtd: ${it.quantidade}`;
+            if (price) price.textContent = _formatBR(it.preco);
+            if (img && it.imagem) img.src = `/static/upload/img/${it.imagem}`;
+          });
+        } else {
+          // rebuild
+          if (!items.length) { review.innerHTML = '<p>Nenhum item no carrinho.</p>'; return; }
+          review.innerHTML = items.map(it => `
+            <div class="cart-item-card">
+              <img src="${it.imagem ? '/static/upload/img/' + it.imagem : '/static/assets/logo/4linhas-bg-red.svg'}" alt="${it.nome}">
+              <div class="cart-item-info">
+                <div class="name">${it.nome}</div>
+                <div class="muted">Qtd: ${it.quantidade}</div>
+                <div class="price">${_formatBR(it.preco)}</div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      async function loadCartForCheckout(opts = { notify: false }){
+        try {
+          const resp = await fetch('/carrinho/itens', { credentials: 'same-origin' });
+          if (!resp.ok) return; // probably not authenticated
+          const data = await resp.json();
+          const items = data.itens || [];
+          const total = Number(data.total || 0);
+
+          // Update minimal parts
+          _updateSidebarTotal(total);
+          _updateStepCart(items);
+          _updateReviewItems(items);
+
+          // Recalculate totals with freight/coupon
+          if (typeof updateTotal === 'function') updateTotal();
+
+          // toast notification on automatic updates (not the first load)
+          const shouldNotify = opts.notify && !__checkout_first_load;
+          if (shouldNotify) {
+            if (window.showToast) window.showToast('Carrinho sincronizado com o servidor.', 'info');
+          }
+
+          __checkout_first_load = false;
+        } catch (e) {
+          console.warn('Erro ao carregar carrinho no checkout:', e);
+        }
+      }
+
+      // Expose lightweight reload: when called programmatically, notify user
+      window.reloadCheckoutCart = function(){
+        return loadCartForCheckout({ notify: true });
+      };
+
+      // Initial load without toast
+      document.addEventListener('DOMContentLoaded', () => {
+        // small delay to let other scripts initialize
+        setTimeout(() => loadCartForCheckout({ notify: false }), 120);
+      });
+    </script>
   </body>
 </html>

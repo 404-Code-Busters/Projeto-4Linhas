@@ -18,6 +18,77 @@
   let map = null;
   let marker = null;
 
+  // --- Modal de confirmação reutilizável ---
+  let _confirmModalReady = false;
+  function ensureConfirmModal() {
+    if (_confirmModalReady) return;
+    _confirmModalReady = true;
+
+    // estilos básicos e responsivos
+    const style = document.createElement('style');
+    style.textContent = `
+      .confirm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2000}
+      .confirm-box{background:#fff;padding:16px;border-radius:12px;max-width:480px;width:94%;box-shadow:0 8px 24px rgba(0,0,0,0.2);font-family:Inter,system-ui,Arial;color:#0b2540}
+      .confirm-title{font-weight:700;margin-bottom:8px;font-size:16px}
+      .confirm-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+      .confirm-btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+      .confirm-cancel{background:#f3f4f6;color:#0b2540}
+      .confirm-ok{background:#ef4444;color:#fff}
+      @media(min-width:640px){.confirm-box{width:420px}}
+    `;
+    document.head.appendChild(style);
+
+    // container
+    const container = document.createElement('div');
+    container.className = 'confirm-backdrop';
+    container.style.display = 'none';
+
+    container.innerHTML = `
+      <div class="confirm-box" role="dialog" aria-modal="true">
+        <div class="confirm-title">Confirmação</div>
+        <div class="confirm-message">Tem certeza?</div>
+        <div class="confirm-actions">
+          <button class="confirm-btn confirm-cancel">Cancelar</button>
+          <button class="confirm-btn confirm-ok">Excluir</button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(container);
+
+    // eventos
+    const cancelBtn = container.querySelector('.confirm-cancel');
+    const okBtn = container.querySelector('.confirm-ok');
+    const messageEl = container.querySelector('.confirm-message');
+
+    let resolver = null;
+
+    cancelBtn.addEventListener('click', () => {
+      container.style.display = 'none';
+      if (resolver) { resolver(false); resolver = null; }
+    });
+
+    okBtn.addEventListener('click', () => {
+      container.style.display = 'none';
+      if (resolver) { resolver(true); resolver = null; }
+    });
+
+    // fechar ao clicar fora
+    container.addEventListener('click', (e) => {
+      if (e.target === container) {
+        container.style.display = 'none';
+        if (resolver) { resolver(false); resolver = null; }
+      }
+    });
+
+    // exporta função de uso
+    window.showConfirmModal = function (message) {
+      ensureConfirmModal();
+      messageEl.textContent = message || 'Tem certeza?';
+      container.style.display = 'flex';
+      return new Promise((resolve) => { resolver = resolve; });
+    };
+  }
+
   // Inicializa o mapa Leaflet quando carregado
   function initMap() {
     if (!mapContainer) return;
@@ -97,29 +168,51 @@
         const data = await response.json();
 
         // Preenche os campos automaticamente
-        const enderecoParts = data.endereco.split(" - ");
+        // `endereco` é retornado pelo backend no formato "logradouro - bairro - cidade - UF"
+        const enderecoRaw = (data && data.endereco) ? data.endereco : '';
+        const enderecoParts = enderecoRaw ? enderecoRaw.split(" - ") : [];
         if (logradouroInput) logradouroInput.value = enderecoParts[0] || "";
         if (bairroInput) bairroInput.value = enderecoParts[1] || "";
         if (cidadeInput) cidadeInput.value = enderecoParts[2] || "";
         if (ufInput) ufInput.value = enderecoParts[3] || "";
 
-        // Se conseguir extrair a cidade, faz geocoding para posicionar o mapa
-        if (enderecoParts[2] && enderecoParts[3] && map) {
-          const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${enderecoParts[2]}, ${enderecoParts[3]}, Brasil`;
-          
-          fetch(geocodingUrl)
+        // Se tivermos um endereço completo, geocodifica-o (mais preciso que usar só cidade/UF)
+        if (enderecoRaw && map) {
+          const q = encodeURIComponent(enderecoRaw + ', Brasil');
+          const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=br&q=${q}&limit=1`;
+          fetch(geocodingUrl, { headers: { 'Accept-Language': 'pt-BR' } })
             .then((response) => response.json())
             .then((results) => {
-              if (results.length > 0) {
+              if (results && results.length > 0) {
                 const location = [parseFloat(results[0].lat), parseFloat(results[0].lon)];
-                map.setView(location, 15);
+                map.setView(location, 18);
                 marker.setLatLng(location);
+              } else {
+                // fallback: se não achar com logradouro, buscar por cidade/uf
+                if (enderecoParts[2] && enderecoParts[3]) {
+                  const cityQ = encodeURIComponent(enderecoParts[2] + ', ' + enderecoParts[3] + ', Brasil');
+                  const cityUrl = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=br&q=${cityQ}&limit=1`;
+                  return fetch(cityUrl).then(r => r.json()).then(res2 => {
+                    if (res2 && res2.length > 0) {
+                      const loc = [parseFloat(res2[0].lat), parseFloat(res2[0].lon)];
+                      map.setView(loc, 15);
+                      marker.setLatLng(loc);
+                    }
+                  });
+                }
               }
             })
             .catch((error) => console.error("Erro ao geocodificar:", error));
         }
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
+      }
+    });
+    // Suporte a tecla Enter: dispara a busca (ativando o blur)
+    cepInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.blur();
       }
     });
   }
@@ -181,7 +274,7 @@
     const complemento = document.getElementById("modal-complemento") ? document.getElementById("modal-complemento").value.trim() : "";
 
     if (!cep || !logradouro || !bairro || !cidade || !uf || !numero) {
-      alert("Preencha todos os campos do novo endereço.");
+      if (window.showToast) window.showToast("Preencha todos os campos do novo endereço.", 'error');
       return false;
     }
 
@@ -221,15 +314,15 @@
         atualizarListaEnderecos();
         window.fecharModalEndereco();
         // feedback visual para o usuário
-        alert('Endereço salvo com sucesso.');
+        if (window.showToast) window.showToast('Endereço salvo com sucesso.', 'success');
         return false;
       } else {
         console.error('Resposta inesperada ao salvar endereço', data);
-        alert('Não foi possível salvar o endereço. Veja o console para detalhes.');
+        if (window.showToast) window.showToast('Não foi possível salvar o endereço. Veja o console para detalhes.', 'error');
       }
     } catch (err) {
       console.error('Erro ao salvar endereço:', err);
-      alert('Erro ao salvar endereço. Veja o console.');
+      if (window.showToast) window.showToast('Erro ao salvar endereço. Veja o console.', 'error');
     }
 
     return false;
@@ -268,7 +361,11 @@
       btn.addEventListener("click", async (ev) => {
         const id = ev.currentTarget.getAttribute("data-id");
         if (!id) return;
-        if (!confirm('Remover este endereço?')) return;
+
+        // mostra modal de confirmação
+        ensureConfirmModal();
+        const confirmed = await window.showConfirmModal('Tem certeza que deseja excluir este endereço?');
+        if (!confirmed) return;
 
         const form = new FormData();
         form.append('id_endereco', id);
@@ -282,13 +379,15 @@
             const idx = enderecos.findIndex(x => String(x.id_endereco) === String(id));
             if (idx >= 0) enderecos.splice(idx, 1);
             atualizarListaEnderecos();
-            alert('Endereço removido com sucesso.');
+            // feedback leve via modal padrão do navegador substituído por alert foi removido
+            // Podemos usar uma notificação menos intrusiva no futuro
           } else {
-            alert('Erro ao remover endereço');
+            // em caso de erro, mostrar toast de erro
+            if (window.showToast) window.showToast('Não foi possível remover o endereço.', 'error');
           }
         } catch (err) {
           console.error('Erro ao remover endereço:', err);
-          alert('Erro ao remover endereço. Veja o console.');
+          if (window.showToast) window.showToast('Erro ao remover endereço. Veja o console.', 'error');
         }
       });
     });

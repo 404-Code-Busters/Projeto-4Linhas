@@ -57,7 +57,7 @@ body.scrolled .scroll-to-top {
 }
 
 .top-logo img {
-  width: 40px;
+  width: 56px;
   height: auto;
   filter: brightness(0) invert(1);
 }
@@ -429,7 +429,7 @@ body.scrolled .main-nav {
 }
 
 .main-nav .logo img {
-  width: 60px;
+  width: 72px;
   height: auto;
 }
 
@@ -562,8 +562,11 @@ body.menu-open .mobile-menu {
 
 .nav-icons,
 .search-icon {
-  width: 25px;
-  height: 25px;
+  width: auto;
+  height: 22px;
+  max-width: 22px;
+  max-height: 22px;
+  object-fit: contain;
   transition: background 0.3s;
   display: block;
 }
@@ -572,14 +575,17 @@ body.menu-open .mobile-menu {
   display: flex;
   gap: 1rem;
   align-items: center;
+  justify-content: center;
 }
 
 .user-actions a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
 }
 
 /* Alteração Gemini: Adiciona o mesmo hover do botão de busca aos outros ícones */
@@ -602,8 +608,11 @@ body.menu-open .mobile-menu {
 
 .nav-right .search-button .search-icon,
 .user-actions .search-button .search-icon {
-  width: 20px;
+  width: auto;
   height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  object-fit: contain;
 }
 
 /* Ensure header action anchors and buttons can host absolute badges and behave like in base.css */
@@ -611,6 +620,12 @@ body.menu-open .mobile-menu {
 .user-actions button { background: transparent; border: none; padding: 0.25rem; }
 .user-actions button:focus { outline: none; box-shadow: none; }
 .cart-button img, .nav-icons { display: block; }
+.cart-button img {
+  width: auto;
+  height: 22px;
+  max-height: 22px;
+  object-fit: contain;
+}
 
 .cart-count {
   position: absolute;

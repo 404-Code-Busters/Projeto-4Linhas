@@ -34,13 +34,13 @@
     const a = pwd.value || '';
     const b = document.getElementById('confirmar').value || '';
     if (a !== b){
-      e.preventDefault();
-      alert('As senhas não coincidem.');
+        e.preventDefault();
+        if (window.showToast) window.showToast('As senhas não coincidem.', 'error');
       return false;
     }
     if (scorePassword(a) < 2){
-      e.preventDefault();
-      alert('Escolha uma senha mais forte.');
+        e.preventDefault();
+        if (window.showToast) window.showToast('Escolha uma senha mais forte.', 'error');
       return false;
     }
   });

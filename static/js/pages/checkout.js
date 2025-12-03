@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function(){
         document.close();
       } catch (err) {
         console.error('Checkout submit failed:', err);
-        alert('Ocorreu um erro ao processar o pedido. Tente novamente.');
+        if (window.showToast) window.showToast('Ocorreu um erro ao processar o pedido. Tente novamente.', 'error');
       }
     });
   }
@@ -251,5 +251,28 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   } else {
     showStep(0);
+  }
+
+  // Observe subtotal changes and flash when it changes
+  try {
+    const totalEl = document.getElementById('total-final');
+    if (totalEl) {
+      let lastText = totalEl.innerText;
+      const flash = () => {
+        totalEl.classList.add('subtotal-flash');
+        setTimeout(() => totalEl.classList.remove('subtotal-flash'), 1000);
+      };
+
+      const mo = new MutationObserver(muts => {
+        const cur = totalEl.innerText;
+        if (cur !== lastText) {
+          lastText = cur;
+          flash();
+        }
+      });
+      mo.observe(totalEl, { characterData: true, subtree: true, childList: true });
+    }
+  } catch (e) {
+    console.warn('Subtotal observer failed', e);
   }
 });

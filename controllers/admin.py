@@ -153,7 +153,12 @@ def atualizar_produto(id: int,
 
 #Deletar produto
 @router.post("/admin/produto/deletar/{id}")
-def deletar_produto(id: int, db: Session = Depends(get_db)): # O 'id' aqui é o id_produto do caminho da URL
+def deletar_produto(id: int, request: Request, db: Session = Depends(get_db)): # O 'id' aqui é o id_produto do caminho da URL
+    token = request.cookies.get("token")
+    payload = verificar_token(token)
+    if not payload or not payload.get("is_admin"):
+        return RedirectResponse(url="/", status_code=303)
+    
     produto = db.query(Produtos).filter(Produtos.id_produto == id).first()
     if produto:
         db.delete(produto)

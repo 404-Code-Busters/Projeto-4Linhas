@@ -69,6 +69,14 @@
         console.error("Erro ao buscar CEP:", error);
       }
     });
+    // Também aceitar Enter para disparar a mesma busca
+    cepInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        // remove focus para acionar o evento blur acima
+        this.blur();
+      }
+    });
   }
 
   // salvar e renderizar
@@ -83,7 +91,7 @@
     const numero = document.getElementById("modal-numero")?.value?.trim() || "";
 
     if (!cep || !logradouro || !bairro || !cidade || !uf || !numero) {
-      alert("Preencha todos os campos do novo endereço.");
+      if (window.showToast) window.showToast("Preencha todos os campos do novo endereço.", 'error');
       return false;
     }
 
@@ -172,7 +180,7 @@
     const numero = document.getElementById("modal-numero")?.value?.trim() || "";
 
     if (!cep || !logradouro || !bairro || !cidade || !uf || !numero) {
-      alert("Preencha todos os campos do novo endereço.");
+      if (window.showToast) window.showToast("Preencha todos os campos do novo endereço.", 'error');
       return false;
     }
 

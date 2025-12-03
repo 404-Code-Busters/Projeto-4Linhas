@@ -77,19 +77,19 @@
   <section id="categoria-principal" class="category-chooser">
     <h2>Categorias Principais</h2>
     <div class="category-grid">
-      <a href="home.html" class="category-card">
+      <a href="{{ url_for('catalogo') }}" class="category-card">
   <img src="{{ url_for('static', path='assets/circle/ver_todo_d_13f23273ac.jpg') }}" alt="Destaques">
         <span>Destaques</span>
       </a>
-      <a href="../produtos/produtos.html" class="category-card">
+      <a href="{{ url_for('catalogo') }}" class="category-card">
   <img src="{{ url_for('static', path='assets/circle/Design sem nome.png') }}" alt="Artigos Esportivos" >
         <span>Artigos Esportivos</span>
       </a>
-      <a href="../produtos/produtos.html" class="category-card">
+      <a href="{{ url_for('catalogo') }}" class="category-card">
   <img src="{{ url_for('static', path='assets/circle/hombre_asset_d_7bb656194a.jpg') }}" alt="Homem">
         <span>Homem</span>
       </a>
-      <a href="../produtos/produtos.html" class="category-card">
+      <a href="{{ url_for('catalogo') }}" class="category-card">
   <img src="{{ url_for('static', path='assets/circle/mujer_asset_d_0d77cee49c.jpg') }}" alt="Mulher">
         <span>Mulher</span>
       </a>
@@ -99,19 +99,30 @@
   <!-- OUTFIT INSPIRATION -->
   <section class="outfit-inspiration">
     <h2>Inspire-se e Monte Seu Outfit</h2>
-    <div class="outfit-grid">
-      <a href="#" class="outfit-card">
-  <img src="{{ url_for('static', path='assets/cards_inpire-se/Shop_the_look_Look_01_desktop_bf.jpg') }}" alt="Outfit 1">
-        <span>Outfit 1</span>
-      </a>
-      <a href="#" class="outfit-card">
-  <img src="{{ url_for('static', path='assets/cards_inpire-se/Shop_the_look_Look_02_desktop_ef.jpg') }}" alt="Outfit 2">
-        <span>Outfit 2</span>
-      </a>
-      <a href="#" class="outfit-card">
-  <img src="{{ url_for('static', path='assets/cards_inpire-se/Shop_the_look_Look_03_desktop_f1.jpg') }}" alt="Outfit 3">
-        <span>Outfit 3</span>
-      </a>
+    <div class="outfit-swiper swiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide outfit-slide">
+          <a href="#" class="outfit-card">
+            <img src="{{ url_for('static', path='assets/cards_inpire-se/Shop_the_look_Look_01_desktop_bf.jpg') }}" alt="Outfit 1">
+            <span>Outfit 1</span>
+          </a>
+        </div>
+        <div class="swiper-slide outfit-slide">
+          <a href="#" class="outfit-card">
+            <img src="{{ url_for('static', path='assets/cards_inpire-se/Shop_the_look_Look_02_desktop_ef.jpg') }}" alt="Outfit 2">
+            <span>Outfit 2</span>
+          </a>
+        </div>
+        <div class="swiper-slide outfit-slide">
+          <a href="#" class="outfit-card">
+            <img src="{{ url_for('static', path='assets/cards_inpire-se/Shop_the_look_Look_03_desktop_f1.jpg') }}" alt="Outfit 3">
+            <span>Outfit 3</span>
+          </a>
+        </div>
+      </div>
+      <!-- controles -->
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
     </div>
   </section>
 

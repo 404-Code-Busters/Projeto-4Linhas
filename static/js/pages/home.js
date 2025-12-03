@@ -177,6 +177,25 @@ document.addEventListener('DOMContentLoaded', function() {
           effect: 'slide',
         });
       }
+
+      // Inicializar Swiper (outfit) se existir
+      const outfitEl = document.querySelector('.outfit-swiper');
+      if (outfitEl) {
+        const outfitPagination = outfitEl.querySelector('.swiper-pagination');
+        const outfitNext = outfitEl.querySelector('.swiper-button-next');
+        const outfitPrev = outfitEl.querySelector('.swiper-button-prev');
+
+        new Swiper(outfitEl, {
+          loop: true,
+          pagination: false,
+          navigation: { nextEl: outfitNext || undefined, prevEl: outfitPrev || undefined },
+          autoplay: false,
+          effect: 'slide',
+          slidesPerView: 3,
+          spaceBetween: 20,
+          centeredSlides: false,
+        });
+      }
     }
   } catch (err) {
     console.error('Erro ao inicializar Swiper:', err);

@@ -21,23 +21,29 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 # Buscar latitude/longitude pelo CEP usando geocodificador gratuito
 async def get_lat_lon_from_cep(cep: str):
     cep_limpo = cep.replace("-", "").strip()
-    headers = {"User-Agent": "Ecommerce-4linhas/1.0"}
+    headers = {"User-Agent": "Ecommerce-4linhas/1.0", "Accept-Language": "pt-BR"}
 
     try:
-        # --- TENTATIVA 1: Buscar diretamente pelo CEP ---
-        url_cep = f"https://nominatim.openstreetmap.org/search?postalcode={cep_limpo}&country=Brazil&format=json"
-        async with httpx.AsyncClient() as client:
+        # --- TENTATIVA 1: Buscar diretamente pelo CEP usando postalcode (limitar país e resultados) ---
+        url_cep = f"https://nominatim.openstreetmap.org/search?postalcode={cep_limpo}&countrycodes=br&format=json&limit=1"
+        async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(url_cep, headers=headers)
-            response.raise_for_status()
-            data = response.json()
-            if data:
-                return float(data[0]["lat"]), float(data[0]["lon"])
+            # Se a API devolver 4xx/5xx, tratamos abaixo
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    return float(data[0]["lat"]), float(data[0]["lon"])
+            else:
+                # Log mais explícito para debug (não interrompe a execução)
+                print(f"Nominatim (postalcode) retornou {response.status_code} para URL: {url_cep}")
 
-        # --- TENTATIVA 2 (Fallback): Usar ViaCEP para obter o endereço e depois buscar ---
+        # --- TENTATIVA 2 (Fallback): Usar ViaCEP para obter o endereço e depois buscar no Nominatim ---
         url_viacep = f"https://viacep.com.br/ws/{cep_limpo}/json/"
-        async with httpx.AsyncClient() as client:
-            response_viacep = await client.get(url_viacep)
-            response_viacep.raise_for_status()
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response_viacep = await client.get(url_viacep, headers=headers)
+            if response_viacep.status_code != 200:
+                print(f"ViaCEP retornou {response_viacep.status_code} para CEP {cep_limpo}")
+                return None
             dados_endereco = response_viacep.json()
 
         if dados_endereco.get("erro"):
@@ -47,16 +53,23 @@ async def get_lat_lon_from_cep(cep: str):
         logradouro = dados_endereco.get("logradouro", "")
         cidade = dados_endereco.get("localidade", "")
         estado = dados_endereco.get("uf", "")
-        query_endereco_raw = f"{logradouro}, {cidade}, {estado}"
+        # Se o logradouro estiver vazio, incluir apenas cidade/estado para aumentar chance de acerto
+        if logradouro:
+            query_endereco_raw = f"{logradouro}, {cidade}, {estado}, Brasil"
+        else:
+            query_endereco_raw = f"{cidade}, {estado}, Brasil"
+
         query_endereco_encoded = quote(query_endereco_raw) # Codifica o endereço para a URL
 
-        url_endereco = f"https://nominatim.openstreetmap.org/search?q={query_endereco_encoded}&country=Brazil&format=json"
-        async with httpx.AsyncClient() as client:
+        url_endereco = f"https://nominatim.openstreetmap.org/search?q={query_endereco_encoded}&countrycodes=br&format=json&limit=1"
+        async with httpx.AsyncClient(timeout=10.0) as client:
             response_nominatim = await client.get(url_endereco, headers=headers)
-            response_nominatim.raise_for_status()
-            data_final = response_nominatim.json()
-            if data_final:
-                return float(data_final[0]["lat"]), float(data_final[0]["lon"])
+            if response_nominatim.status_code == 200:
+                data_final = response_nominatim.json()
+                if data_final:
+                    return float(data_final[0]["lat"]), float(data_final[0]["lon"])
+            else:
+                print(f"Nominatim (endereco) retornou {response_nominatim.status_code} para URL: {url_endereco}")
 
         return None # Não encontrou em nenhuma das tentativas
 
@@ -65,18 +78,21 @@ async def get_lat_lon_from_cep(cep: str):
         return None
 
 
-@router.get("")  # /api/frete?cep=XXXXX-XXX
-async def calcular_frete(request: Request, cep: str = Query(...)):
+@router.get("")  # /api/frete?cep=XXXXX-XXX OR /api/frete?cep_destino=XXXXX-XXX
+async def calcular_frete(request: Request, cep: str = Query(None), cep_destino: str = Query(None)):
     # Adiciona verificação de autenticação
     token = request.cookies.get("token")
     payload = verificar_token(token)
     if not payload:
         return {"success": False, "msg": "Usuário não autenticado"}
-
+    # aceita ambos parâmetros `cep` ou `cep_destino` (compatibilidade front-end)
+    cep_value = cep or cep_destino
+    if not cep_value:
+        return {"success": False, "msg": "Parâmetro 'cep' é obrigatório"}
 
     origem_lat, origem_lon = -23.5422, -46.6066  # CEP 03008-020 (base)
 
-    destino = await get_lat_lon_from_cep(cep)
+    destino = await get_lat_lon_from_cep(cep_value)
     if not destino:
         return {"success": False, "msg": "CEP inválido"}
 
@@ -97,9 +113,30 @@ async def calcular_frete(request: Request, cep: str = Query(...)):
         frete = 30.00
         estimativa = 7  # ALTERADO
 
+    # Tenta obter dados de endereço via ViaCEP para popular campos de rua/bairro/cidade/uf
+    endereco_str = ""
+    try:
+        cep_limpo = cep_value.replace('-', '').strip()
+        url_viacep = f"https://viacep.com.br/ws/{cep_limpo}/json/"
+        async with httpx.AsyncClient(timeout=6.0) as client:
+            resp = await client.get(url_viacep)
+            if resp.status_code == 200:
+                dados = resp.json()
+                if not dados.get('erro'):
+                    log = dados.get('logradouro', '') or ''
+                    bai = dados.get('bairro', '') or ''
+                    cid = dados.get('localidade', '') or ''
+                    uf = dados.get('uf', '') or ''
+                    # monta string compatível com front-end: logradouro - bairro - cidade - uf
+                    parts = [p for p in [log, bai, cid, uf] if p]
+                    endereco_str = ' - '.join(parts)
+    except Exception as e:
+        print(f"Warning: não foi possível obter endereço via ViaCEP para {cep_value}: {e}")
+
     return {
         "success": True,
         "distancia_km": round(distancia_km, 1),
         "frete": round(frete, 2),
-        "estimativa": estimativa
+        "estimativa": estimativa,
+        "endereco": endereco_str
     }

@@ -126,4 +126,14 @@ async def detalhe_produto(request: Request, id_produto: int, db: Session = Depen
 
     context["produto"] = produto
     context["is_favorited"] = is_favorited # Adiciona a informação de favorito ao contexto
+    # Buscar produtos relacionados: prioriza mesma cor ou mesmo tamanho, exclui o produto atual
+    try:
+        related_query = db.query(Produtos).filter(Produtos.id_produto != id_produto)
+        # Produtos com mesma cor ou mesmo tamanho
+        related_query = related_query.filter((Produtos.cor == produto.cor) | (Produtos.tamanho == produto.tamanho))
+        related_produtos = related_query.limit(6).all()
+    except Exception:
+        related_produtos = []
+
+    context["related_produtos"] = related_produtos
     return templates.TemplateResponse('pages/produto/produto.html', context)

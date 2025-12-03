@@ -11,9 +11,12 @@
 .newsletter {
   background-color: rgba(255, 255, 255, 0.05);
   text-align: center;
-  padding: 3rem 2rem; /* Aumentado o padding para tornar maior */
+  padding: 2rem 2rem;
   border-top: 1px solid rgba(255,255,255,0.1);
   border-bottom: 1px solid rgba(255,255,255,0.1);
+  max-width: 1400px; /* Constrain to same width as footer content */
+  margin: 0 auto; /* Center horizontally */
+  box-sizing: border-box;
 }
 
 .newsletter h3 {
@@ -151,5 +154,10 @@
 
   .newsletter-form {
     flex-direction: column;
+  }
+
+  /* Reduce newsletter padding on very small screens to avoid feeling 'stretched' */
+  .newsletter {
+    padding: 1.2rem 1rem;
   }
 }

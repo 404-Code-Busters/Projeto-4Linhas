@@ -205,4 +205,26 @@ document.addEventListener('DOMContentLoaded', () => {
       if (fake) fake.click();
     });
   }
+
+  // Image placeholder: add `loaded` class when product images finish loading
+  const productImages = document.querySelectorAll('img.product-card-img');
+  productImages.forEach(img => {
+    function markLoaded() {
+      try {
+        img.classList.add('loaded');
+        const parent = img.closest('.product-link');
+        if (parent) parent.style.animation = 'none'; // stop shimmer once loaded
+      } catch (e) { console.warn(e); }
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      markLoaded();
+    } else {
+      img.addEventListener('load', markLoaded);
+      img.addEventListener('error', () => {
+        // keep placeholder background if image failed
+        img.classList.remove('loaded');
+      });
+    }
+  });
 });
