@@ -158,8 +158,8 @@
                 <img src="{{ url_for('static', path='assets/icons/') }}{% if produto.id_produto in favoritos_ids %}add-to-favorites.png{% else %}heart.png{% endif %}" alt="Favoritar">
             </div> -->
             <div class="outfit-overlay">
-              <h3>{{ produto.nome }}</h3>
-              <p class="product-desc">{{ produto.descricao }}</p>
+              <h3><a href="{{ url_for('detalhe_produto', id_produto=produto.id_produto) }}" class="product-title-link">{{ produto.nome }}</a></h3>
+              <a href="{{ url_for('detalhe_produto', id_produto=produto.id_produto) }}" class="product-desc-link"><p class="product-desc">{{ produto.descricao }}</p></a>
               <p class="product-price">R$ {{ "%.2f"|format(produto.preco)|replace('.', ',') }}</p>
               <p class="product-size">Tamanho: {{ produto.tamanho }}</p>
               <button class="add-to-cart-btn" data-product-id="{{ produto.id_produto }}"

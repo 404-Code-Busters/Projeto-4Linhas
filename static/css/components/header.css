@@ -872,3 +872,28 @@ body.menu-open .mobile-menu {
   background-color: #0D1B2A; /* Cor mais escura no hover */
   transform: translateY(-2px); /* Leve elevação no hover */
 }
+
+/* Responsividade específica para o modal de busca em telas pequenas
+   Evita que o botão encolha estranhamente; empilha input + botão verticalmente */
+@media (max-width: 480px) {
+  .search-modal-content {
+    margin: 8% auto; /* menor top spacing */
+    padding: 1rem 1rem;
+    width: 94%;
+    max-width: 420px;
+  }
+  .search-modal-form {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .search-modal-input {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.95rem;
+  }
+  .search-modal-form button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+}

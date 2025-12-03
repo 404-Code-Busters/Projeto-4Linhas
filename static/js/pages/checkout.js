@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   // delegate next/prev buttons
-  document.querySelectorAll('[data-action="next"]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-action="next"]').forEach(b => b.addEventListener('click', async () => {
     // Validate address selection before moving to payment
     if(current === 1) { // step-address
       const selectedAddress = document.querySelector('input[name="selected-address"]:checked');
@@ -112,6 +112,25 @@ document.addEventListener('DOMContentLoaded', function(){
         const addressError = document.querySelector('[data-error="address-method"]');
         if(addressError) addressError.style.display = 'block';
         return; // Do not advance without an address
+      }
+
+      // Calculate freight for selected address before advancing
+      try {
+        // Prefer hidden input 'cep' if filled (cards set it on click), otherwise try to read from card dataset
+        let cep = document.getElementById('cep')?.value || '';
+        if(!cep) {
+          const card = selectedAddress.closest('.saved-address-card');
+          cep = card ? (card.querySelector('.calculate-shipping-btn')?.dataset.cep || '') : '';
+        }
+        if(cep) {
+          // global function defined in checkout.html: calcularFrete
+          if(typeof window.calcularFrete === 'function') {
+            await window.calcularFrete(cep);
+          }
+        }
+      } catch (err) {
+        console.warn('Falha ao calcular frete antes de avançar:', err);
+        // allow advance even if freight calc failed
       }
     }
 
