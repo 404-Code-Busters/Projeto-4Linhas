@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Simulação de Frete</title>
+</head>
+<body>
+  <h1>Simulação de Frete</h1>
+
+  <label for="cep">CEP (somente números, 8 dígitos):</label><br>
+  <input type="text" id="cep" maxlength="8" placeholder="01001000" />
+  <button id="btnCalcular">Calcular Frete</button>
+
+  <div id="mensagem" style="color:red; margin-top:10px;"></div>
+
+  <hr>
+
+  <div id="resultado" style="display:none; margin-top:10px;">
+    <p><strong>Endereço:</strong> <span id="endereco"></span></p>
+    <p><strong>CEP:</strong> <span id="cepResp"></span></p>
+    <p><strong>Valor do frete:</strong> R$ <span id="valor_frete"></span></p>
+    <p><strong>Prazo estimado:</strong> <span id="prazo"></span> dias</p>
+    <p><strong>Status:</strong> <span id="status"></span></p>
+  </div>
+
+  <script>
+    document.getElementById('btnCalcular').addEventListener('click', async () => {
+      const msg = document.getElementById('mensagem');
+      const resultado = document.getElementById('resultado');
+      msg.textContent = '';
+      resultado.style.display = 'none';
+
+      let cep = document.getElementById('cep').value.trim();
+      cep = cep.replace(/\D/g, ''); // remove não dígitos
+
+      if (cep.length !== 8) {
+        msg.textContent = 'Digite um CEP válido com 8 dígitos (apenas números).';
+        return;
+      }
+
+      try {
+        const url = `/api/frete?cep_destino=${encodeURIComponent(cep)}`;
+        const resp = await fetch(url, {
+          method: 'GET',
+          credentials: 'include' // envia cookies (token) para autenticação
+        });
+
+        if (resp.status === 401) {
+          msg.textContent = 'Usuário não autenticado. Faça login e tente novamente.';
+          return;
+        }
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          msg.textContent = err.detail || 'Erro ao consultar o frete.';
+          return;
+        }
+
+        const data = await resp.json();
+
+        document.getElementById('endereco').textContent = data.endereco || '';
+        document.getElementById('cepResp').textContent = data.cep || cep;
+        document.getElementById('valor_frete').textContent = (data.valor_frete ?? 0).toFixed(2);
+        document.getElementById('prazo').textContent = data.prazo_estimado_dias ?? '';
+        document.getElementById('status').textContent = data.status || '';
+
+        resultado.style.display = 'block';
+
+      } catch (error) {
+        console.error(error);
+        msg.textContent = 'Erro de rede ao consultar o frete. Tente novamente.';
+      }
+    });
+
+  </script>
+</body>
+</html>

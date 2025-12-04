@@ -1,0 +1,164 @@
+/* ===================== BASE GERAL ===================== */
+.sobre {
+  width: 100%;
+  padding: 4rem 2rem; /* Removido padding duplicado */
+  background: #f3f5f8;
+  box-sizing: border-box; /* garante alinhamento perfeito */
+}
+.sobre-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+body {
+  padding: 0; /* Corrigido: estava .body (classe) */
+} /* ===================== TÍTULO PRINCIPAL ===================== */
+.sobre-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  text-align: center;
+  color: #0d1b2a;
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+  opacity: 0;
+  animation: fadeSlide 0.9s ease forwards;
+}
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} /* ===================== INTRODUÇÃO ===================== */
+.sobre-intro {
+  font-size: 1.2rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 3rem auto;
+  color: #4b5563;
+  line-height: 1.7;
+  opacity: 0;
+  animation: fadeSlide 1.2s ease forwards;
+} /* ===================== MISSÃO / VISÃO / VALORES ===================== */
+.sistema-identidade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+.identidade-card {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  opacity: 0;
+  animation: fadeSlide 0.9s ease forwards;
+}
+.identidade-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+.identidade-card h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0d1b2a;
+  margin-bottom: 1rem;
+}
+.identidade-card p,
+.identidade-card li {
+  color: #4b5563;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.identidade-card ul {
+  padding-left: 1rem;
+} /* ===================== TÍTULOS DE SEÇÃO ===================== */
+.sec-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #0d1b2a;
+  font-weight: 700;
+  text-align: center;
+  position: relative;
+}
+.sec-title::after {
+  content: "";
+  width: 70px;
+  height: 4px;
+  background: #ff6b35;
+  display: block;
+  margin: 0.6rem auto 1.8rem auto;
+  border-radius: 4px;
+} /* ===================== TEXTOS GERAIS DAS SEÇÕES ===================== */
+.sec-text {
+  max-width: 900px;
+  margin: 0 auto 3.5rem auto;
+  font-size: 1.1rem;
+  color: #4b5563;
+  line-height: 1.7;
+  text-align: center;
+} /* ===================== COMPETÊNCIAS ===================== */
+.competencias-lista {
+  max-width: 800px;
+  margin: 0 auto 4rem auto;
+  padding: 0;
+  list-style: none;
+}
+.competencias-lista li {
+  background: #ffffff;
+  padding: 1rem 1.4rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  color: #0d1b2a;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.competencias-lista li:hover {
+  transform: translateX(6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+} /* ===================== QUEM SOMOS ===================== */
+.quem-somos {
+  margin-top: 3rem;
+  margin-bottom: 6rem;
+}
+.quem-somos p {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #4b5563;
+} /* ===================== RESPONSIVIDADE ===================== */
+@media (max-width: 768px) {
+  .sobre-title {
+    font-size: 2.2rem;
+  }
+  .sobre-intro {
+    font-size: 1.05rem;
+  }
+  .sec-title {
+    font-size: 1.7rem;
+  }
+  .competencias-lista li {
+    font-size: 1rem;
+  }
+  .identidade-card {
+    padding: 1.6rem;
+  }
+}
+@media (max-width: 480px) {
+  .sobre {
+    padding: 3rem 1rem;
+  }
+  .sobre-title {
+    font-size: 1.9rem;
+  }
+}

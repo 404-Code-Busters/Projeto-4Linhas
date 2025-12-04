@@ -1,0 +1,56 @@
+<![CDATA[<div id="cart-content">
+    {% if not carrinho or carrinho|length == 0 %}
+        <p>Seu carrinho está vazio.</p>
+    {% else %}
+        {% for item in carrinho %}
+        <div class="cart-item-row">
+            {% if item.imagem %}
+            <img src="{{ url_for('static', path='/upload/img/' + item.imagem) }}" alt="{{ item.nome }}" class="cart-item-img">
+            {% endif %}
+            <div class="cart-item-info">
+                <div class="cart-item-name">{{ item.nome }}</div>
+                <div class="cart-item-price">R$ {{ "%.2f"|format(item.preco * item.quantidade)|replace('.', ',') }}</div>
+                <div class="cart-item-qty">
+                    Qtd: 
+                    <button class="qty-decr" data-produto-id="{{ item.id }}" style="background: white; border: 1px solid #ddd; border-radius: 4px; padding: 0.3rem 0.5rem; cursor: pointer;">
+                      <img src="{{ url_for('static', path='assets/icons/simbolo-de-menos.png') }}" alt="-" style="width: 14px; height: 14px;">
+                    </button>
+                    <span class="qty-value" style="margin: 0 0.5rem; font-weight: 600;">{{ item.quantidade }}</span>
+                    <button class="qty-incr" data-produto-id="{{ item.id }}" style="background: white; border: 1px solid #ddd; border-radius: 4px; padding: 0.3rem 0.5rem; cursor: pointer;">
+                      <img src="{{ url_for('static', path='assets/icons/botao-de-simbolo-de-mais.png') }}" alt="+" style="width: 14px; height: 14px;">
+                    </button>
+                </div>
+            </div>
+            <button class="cart-item-remove" data-produto-id="{{ item.id }}">Remover</button>
+        </div>
+        {% endfor %}
+        <div class="cart-total">
+            Total: R$ {{ "%.2f"|format(total)|replace('.', ',') }}
+        </div>
+        <div class="cart-modal-footer" style="
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background-color: #f9f9f9;
+        ">
+            <a href="/carrinho" style="
+                background-color: #007bff;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                text-decoration: none;
+                font-weight: bold;
+            ">Ver Carrinho</a>
+            <button class="checkout-button" style="
+                background-color: #28a745;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+            ">Finalizar Compra</button>
+        </div>
+    {% endif %}
+</div>]]>

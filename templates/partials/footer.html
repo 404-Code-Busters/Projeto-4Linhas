@@ -1,0 +1,65 @@
+<link rel="stylesheet" href="{{ url_for('static', path='css/components/footer.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='css/components/notifications.css') }}">
+<!-- FOOTER -->
+<footer class="site-footer">
+  <!-- Bloco de Newsletter - Primeiro -->
+  <div id="newsletter" class="newsletter">
+    <h3>Assine nossa newsletter</h3>
+    <p>Receba novidades, promoções e lançamentos em primeira mão.</p>
+    <form class="newsletter-form" action="../../newsletter" method="post">
+      <input type="email" name="email" placeholder="Seu e-mail" required>
+      <button type="submit">Inscrever-se</button>
+    </form>
+  </div>
+
+  <div class="footer-content">
+    <div class="footer-col">
+      <a href="/" class="footer-logo">
+        <img src="{{ url_for('static', path='assets/logo/Logo_m.svg') }}" alt="Logo da Loja">
+      </a>
+      <p>Produtos de alta qualidade, estilo e conforto. Inspirados nas melhores marcas do mundo.</p>
+    </div>
+    <div class="footer-col">
+      <h3>Institucional</h3>
+      <ul>
+        <li><a href="/sobre">Sobre nós</a></li>
+        <li><a href="/politica-de-privacidade">Política de Privacidade</a></li>
+        <li><a href="/termos">Termos de Uso</a></li>
+        <li><a href="/contato">Contato</a></li>
+        <li><a href="/carreiras">Carreiras</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Ajuda</h3>
+      <ul>
+        <li><a href="/faq">FAQ</a></li>
+        <li><a href="/acompanhe-pedido">Acompanhe seu pedido</a></li>
+        <li><a href="/suporte">Suporte</a></li>
+        <li><a href="/trocas">Trocas e Devoluções</a></li>
+        <li><a href="/entrega">Entrega</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Nos siga</h3>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/4linhas_adm/"><img src="{{ url_for('static', path='assets/icons/instagram.svg') }}" alt="Instagram"></a>
+        <!-- <a href="#"><img src="{{ url_for('static', path='assets/icons/facebook.svg') }}" alt="Facebook"></a>  -->
+        <!-- Twitter removed per request -->
+      </div>
+    </div>
+    <div class="footer-col">
+      <h3>Produtos</h3>
+      <ul>
+        <li><a href="/homem">Homem</a></li>
+        <li><a href="/mulher">Mulher</a></li>
+        <li><a href="/artigos">Artigos Esportivos</a></li>
+        <li><a href="/destaques">Destaques</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 4linhas. Todos os direitos reservados. | CNPJ: 12.345.678/0001-90</p>
+  </div>
+</footer>
+<script src="{{ url_for('static', path='js/utils/toast.js') }}"></script>
