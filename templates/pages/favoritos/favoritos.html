@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', path='assets/favicon/favicon-4linhas.ico') }}" type="image/x-icon">
+    <title>Favoritos | 4linhas</title>
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+    <!-- CSS dos favoritos -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/favoritos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components/footer.css') }}">
+
+    <!-- Fonte -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    {% include 'partials/header.html' %}
+
+    <main class="favoritos-container">
+        <h1 class="favoritos-title">Meus Favoritos</h1>
+
+        <!-- Mensagem caso a lista esteja vazia -->
+        {% if not favoritos_list %}
+        <div class="favoritos-vazio">
+            <img src="{{ url_for('static', path='assets/icons/heart.png') }}" alt="Vazio">
+            <p>Você ainda não adicionou nenhum item aos favoritos.</p>
+        </div>
+        {% else %}
+        <!-- Grid dos produtos favoritos -->
+        <div class="favoritos-grid">
+            {% for produto in favoritos_list %}
+            <div class="favorito-card" data-product-id="{{ produto.id_produto }}">
+                <div class="card-heart">
+                    <!-- O coração aqui já vem preenchido. O JS cuidará da remoção -->
+                    <button class="favorite-button favorited" data-product-id="{{ produto.id_produto }}">
+                        <img src="{{ url_for('static', path='assets/icons/add-to-favorites.png') }}" alt="Remover dos Favoritos">
+                    </button>
+                </div>
+
+                <a href="{{ url_for('detalhe_produto', id_produto=produto.id_produto) }}">
+                    <img src="{{ url_for('static', path='upload/img/' + produto.imagem_caminho) if produto.imagem_caminho else '' }}" class="card-img" alt="{{ produto.nome }}">
+                </a>
+
+                <h3 class="card-name">{{ produto.nome }}</h3>
+                <p class="card-price">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
+
+                <button class="btn-carrinho" data-product-id="{{ produto.id_produto }}">Adicionar ao carrinho</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+    <!-- Adiciona o script para interatividade dos favoritos -->
+    <script src="{{ url_for('static', path='js/favoritos.js') }}"></script>
+
+</body>
+</html>
